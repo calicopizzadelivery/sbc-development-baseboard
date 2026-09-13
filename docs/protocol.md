@@ -33,9 +33,11 @@ each other. `CONSOLE` attach is the exception and is exclusive — see below.
 | `RELAY <1-2\|ALL> ON\|OFF\|TOGGLE` | Energize a relay coil |
 | `RELAY <n\|ALL> PULSE [ON\|OFF] <ms>` | As above |
 | `RELAY <n>` | Report one relay |
-| `TGT POWER ON\|OFF\|TOGGLE` | The switched +5V_TGT rail on J14 |
-| `TGT POWER PULSE OFF <ms>` | Hold the target dark for *ms* |
-| `TGT CYCLE [<ms>]` | Convenience: `PULSE OFF`, default 5000 ms |
+| `TGT 5V ON\|OFF\|TOGGLE` | The board's switched +5V_TGT rail on J14 |
+| `TGT PSU ON\|OFF\|TOGGLE` | The external PSU passthrough, J18 → J19 |
+| `TGT 5V\|PSU PULSE OFF <ms>` | Hold that supply dark for *ms* |
+| `TGT CYCLE [5V\|PSU] [<ms>]` | `PULSE OFF` on one supply, or both if none is named. Default 5000 ms |
+| `TGT` | Report both supplies |
 
 Pulses are non-blocking and several can run at once; the console stays
 responsive throughout, and the revert happens even if the host wanders off. A
@@ -47,6 +49,16 @@ any pulse still running on it. Range is 1–3600000 ms.
 powered, the target is powered, a relay is energized. Which way a relay's
 contacts run at that point is a wiring choice — SPDT gives you NO and NC on the
 terminal block — so the protocol does not need to know.
+
+The passthrough is the one place that inverts underneath: `TGT PSU ON` means
+the relay is *passing*, which is its de-energized state, and also what an
+unpowered baseboard does. The protocol still says `ON`, because the thing the
+channel exists to do is happening. The polarity lives in one place in the
+firmware, as it does on the relay controller.
+
+`TGT CYCLE` with no supply named cycles both. A target uses one of the two, so
+cycling the other is a no-op — and if a target ever uses both, cycling both is
+the only thing that is actually a power cycle.
 
 ### There is no bare `ON` or `OFF`
 
@@ -140,7 +152,7 @@ is disabled, and `GPIO` returns `ERR NO VREF` rather than pretending.
 
 ```
 > STATE
-STATE PORT 1=ON 2=ON 3=OFF 4=ON(pulse 480ms) 5=ON 6=ON RELAY 1=OFF 2=OFF TGT=ON
+STATE PORT 1=ON 2=ON 3=OFF 4=ON(pulse 480ms) 5=ON 6=ON RELAY 1=OFF 2=OFF TGT 5V=ON PSU=ON(present)
 > POWER
 OK POWER contract=20V/3.0A/60W src=pd budget=60W used=14W headroom=46W
 > INFO
@@ -201,6 +213,7 @@ EVT PD contract=5V/3.0A/15W was=20V/3.0A/60W
 EVT PD PROG attached
 EVT PD PROG removed contract=20V/3.0A/60W
 EVT TGT UNDERVOLT 4.62V
+EVT PSU absent
 ```
 
 Default off, so a client that reads exactly one line per command — which both

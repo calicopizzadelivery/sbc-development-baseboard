@@ -17,7 +17,7 @@ is replugged.
 |---|---|
 | Type at the target | USB HID keyboard + mouse from the K64's device port |
 | Cut power to any USB device | Six USB-A ports, each with its own current-limited switch |
-| Hard power-cycle the target | Switched +5V_TGT rail, up to 5 A |
+| Hard power-cycle the target | Switched +5V_TGT rail up to 5 A, or any PSU up to 30 V / 5 A through an isolated relay |
 | Toggle target I/O — FORCE_RECOVERY and friends | Two SPDT relays, dry contacts, Phoenix terminals |
 | Read the target's serial console | MCU-owned UART, auto level translation 1.2–3.6 V |
 | Do all of it from somewhere else | 10/100 Ethernet to the workstation |
@@ -35,6 +35,7 @@ workstation ──USB-C──> hub ──> 6x USB-A (switched)     ──> whate
                            ──> UART + VREF             ──> target's console
                            ──> 2x SPDT dry contacts    ──> target's recovery/reset pins
                            ──> switched +5V, 5 A       ──> target's supply
+ target PSU ──Phoenix──> isolated relay, NC, 5 A       ──> target's supply, any voltage
  PD charger ──USB-C──> PD sink ──> 5 V rails
 ```
 
@@ -65,6 +66,10 @@ preferences. They are written up in full in
   that such a signal cannot break down.
 - **The MCU owns the target's console.** No USB-UART bridge to wedge and look
   exactly like a target that is not booting.
+- **The target's PSU passes through on its own nets.** A 19 V / 3 A return
+  current has no business on the board's ground plane or its USB shields. It
+  crosses one relay contact — normally closed — so a dead baseboard still
+  passes power.
 
 ## Status
 

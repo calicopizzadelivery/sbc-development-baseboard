@@ -20,6 +20,7 @@ flowchart LR
     J10["J10 RJ45<br/>10/100"]
     J2["J2 USB-C<br/>PD power in"]
     J17["J17 JST SH<br/>PD programming"]
+    J18["J18<br/>PSU in"]
   end
 
   subgraph BD["baseboard"]
@@ -33,6 +34,7 @@ flowchart LR
     SW["6x TPS2553<br/>current-limited"]
     TSW["eFuse<br/>+5V_TGT"]
     RLY["2x SPDT<br/>signal relay"]
+    PT["passthrough<br/>SPDT power relay, 5 A NC"]
     LT["TXB0104 / TXB0108<br/>PCA9306"]
   end
 
@@ -42,6 +44,7 @@ flowchart LR
     J13["J13<br/>console"]
     J11["J11, J12<br/>COM/NO/NC"]
     J14["J14<br/>supply"]
+    J19["J19<br/>PSU out"]
     J15["J15<br/>GPIO + I2C"]
   end
 
@@ -61,6 +64,8 @@ flowchart LR
   MCU -->|"GPIO + I2C"| LT --> J15
   MCU -->|"2x FET + flyback"| RLY --> J11
   MCU -->|"EN + /FAULT"| TSW --> J14
+  J18 --> PT --> J19
+  MCU -->|"FET + flyback"| PT
 ```
 
 Power is a separate tree; see [§4](#4-power).
@@ -89,6 +94,8 @@ host is attached and whether or not the host agrees.
 | J15 | 2×6 header, 2.54 mm | target | 6× level-shifted GPIO, I2C SDA/SCL, VREF, GND. |
 | J16 | 10-pin Cortex debug | you | Direct SWD to the K64, bypassing DAPLink. |
 | J17 | 4-pin JST SH, 1.0 mm | you | STUSB4500 NVM programming. Qwiic / STEMMA QT pinout: GND, 3.3 V, SDA, SCL. |
+| J18 | 2-pos pluggable 5.08 mm | PSU | Target passthrough in: V+, GND. 0–30 VDC, 5 A. Isolated from every board net. |
+| J19 | 2-pos pluggable 5.08 mm | target | Target passthrough out: V+ through the relay's NC contact, GND on the copper bus. |
 
 Pluggable terminal blocks rather than fixed: a relay's wiring can be unplugged
 as a unit and reinstalled the same way, which fixed screw terminals do not give
@@ -133,7 +140,9 @@ upstream without cutting itself.
 | PD programming header | **JST SM04B-SRSS-TB** | The Qwiic / STEMMA QT connector, side entry; `BM04B-SRSS-TB` if placement wants top entry. Stock cables fit either. |
 | PD bus buffer | **PCA9517A** | Isolates the K64 from the PD sink's I2C whenever the board is unpowered or a programmer is on J17. See §4. |
 | Relays, 2× | **Omron G6K-1F-Y**, 5 V coil | 1 Form C (SPDT), gold-clad contacts, 1 A / 30 VDC, ~30 mA coil. |
-| Relay drivers | 2N7002 + 1N4148 flyback | Gate pulldown to ground — see §5. |
+| Power relay | SPDT, **NC contact ≥5 A at 30 VDC** | Candidates: Omron G5LE-1, G2R-1, Panasonic JW1FSN; 5 V coil, ~80 mA, AgSnO2 contacts. **Read the NC figure specifically** — see §4. |
+| Relay drivers, 3× | AO3400 + 1N4148 flyback | One FET for all three coils. Gate pulldown to ground — see §5. |
+| PSU presence detect | LTV-817-class optocoupler | Optional. The only component that touches the passthrough, across an isolation barrier — see §4. |
 | UART translation | **TXB0104** | Auto-direction, push-pull. `VCCA` from J13's VREF pin. |
 | I2C translation | **PCA9306** | Open-drain pass-through. **Do not** use a TXB part for I2C. |
 | GPIO translation | **TXB0108** | Same VREF as the console. |
@@ -178,12 +187,15 @@ them costs one converter and removes a whole class of confusing failure.
 `+3V3` hangs off `+5V_PORTS` rather than `VBUS_IN` so the logic supply sees a
 pre-regulated input and a narrow conversion ratio.
 
+The target passthrough (J18 → J19) is deliberately absent from this tree. It is
+not a board rail and draws nothing from the PD contract; see below.
+
 ### Budget
 
 | Rail | Load | Typical | Worst case |
 |---|---|---|---|
 | +5V_PORTS | 6× USB-A | 6 × 0.5 A = 3.0 A | 6 × 1.0 A = 6.0 A |
-| | 2× relay coil | 60 mA | 60 mA |
+| | 3× relay coil | 140 mA | 140 mA |
 | +5V_TGT | target SBC | 2.0 A | 5.0 A |
 | +3V3 | K64 ~100 mA, KSZ8081 ~60 mA, USB2517 ~250 mA, DAPLink ~30 mA, translators ~20 mA | 0.30 A | 0.50 A |
 | **Total at 5 V** | | **≈5.4 A (27 W)** | **≈11.4 A (57 W)** |
@@ -257,6 +269,66 @@ The minimum alternative is a 2-pin jumper that disconnects the K64. It saves
 one IC and it is the kind of thing this bench has been removing: a step a human
 has to remember, whose failure mode looks like a broken bus.
 
+### Target passthrough
+
+Not every target runs from 5 V. An Xavier AGX ships with a 19 V / 3 A supply,
+and the board's own +5V_TGT rail — inside the PD budget, behind a 5 A eFuse — is
+the wrong tool for it. So J18 and J19 pass an external PSU straight through,
+the board's only involvement being one relay contact in the high side.
+
+```
+J18 (PSU in)   V+  ──> relay COM ── NC ──> V+   J19 (target out)
+               GND ──> copper bus, ≥5 mm, both outer layers ──> GND
+```
+
+**The passthrough nets are independent of every board net.** Not the ground
+plane, not any rail. The relay's coil is on the board; its contacts are not.
+Three reasons, all of which matter at 19 V / 3 A:
+
+- The board is not in the PSU's return path. 3 A does not flow through the
+  ground plane, out through the USB shields to the workstation, or down the
+  console cable's GND.
+- Any PSU can be attached — 5 to 30 V, either polarity, floating or
+  earth-referenced — and the board neither knows nor cares.
+- A fault on the target's supply side cannot reach the board's logic.
+
+The target's ground still meets the board's through J3 and J13, as it would on
+any bench. The point is that the *power* current does not.
+
+**NC, not NO.** The relay is de-energized in the passing state. This is the §5
+rule — a rail boots to the state that does no harm, set by hardware — taken one
+step further: a baseboard that has lost its own power, or has been unplugged
+entirely, still passes the PSU through. The only way to cut the target is to
+energize the coil, and a coil cannot energize by accident.
+
+The cost is the mirror image: with the baseboard unpowered, the target *cannot*
+be cut. That is the right way round for a development bench.
+
+**The NC rating is the selection criterion, and it is easy to get wrong.** SPDT
+power relays are commonly rated on the NO contact — the "10 A" on the front of
+the datasheet — with the NC contact derated to 3 or 5 A in a table further in.
+Candidates that advertise 10 A can fail 5 A on NC. Read the NC figure, at 30 VDC
+resistive, before choosing. Prefer AgSnO2 contacts: an SBC's input is a bank of
+bulk capacitance, so the contact closes into an inrush of tens of amps for
+microseconds, which AgSnO2 tolerates and AgNi pits under. Resistive and
+capacitive loads are assumed and no snubber is fitted, so an inductive load on
+J19 needs its own.
+
+**Copper.** 5 A continuous at a 10 °C rise wants about 2.7 mm of 1 oz outer
+copper by IPC-2221. Use ≥5 mm on both outer layers, via-stitched, for GND and
+for the V+ runs to and from the relay, and keep J18, the relay and J19 within a
+few centimetres of one another so those runs are short. The relay's contact pins
+get solid pads, no thermal relief. Keep ≥1 mm from every board net, so the
+isolation is visible in the layout and not only in the netlist.
+
+**Presence detect, optional, fitted by default.** An optocoupler across J18: LED
+in series with a resistor sized to stay within limits from 5 to 30 V (split for
+dissipation), an antiparallel diode so a reversed PSU does no harm, transistor
+side on a K64 GPIO. That gives `psu=present` in `STATE` without breaking the
+isolation, and it is the only component on the board that touches the
+passthrough at all. It is the difference between "the target is not booting"
+and "the PSU is not plugged in".
+
 ### Open item
 
 Buck 1 must do 6 A continuous from a 4.5–21 V input. A 6 A part (LM61460 class)
@@ -278,6 +350,7 @@ runs. Choose each switch's enable polarity so the passive state is the safe one.
 | J4–J9 USB-A ports | **ON** | pull-up on active-high `EN` | Never silently drop power. A watchdog reset must not disconnect the console adapter you are reading the target's boot log on. |
 | +5V_TGT | **ON** | pull-up on `EN` | Same. Resetting the baseboard must not reset the target. |
 | Relay 1, 2 | **DE-ENERGIZED** | 100 kΩ gate pulldown | A relay that energizes at boot asserts FORCE_RECOVERY on every reset of the controller. Which way that fails is the installer's choice — SPDT gives both NO and NC on the terminal block. |
+| Passthrough relay | **PASSING** (de-energized, NC closed) | 100 kΩ gate pulldown, and the relay itself | A baseboard that has lost its own power still passes the PSU through. Cutting the target takes an energized coil, which cannot happen by accident. |
 
 This is carried straight from the relay controller, where the two firmware
 profiles boot opposite ways for exactly these reasons, and where a unit test
@@ -321,7 +394,8 @@ during capture.
 | USB FS device — DP, DM, VREGIN, VOUT33 | 4 (dedicated) |
 | Port power — 6× EN, 6× /FAULT | 12 |
 | Target power — EN, /FAULT | 2 |
-| Relays — 2× gate | 2 |
+| Relays — 3× gate | 3 |
+| PSU presence — optocoupler | 1 |
 | Target UART — TXD, RXD | 2 |
 | DAPLink CDC UART — TXD, RXD | 2 |
 | I2C — hub, PD sink (shared bus) | 2 |
@@ -330,8 +404,8 @@ during capture.
 | Hub `RESET_N`, PD `ATTACH`/alert | 2 |
 | `PD_PROG_DET` — programmer on J17 | 1 |
 | SWD — SWCLK, SWDIO, `RESET_b` | 3 |
-| Status — RGB heartbeat, 6× port LED, 2× relay LED | 11 |
-| **Total signal** | **61** |
+| Status — RGB heartbeat, 6× port LED, 3× relay LED | 12 |
+| **Total signal** | **64** |
 
 Comfortable in a 100-LQFP after power and analogue pins. Two things to note: the
 target's I2C is a **separate bus** from the hub and PD controller's, because a
@@ -374,11 +448,12 @@ firmware is running and its loop is not wedged.
 | 3 | DAPLink board ID and MSD volume name. A custom DAPLink build can name the volume anything; `frdm-k64f-hid/scripts/flash.sh` already reads `LABEL=${MBED_LABEL:-MBED}`, so agreeing with it is one environment variable rather than a change. Decide the name. | Firmware tooling |
 | 4 | USB VID/PID. `frdm-k64f-hid` currently ships `2fe3:0001`, which is **the Zephyr project's VID** and was already flagged as unshippable. This board needs its own, and now has a hub and a DAPLink wanting identifiers too. | Anything leaving the lab |
 | 5 | K64 lead time. If it is bad, the fallback is an RP2350 + W5500, which costs the Zephyr board port and the FRDM tooling. | BOM |
-| 6 | Does J14 need a raw `VBUS_IN` pass-through option for 12 V targets, or is 5 V enough? | Connector count |
+| 6 | ~~Does J14 need a raw `VBUS_IN` pass-through for 12 V targets?~~ **Resolved** by J18/J19: any PSU passes through, isolated. J14 stays for 5 V targets that want to live inside the PD budget without a PSU of their own. | — |
 | 7 | Form factor and mounting. Standalone with a mounting pattern, or does it want to sit under a specific carrier? | Layout |
 | 8 | Authentication on the TCP transport. Today anything that can reach the port can cut the target's power and assert its recovery pins. A trusted segment is the assumption; decide whether that is good enough. | Remote management outside the lab |
 | 9 | Should the K64 be able to rewrite the STUSB4500 NVM itself, over the buffered bus? Then J17 is bring-up and recovery only, and PDO changes become a console command. | Firmware scope |
 | 10 | Verify at bring-up, against the datasheets: the STUSB4500 runs and answers I2C from `VSYS` alone with no VBUS; what it asks of an unused `VSYS`; and the PCA9517A's B side with `VCCA` at 0 V. The J17 circuit assumes all three. | J17 circuit |
+| 11 | Power relay: confirm on the chosen part's datasheet that the **NC** contact is rated ≥5 A at 30 VDC resistive, and the contact material. The headline figure is usually NO. | J18/J19 |
 
 Item 4 is the one that is easy to defer and expensive to defer — a VID has lead
 time of its own.
