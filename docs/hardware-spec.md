@@ -119,7 +119,7 @@ upstream without cutting itself.
 | Block | Part | Notes |
 |---|---|---|
 | Application MCU | **MK64FN1M0VLL12** | 100-LQFP, Cortex-M4F 120 MHz, 1 MB flash, 256 KB SRAM, USB FS OTG, 10/100 MAC. Same die as the FRDM-K64F, whose schematic is public and serves as the reference design. |
-| Ethernet PHY | **KSZ8081RNA** | RMII. The `RNA` suffix is the 50 MHz-reference variant; `RND` expects a 25 MHz crystal and is **not** a drop-in. Same part as the FRDM, so the Zephyr devicetree carries over. |
+| Ethernet PHY | **KSZ8081RNA** | RMII, same part as the FRDM, so the Zephyr devicetree carries over. The `RNA` and `RND` suffixes differ in how the PHY is clocked (50 MHz reference in vs 25 MHz crystal) and are **not** interchangeable — confirm which one the FRDM fits and which one this clock tree wants, against the datasheet, at BOM time. See [open question 2](#8-open-questions). |
 | Debug/console MCU | **MK20DX128VFM5** running DAPLink | CMSIS-DAP SWD + USB CDC + mass-storage drag-drop, exactly as OpenSDA v2 does today. |
 | USB hub | **USB2517** (or USB2517i) | 7-port USB 2.0 HS. Ports 1–6 to the USB-A connectors, port 7 to the DAPLink. I2C/SMBus configuration, 24 MHz crystal. |
 | Port switches, 6× | **TPS2553** | Adjustable current limit via `ILIM`, soft-start, open-drain `/FAULT`. |
