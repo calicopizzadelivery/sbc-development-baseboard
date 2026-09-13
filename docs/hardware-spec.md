@@ -19,6 +19,7 @@ flowchart LR
     J1["J1 USB-C<br/>upstream data"]
     J10["J10 RJ45<br/>10/100"]
     J2["J2 USB-C<br/>PD power in"]
+    J17["J17 JST SH<br/>PD programming"]
   end
 
   subgraph BD["baseboard"]
@@ -28,6 +29,7 @@ flowchart LR
     MCU["MK64FN1M0VLL12<br/>Cortex-M4F 120 MHz"]
     PHY["KSZ8081RNA<br/>RMII"]
     PD["STUSB4500<br/>PD sink"]
+    BUF["PCA9517A<br/>I2C buffer"]
     SW["6x TPS2553<br/>current-limited"]
     TSW["eFuse<br/>+5V_TGT"]
     RLY["2x SPDT<br/>signal relay"]
@@ -48,7 +50,9 @@ flowchart LR
   HUB -->|"port 7, unswitched"| DAP
   DAP -->|"SWD + UART"| MCU
   J10 --> PHY --> MCU
-  J2 --> PD -->|I2C| MCU
+  J2 --> PD
+  J17 -->|"I2C + VSYS"| PD
+  PD <-->|I2C| BUF <-->|I2C| MCU
 
   MCU -->|"6x EN + 6x /FAULT"| SW
   MCU -->|I2C| HUB
@@ -84,6 +88,7 @@ host is attached and whether or not the host agrees.
 | J14 | 2-pos pluggable 5.08 mm | target | Switched +5V_TGT and GND. |
 | J15 | 2×6 header, 2.54 mm | target | 6× level-shifted GPIO, I2C SDA/SCL, VREF, GND. |
 | J16 | 10-pin Cortex debug | you | Direct SWD to the K64, bypassing DAPLink. |
+| J17 | 4-pin JST SH, 1.0 mm | you | STUSB4500 NVM programming. Qwiic / STEMMA QT pinout: GND, 3.3 V, SDA, SCL. |
 
 Pluggable terminal blocks rather than fixed: a relay's wiring can be unplugged
 as a unit and reinstalled the same way, which fixed screw terminals do not give
@@ -125,6 +130,8 @@ upstream without cutting itself.
 | Port switches, 6× | **TPS2553** | Adjustable current limit via `ILIM`, soft-start, open-drain `/FAULT`. |
 | Target rail switch | eFuse or load switch, ≥5 A | Adjustable limit, `/FAULT` back to the MCU. Candidate: TPS25940 family. |
 | PD sink | **STUSB4500** | Autonomous — negotiates from NVM-stored PDOs with no MCU involvement, so the board is powered before firmware runs. I2C readback lets the MCU learn the contract. Alternate: Infineon CYPD3177. |
+| PD programming header | **JST SM04B-SRSS-TB** | The Qwiic / STEMMA QT connector, side entry; `BM04B-SRSS-TB` if placement wants top entry. Stock cables fit either. |
+| PD bus buffer | **PCA9517A** | Isolates the K64 from the PD sink's I2C whenever the board is unpowered or a programmer is on J17. See §4. |
 | Relays, 2× | **Omron G6K-1F-Y**, 5 V coil | 1 Form C (SPDT), gold-clad contacts, 1 A / 30 VDC, ~30 mA coil. |
 | Relay drivers | 2N7002 + 1N4148 flyback | Gate pulldown to ground — see §5. |
 | UART translation | **TXB0104** | Auto-direction, push-pull. `VCCA` from J13's VREF pin. |
@@ -201,6 +208,55 @@ Per-port limit is set to ~1.1 A by the `ILIM` resistor: a 500 mA device plus
 inrush headroom, and well under what a single port could otherwise pull from a
 shared rail.
 
+### Programming the PD sink
+
+The STUSB4500 negotiates from PDOs stored in its NVM, and the NVM is written
+over I2C. Rather than depend on K64 firmware for that, J17 brings the sink's
+I2C out on a 4-pin 1.0 mm JST — the Qwiic / STEMMA QT footprint, pinned to that
+standard: **1 GND, 2 3.3 V, 3 SDA, 4 SCL** (black, red, blue, yellow on the
+stock cables). Any Qwiic-equipped dev board running SparkFun's STUSB4500 library
+programs it, as does ST's own tool.
+
+The connector is nothing. What it has to survive is this: if the NVM is ever
+written badly enough that the sink stops attaching, VBUS never arrives, the
+board never powers, and nothing on the board can fix the NVM. That is a bricked
+board unless the sink can be powered from somewhere other than the charger.
+
+So the header's 3.3 V pin feeds the STUSB4500's `VSYS` — its optional external
+supply — and **nothing else**. Not the board's +3V3 rail. The sink then runs
+from the programmer alone, with no charger attached and the bucks dark, and the
+programmer's 3.3 V never back-drives a rail. A 100 kΩ pull-down holds `VSYS` at
+0 V when nothing is plugged in.
+
+That creates the second problem. The K64 also has to reach the STUSB4500, to
+read the negotiated contract. With the board unpowered and a programmer
+attached, a dead K64 on the same bus clamps SDA and SCL through its protection
+diodes, and pull-ups to a dead +3V3 rail are pull-downs. With the board powered,
+a programmer and the K64 are two masters on one bus with nothing arbitrating.
+
+Both go away with one part: a **PCA9517A** I2C buffer between the board bus
+(K64, hub) and the PD segment (STUSB4500, J17).
+
+- The PD segment's pull-ups, and the buffer's B side and `EN` pull-up, go to
+  `+3V3_PD`: a BAT54C diode-OR of board +3V3 and header VCC, live from
+  whichever is present.
+- The buffer isolates its two sides whenever `EN` is low. Header VCC drives a
+  2N7002 that pulls `EN` low, so **a programmer on J17 disconnects the K64 in
+  hardware**. No multi-master case, and nothing for firmware to get right.
+- With the board unpowered, `+3V3_PD` comes only from the programmer, whose
+  presence is what pulls `EN` low — so the two cases that need isolation are
+  the two cases that get it.
+- Header VCC also reaches a K64 GPIO, `PD_PROG_DET`, through 100 kΩ — so
+  firmware knows why it cannot see the sink and says so, and a programmer on
+  a dead board pushes microamps into the K64, not milliamps.
+
+A TVS array on SDA/SCL, since the header will be hot-plugged, and 1 µF on
+`VSYS`.
+
+The minimum alternative is a 2-pin jumper that disconnects the K64. It saves
+one IC and it is the kind of thing this bench has been removing: a step a human
+has to remember, whose failure mode looks like a broken bus.
+
 ### Open item
 
 Buck 1 must do 6 A continuous from a 4.5–21 V input. A 6 A part (LM61460 class)
@@ -272,9 +328,10 @@ during capture.
 | I2C — target breakout (separate bus) | 2 |
 | GPIO breakout | 6 |
 | Hub `RESET_N`, PD `ATTACH`/alert | 2 |
+| `PD_PROG_DET` — programmer on J17 | 1 |
 | SWD — SWCLK, SWDIO, `RESET_b` | 3 |
 | Status — RGB heartbeat, 6× port LED, 2× relay LED | 11 |
-| **Total signal** | **60** |
+| **Total signal** | **61** |
 
 Comfortable in a 100-LQFP after power and analogue pins. Two things to note: the
 target's I2C is a **separate bus** from the hub and PD controller's, because a
@@ -320,6 +377,8 @@ firmware is running and its loop is not wedged.
 | 6 | Does J14 need a raw `VBUS_IN` pass-through option for 12 V targets, or is 5 V enough? | Connector count |
 | 7 | Form factor and mounting. Standalone with a mounting pattern, or does it want to sit under a specific carrier? | Layout |
 | 8 | Authentication on the TCP transport. Today anything that can reach the port can cut the target's power and assert its recovery pins. A trusted segment is the assumption; decide whether that is good enough. | Remote management outside the lab |
+| 9 | Should the K64 be able to rewrite the STUSB4500 NVM itself, over the buffered bus? Then J17 is bring-up and recovery only, and PDO changes become a console command. | Firmware scope |
+| 10 | Verify at bring-up, against the datasheets: the STUSB4500 runs and answers I2C from `VSYS` alone with no VBUS; what it asks of an unused `VSYS`; and the PCA9517A's B side with `VCCA` at 0 V. The J17 circuit assumes all three. | J17 circuit |
 
 Item 4 is the one that is easy to defer and expensive to defer — a VID has lead
 time of its own.

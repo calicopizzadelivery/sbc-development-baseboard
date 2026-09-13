@@ -165,6 +165,31 @@ Better than the alternative, which is a rail that sags and drops every attached
 device at once — including whichever one you were watching to work out what went
 wrong.
 
+A programmer on J17 disconnects the MCU from the PD sink in hardware
+([spec §4](hardware-spec.md#4-power)), so the contract cannot be re-read while
+one is attached. The contract does not change just because a programmer is
+plugged in — a new NVM only takes effect when the charger re-attaches — so the
+last reading stays in force and is marked:
+
+```
+> POWER
+OK POWER contract=20V/3.0A/60W src=pd stale=prog-attached budget=60W used=14W headroom=46W
+```
+
+If the board *boots* with a programmer attached there is no last reading. Then
+the budget is unknown, and unknown means **anything may be turned off and
+nothing may be turned on** — the rails are already in their resistor-set boot
+state, and firmware will not add load it cannot account for:
+
+```
+> POWER
+OK POWER contract=unknown reason=prog-attached budget=unknown
+> PORT 3 ON
+ERR POWER BUDGET unknown, programmer attached on J17
+```
+
+Firmware re-reads the contract the moment the programmer is removed.
+
 ### Events
 
 Faults are asynchronous, and the protocol is otherwise strictly one line in, one
@@ -173,6 +198,8 @@ line out. With `EVENTS ON`, unsolicited lines start `EVT`:
 ```
 EVT OC PORT 3 limit=1.1A
 EVT PD contract=5V/3.0A/15W was=20V/3.0A/60W
+EVT PD PROG attached
+EVT PD PROG removed contract=20V/3.0A/60W
 EVT TGT UNDERVOLT 4.62V
 ```
 
