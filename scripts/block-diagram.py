@@ -98,7 +98,7 @@ box(50, 610, 200, 60, "J17  JST SH 1.0 mm", "PD programming · Qwiic", "conn")
 box(50, 950, 200, 70, "J18  Phoenix 5.08", ["PSU in", "0–30 VDC · 5 A"], "conn")
 
 # ---------- center-left devices
-box(330, 85, 200, 75, "USB2517", "7-port USB 2.0 HS hub")
+box(330, 85, 200, 75, "USB2517", "7-port USB 2.0 HS · port 5 n/c")
 box(330, 195, 200, 60, "MK20DX128  DAPLink", "SWD · CDC · MSD")
 box(330, 290, 200, 60, "KSZ8081RNA", "RMII PHY")
 box(330, 520, 200, 150, "STUSB4500", ["USB-PD sink", "autonomous, NVM PDOs", "I2C readback"], "pwr")
@@ -129,7 +129,7 @@ box(780, 180, 200, 580, "MK64FN1M0VLL12", ["Cortex-M4F · 120 MHz", "1 MB flash 
 
 # ---------- center-right devices
 box(1090, 85, 220, 50, "FT231X", "USB-UART · 3.3 V I/O · TX/RX LEDs")
-box(1090, 155, 220, 50, "6× TPS2553", "5× USB-A at 1.1 A · 1× FT231X")
+box(1090, 155, 220, 50, "5× TPS2553", "4× USB-A at 1.1 A · 1× FT231X")
 tag(1215, 221, "+5V_PORTS")
 path([(1200, 155), (1200, 135)], width=2.4, color=C["power"])
 box(1090, 345, 220, 55, "TXB0104", "UART level shift · VREF from target")
@@ -147,7 +147,7 @@ e(f'<text x="1200" y="980" text-anchor="middle" font-size="12.5" fill="{C["mute"
 
 # ---------- right column
 box(1470, 85, 240, 50, "J9  FTDI header · 6-pin 0.1″", "GND CTS VCC TXD RXD DTR · 3.3 V", "conn")
-box(1470, 155, 240, 50, "J4–J8  5× USB-A", "bench · each switched", "conn")
+box(1470, 155, 240, 50, "J4, J5  2× stacked USB-A", "4 ports · bench · each switched", "conn")
 box(1470, 270, 240, 55, "J3  USB-C", "HID kbd + mouse · VBUS sense-only", "conn")
 box(1470, 345, 240, 55, "J13  Phoenix 3.5", "console: VREF · TXD · RXD · GND", "conn")
 box(1470, 415, 240, 55, "J15  2×6 header", "6× GPIO · I2C · VREF · GND", "conn")
@@ -158,7 +158,7 @@ box(1470, 950, 240, 70, "J19  Phoenix 5.08", ["PSU out", "V+ via NC · GND via b
 # ---------- edges: USB / debug / ethernet
 path([(250, 120), (330, 120)])
 path([(530, 110), (1090, 110)], "port 6", (700, 104))
-path([(530, 130), (1050, 130), (1050, 180), (1090, 180)], "ports 1–5", (950, 124))
+path([(530, 130), (1050, 130), (1050, 180), (1090, 180)], "ports 1–4", (950, 124))
 path([(850, 180), (850, 150), (530, 150)], "I2C", (700, 144))
 path([(380, 160), (380, 195)], "port 7 · unswitched", (392, 183), anchor="start")
 path([(1310, 110), (1470, 110)], "UART · 3.3 V", (1390, 104))
@@ -175,7 +175,7 @@ path([(530, 595), (580, 595)], arrow="both")
 path([(710, 595), (780, 595)], "I2C", (745, 589), arrow="both")
 
 # MCU outputs
-path([(980, 230), (1200, 230), (1200, 205)], "6× EN · 6× /FAULT", (1090, 224))
+path([(980, 230), (1200, 230), (1200, 205)], "5× EN · 5× /FAULT", (1090, 224))
 path([(980, 297), (1470, 297)], "USB FS device", (1225, 291))
 path([(980, 372), (1090, 372)], "UART", (1035, 366)); path([(1310, 372), (1470, 372)])
 path([(980, 442), (1090, 442)], "GPIO · I2C", (1035, 436)); path([(1310, 442), (1470, 442)])

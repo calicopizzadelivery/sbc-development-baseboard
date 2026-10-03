@@ -39,7 +39,7 @@ flowchart LR
     PHY["KSZ8081RNA<br/>RMII"]
     PD["STUSB4500<br/>PD sink"]
     BUF["PCA9517A<br/>I2C buffer"]
-    SW["6x TPS2553<br/>5 ports + FT231X"]
+    SW["5x TPS2553<br/>4 ports + FT231X"]
     FTDI["FT231X<br/>USB-UART, 3.3 V"]
     TSW["eFuse<br/>+5V_TGT"]
     RLY["2x SPDT<br/>signal relay"]
@@ -59,7 +59,7 @@ flowchart LR
   end
 
   J1 --> HUB
-  HUB -->|"ports 1-5"| SW --> UA["J4-J8<br/>5x USB-A"]
+  HUB -->|"ports 1-4"| SW --> UA["J4, J5<br/>2x stacked USB-A"]
   HUB -->|"port 6"| FTDI --> J9
   SW -.->|VBUS| FTDI
   HUB -->|"port 7, unswitched"| DAP
@@ -98,7 +98,7 @@ host is attached and whether or not the host agrees.
 | J1 | USB-C receptacle | workstation | Hub upstream data. USB 2.0 only, UFP (5.1 kΩ Rd on both CC). |
 | J2 | USB-C receptacle | charger | PD sink, power in. No data. |
 | J3 | USB-C receptacle | target | K64 USB FS device port — HID keyboard/mouse. UFP, **VBUS sense-only**. |
-| J4–J8 | USB-A, 5× | bench | Downstream hub ports 1–5, each individually switched. |
+| J4, J5 | USB-A, 2× double-stacked | bench | Hub ports 1–4, two per receptacle, each individually switched. Hub port 5 is unconnected. |
 | J9 | 6-pin 0.1″ header | target | FT231X UART on hub port 6. Standard FTDI pinout: GND, CTS, VCC, TXD, RXD, RTS/DTR. **3.3 V levels.** |
 | J10 | RJ45 + magnetics + LEDs | workstation | 10/100 Ethernet. |
 | J11, J12 | 3-pos pluggable 3.5 mm | target | Relay 1 and 2: COM, NO, NC. |
@@ -125,7 +125,7 @@ link to the workstation. It also needs to be a **sink** for roughly 60 W. Those
 two are individually fine — UFP + sink is what a bus-powered hub is — but the
 sources differ: a 65 W PD charger presents no data at all, and a workstation
 port that presents data sources 5 V at 0.9 A, or 15 W if it does PD. Neither one
-alone runs five switched ports, a bridge and a target rail.
+alone runs four switched ports, a bridge and a target rail.
 
 Power Role Swap could in principle ask the workstation for more, but what you
 get back depends entirely on the host, which makes the board's capability a
@@ -202,8 +202,9 @@ activity at the header. TVS on all four signals; the header will be hot-plugged.
 | Application MCU | **MK64FN1M0VLL12** | 100-LQFP, Cortex-M4F 120 MHz, 1 MB flash, 256 KB SRAM, USB FS OTG, 10/100 MAC. Same die as the FRDM-K64F, whose schematic is public and serves as the reference design. |
 | Ethernet PHY | **KSZ8081RNA** | RMII, same part as the FRDM, so the Zephyr devicetree carries over. The `RNA` and `RND` suffixes differ in how the PHY is clocked (50 MHz reference in vs 25 MHz crystal) and are **not** interchangeable — confirm which one the FRDM fits and which one this clock tree wants, against the datasheet, at BOM time. See [open question 2](#8-open-questions). |
 | Debug/console MCU | **MK20DX128VFM5** running DAPLink | CMSIS-DAP SWD + USB CDC + mass-storage drag-drop, exactly as OpenSDA v2 does today. |
-| USB hub | **USB2517** (or USB2517i) | 7-port USB 2.0 HS. Ports 1–5 to the USB-A connectors, port 6 to the FT231X, port 7 to the DAPLink; 6 and 7 flagged non-removable. I2C/SMBus configuration, 24 MHz crystal. |
-| Port switches, 6× | **TPS2553** | Five USB-A ports and the FT231X's VBUS. Adjustable current limit via `ILIM`, soft-start, open-drain `/FAULT`. |
+| USB hub | **USB2517** (or USB2517i) | 7-port USB 2.0 HS. Ports 1–4 to the USB-A receptacles, port 5 unconnected and disabled in configuration, port 6 to the FT231X, port 7 to the DAPLink; 6 and 7 flagged non-removable. I2C/SMBus configuration, 24 MHz crystal. |
+| Port switches, 5× | **TPS2553** | Four USB-A ports and the FT231X's VBUS. Adjustable current limit via `ILIM`, soft-start, open-drain `/FAULT`. |
+| USB-A receptacles, 2× | double-stacked USB 2.0 Type-A, through-hole | Würth WR-COM dual-port class (61400826021). Two ports per body, shield tabs to chassis. Four ports on two bodies rather than five with one on its own. |
 | USB-UART bridge | **FT231XS** | SSOP-20 (`FT231XQ` for QFN). Bus-powered from hub port 6; `3V3OUT` feeds `VCCIO`. CBUS0/1 drive TX/RX LEDs. |
 | FTDI header | 6-pin 0.1″, right-angle, board edge | J9. Two solder jumpers: pin 6 RTS#/DTR#, pin 3 VCC. 470 Ω series on TXD and pin 6. |
 | Target rail switch | eFuse or load switch, ≥5 A | Adjustable limit, `/FAULT` back to the MCU. Candidate: TPS25940 family. |
@@ -243,7 +244,7 @@ open-drain** — document that on the silkscreen.
 ### Tree
 
 ```
-J2 ──> STUSB4500 ──> VBUS_IN (5-20 V) ──┬──> buck 1 ──> +5V_PORTS ──┬──> 5x TPS2553 ──> J4-J8
+J2 ──> STUSB4500 ──> VBUS_IN (5-20 V) ──┬──> buck 1 ──> +5V_PORTS ──┬──> 4x TPS2553 ──> J4, J5
         reverse-polarity + OVP          │                            ├──> 1x TPS2553 ──> FT231X
                                         │                            ├──> relay coils
                                         │                            └──> buck 3 ──> +3V3
@@ -266,19 +267,20 @@ not a board rail and draws nothing from the PD contract; see below.
 
 | Rail | Load | Typical | Worst case |
 |---|---|---|---|
-| +5V_PORTS | 5× USB-A | 5 × 0.5 A = 2.5 A | 5 × 1.0 A = 5.0 A |
+| +5V_PORTS | 4× USB-A | 4 × 0.5 A = 2.0 A | 4 × 1.0 A = 4.0 A |
 | | FT231X, and J9 VCC if jumpered | 10 mA | 60 mA |
 | | 3× relay coil | 140 mA | 140 mA |
 | +5V_TGT | target SBC | 2.0 A | 5.0 A |
 | +3V3 | K64 ~100 mA, KSZ8081 ~60 mA, USB2517 ~250 mA, DAPLink ~30 mA, translators ~20 mA | 0.30 A | 0.50 A |
-| **Total at 5 V** | | **≈5.0 A (25 W)** | **≈10.7 A (54 W)** |
+| **Total at 5 V** | | **≈4.5 A (22 W)** | **≈9.7 A (49 W)** |
 
-With conversion losses, worst case draws roughly 62 W at the inlet. So:
+With conversion losses, worst case draws roughly 56 W at the inlet. So:
 
-- **20 V / 5 A (100 W)** — full worst case with headroom.
-- **20 V / 3 A or 15 V / 3 A (60 W / 45 W)** — the realistic common case, and
-  enough for typical load, but **not** enough for every port at its limit plus a
-  5 A target.
+- **20 V / 3 A (60 W)** — covers the full worst case, every port at its limit
+  plus a 5 A target, with a few watts spare. This is the common charger, and
+  going from six ports to four is what brought the board inside it.
+- **20 V / 5 A (100 W)** — headroom.
+- **15 V / 3 A (45 W)** — typical load, not worst case.
 - **5 V / 3 A (15 W)** — degraded. Board runs, MCU and Ethernet and relays are
   fine, but ports must be budgeted tightly.
 
@@ -402,14 +404,13 @@ isolation, and it is the only component on the board that touches the
 passthrough at all. It is the difference between "the target is not booting"
 and "the PSU is not plugged in".
 
-### Open item
+### Buck 1, settled
 
-Buck 1 feeds five ports, the FT231X, the relay coils and buck 3, from a
-4.5–21 V input: about 5.7 A continuous with ports limited at 1.0 A, 6.2 A at
-1.1 A. A 6 A part (LM61460 class) now fits at 1.0 A and is marginal at 1.1 A —
-the FT231X taking port 6 made this easier, not moot. **Resolve the per-port
-limit before schematic capture** — it is the one number that changes the power
-section's topology.
+Buck 1 feeds four ports, the FT231X, the relay coils and buck 3, from a
+4.5–21 V input: about 5.1 A continuous with every port at its 1.1 A limit. A
+6 A part (LM61460 class) fits with margin. This was open question 1 — at six
+ports it sat exactly on the number — and going to four closed it without
+touching the per-port limit.
 
 ---
 
@@ -421,7 +422,7 @@ runs. Choose each switch's enable polarity so the passive state is the safe one.
 
 | Load | State in reset | Set by | Why |
 |---|---|---|---|
-| J4–J8 USB-A ports, FT231X | **ON** | pull-up on active-high `EN` | Never silently drop power. A watchdog reset must not disconnect the console adapter you are reading the target's boot log on — which on this board may be the FT231X itself. |
+| J4, J5 USB-A ports, FT231X | **ON** | pull-up on active-high `EN` | Never silently drop power. A watchdog reset must not disconnect the console adapter you are reading the target's boot log on — which on this board may be the FT231X itself. |
 | +5V_TGT | **ON** | pull-up on `EN` | Same. Resetting the baseboard must not reset the target. |
 | Relay 1, 2 | **DE-ENERGIZED** | 100 kΩ gate pulldown | A relay that energizes at boot asserts FORCE_RECOVERY on every reset of the controller. Which way that fails is the installer's choice — SPDT gives both NO and NC on the terminal block. |
 | Passthrough relay | **PASSING** (de-energized, NC closed) | 100 kΩ gate pulldown, and the relay itself | A baseboard that has lost its own power still passes the PSU through. Cutting the target takes an energized coil, which cannot happen by accident. |
@@ -466,7 +467,7 @@ during capture.
 | RMII to PHY — TXD0/1, TXEN, RXD0/1, RXER, CRS_DV, MDIO, MDC | 9 |
 | RMII 50 MHz reference | 1 |
 | USB FS device — DP, DM, VREGIN, VOUT33 | 4 (dedicated) |
-| Port power — 5× EN, 5× /FAULT | 10 |
+| Port power — 4× EN, 4× /FAULT | 8 |
 | FT231X power — EN, /FAULT | 2 |
 | Target power — EN, /FAULT | 2 |
 | Relays — 3× gate | 3 |
@@ -479,8 +480,8 @@ during capture.
 | Hub `RESET_N`, PD `ATTACH`/alert | 2 |
 | `PD_PROG_DET` — programmer on J17 | 1 |
 | SWD — SWCLK, SWDIO, `RESET_b` | 3 |
-| Status — RGB heartbeat, 5× port LED, 3× relay LED | 11 |
-| **Total signal** | **63** |
+| Status — RGB heartbeat, 4× port LED, 3× relay LED | 10 |
+| **Total signal** | **60** |
 
 Comfortable in a 100-LQFP after power and analogue pins. Two things to note: the
 target's I2C is a **separate bus** from the hub and PD controller's, because a
@@ -521,7 +522,7 @@ firmware is running and its loop is not wedged.
 
 | # | Question | Blocks |
 |---|---|---|
-| 1 | Per-port current limit — 0.75 A or 1.1 A? | Buck 1 selection, §4 |
+| 1 | ~~Per-port current limit — 0.75 A or 1.1 A?~~ **Resolved** at four ports: 1.1 A, and a 6 A buck 1 fits with margin. See §4. | — |
 | 2 | Verify the FRDM-K64F clocking: one 50 MHz oscillator into both K64 `EXTAL0` and PHY `XI`? Read it off the rev E schematic, do not assume. | Clock tree |
 | 3 | DAPLink board ID and MSD volume name. A custom DAPLink build can name the volume anything; `frdm-k64f-hid/scripts/flash.sh` already reads `LABEL=${MBED_LABEL:-MBED}`, so agreeing with it is one environment variable rather than a change. Decide the name. | Firmware tooling |
 | 4 | USB VID/PID. `frdm-k64f-hid` currently ships `2fe3:0001`, which is **the Zephyr project's VID** and was already flagged as unshippable. This board needs its own, and now has a hub and a DAPLink wanting identifiers too. | Anything leaving the lab |

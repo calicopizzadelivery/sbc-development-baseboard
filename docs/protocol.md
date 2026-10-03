@@ -27,7 +27,7 @@ each other. `CONSOLE` attach is the exception and is exclusive — see below.
 
 | Command | Effect |
 |---|---|
-| `PORT <1-5\|ALL> ON\|OFF\|TOGGLE` | Power a USB-A port |
+| `PORT <1-4\|ALL> ON\|OFF\|TOGGLE` | Power a USB-A port |
 | `PORT <n\|ALL> PULSE [ON\|OFF] <ms>` | Invert (or force a state) for *ms*, then revert |
 | `PORT <n>` | Report one port |
 | `RELAY <1-2\|ALL> ON\|OFF\|TOGGLE` | Energize a relay coil |
@@ -165,7 +165,7 @@ is disabled, and `GPIO` returns `ERR NO VREF` rather than pretending.
 
 ```
 > STATE
-STATE PORT 1=ON 2=ON 3=OFF 4=ON(pulse 480ms) 5=ON FTDI=ON RELAY 1=OFF 2=OFF TGT 5V=ON PSU=ON(present)
+STATE PORT 1=ON 2=ON 3=OFF 4=ON(pulse 480ms) FTDI=ON RELAY 1=OFF 2=OFF TGT 5V=ON PSU=ON(present)
 > POWER
 OK POWER contract=20V/3.0A/60W src=pd budget=60W used=14W headroom=46W
 > INFO
