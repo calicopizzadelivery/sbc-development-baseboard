@@ -1,0 +1,190 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1760" height="1120" viewBox="0 0 1760 1120" font-family="Inter, Helvetica, Arial, DejaVu Sans, sans-serif">
+<defs><marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse"><path d="M0,1 L9,5 L0,9 z" fill="#2b3340"/></marker><marker id="arrowR" viewBox="0 0 10 10" refX="1" refY="5" markerWidth="8" markerHeight="8" orient="auto"><path d="M10,1 L1,5 L10,9 z" fill="#2b3340"/></marker></defs>
+<rect width="1760" height="1120" fill="#ffffff"/>
+<text x="30" y="34" font-size="20" font-weight="700" fill="#1f2430">SBC development baseboard — block diagram</text>
+<text x="1730" y="34" text-anchor="end" font-size="12.5" fill="#5b6372">spec rev 0.1 · as of 42ac6da · 2026-10-03</text>
+<rect x="30" y="52" width="240" height="1030" rx="10" fill="#f5f6f8" stroke="#d6d9de"/>
+<text x="44" y="74" font-size="13" font-weight="700" letter-spacing="1.5" fill="#5b6372">FACING YOU</text>
+<rect x="300" y="52" width="1120" height="1030" rx="10" fill="#f5f6f8" stroke="#d6d9de"/>
+<text x="314" y="74" font-size="13" font-weight="700" letter-spacing="1.5" fill="#5b6372">BASEBOARD</text>
+<rect x="1450" y="52" width="280" height="1030" rx="10" fill="#f5f6f8" stroke="#d6d9de"/>
+<text x="1464" y="74" font-size="13" font-weight="700" letter-spacing="1.5" fill="#5b6372">FACING THE TARGET</text>
+<rect x="312" y="935" width="1096" height="130" rx="8" fill="#ecfdf5" stroke="#15803d" stroke-width="1.4" stroke-dasharray="7 5"/>
+<text x="326" y="1052" font-size="12" font-weight="600" fill="#15803d">ISOLATED — the passthrough nets connect to no board net. Not the ground plane, not a rail.</text>
+<rect x="50" y="90" width="200" height="60" rx="6" fill="#dbeafe" stroke="#2563eb" stroke-width="1.6"/>
+<text x="150.0" y="116.5" text-anchor="middle" font-size="14" font-weight="600" fill="#1f2430">J1  USB-C</text>
+<text x="150.0" y="133.5" text-anchor="middle" font-size="12.5" font-weight="400" fill="#5b6372">upstream data · USB 2.0</text>
+<rect x="50" y="290" width="200" height="60" rx="6" fill="#dbeafe" stroke="#2563eb" stroke-width="1.6"/>
+<text x="150.0" y="316.5" text-anchor="middle" font-size="14" font-weight="600" fill="#1f2430">J10  RJ45</text>
+<text x="150.0" y="333.5" text-anchor="middle" font-size="12.5" font-weight="400" fill="#5b6372">10/100 Ethernet</text>
+<rect x="50" y="400" width="200" height="60" rx="6" fill="#dbeafe" stroke="#2563eb" stroke-width="1.6"/>
+<text x="150.0" y="426.5" text-anchor="middle" font-size="14" font-weight="600" fill="#1f2430">J16  Cortex debug</text>
+<text x="150.0" y="443.5" text-anchor="middle" font-size="12.5" font-weight="400" fill="#5b6372">SWD, bypasses DAPLink</text>
+<rect x="50" y="520" width="200" height="60" rx="6" fill="#dbeafe" stroke="#2563eb" stroke-width="1.6"/>
+<text x="150.0" y="546.5" text-anchor="middle" font-size="14" font-weight="600" fill="#1f2430">J2  USB-C</text>
+<text x="150.0" y="563.5" text-anchor="middle" font-size="12.5" font-weight="400" fill="#5b6372">PD power in · no data</text>
+<rect x="50" y="610" width="200" height="60" rx="6" fill="#dbeafe" stroke="#2563eb" stroke-width="1.6"/>
+<text x="150.0" y="636.5" text-anchor="middle" font-size="14" font-weight="600" fill="#1f2430">J17  JST SH 1.0 mm</text>
+<text x="150.0" y="653.5" text-anchor="middle" font-size="12.5" font-weight="400" fill="#5b6372">PD programming · Qwiic</text>
+<rect x="50" y="950" width="200" height="70" rx="6" fill="#dbeafe" stroke="#2563eb" stroke-width="1.6"/>
+<text x="150.0" y="973.0" text-anchor="middle" font-size="14" font-weight="600" fill="#1f2430">J18  Phoenix 5.08</text>
+<text x="150.0" y="990.0" text-anchor="middle" font-size="12.5" font-weight="400" fill="#5b6372">PSU in</text>
+<text x="150.0" y="1007.0" text-anchor="middle" font-size="12.5" font-weight="400" fill="#5b6372">0–30 VDC · 5 A</text>
+<rect x="330" y="85" width="200" height="70" rx="6" fill="#ffffff" stroke="#374151" stroke-width="1.6"/>
+<text x="430.0" y="116.5" text-anchor="middle" font-size="14" font-weight="600" fill="#1f2430">USB2517</text>
+<text x="430.0" y="133.5" text-anchor="middle" font-size="12.5" font-weight="400" fill="#5b6372">7-port USB 2.0 HS hub</text>
+<rect x="330" y="195" width="200" height="60" rx="6" fill="#ffffff" stroke="#374151" stroke-width="1.6"/>
+<text x="430.0" y="221.5" text-anchor="middle" font-size="14" font-weight="600" fill="#1f2430">MK20DX128  DAPLink</text>
+<text x="430.0" y="238.5" text-anchor="middle" font-size="12.5" font-weight="400" fill="#5b6372">SWD · CDC · MSD</text>
+<rect x="330" y="290" width="200" height="60" rx="6" fill="#ffffff" stroke="#374151" stroke-width="1.6"/>
+<text x="430.0" y="316.5" text-anchor="middle" font-size="14" font-weight="600" fill="#1f2430">KSZ8081RNA</text>
+<text x="430.0" y="333.5" text-anchor="middle" font-size="12.5" font-weight="400" fill="#5b6372">RMII PHY</text>
+<rect x="330" y="520" width="200" height="150" rx="6" fill="#ffedd5" stroke="#c2410c" stroke-width="1.6"/>
+<text x="430.0" y="574.5" text-anchor="middle" font-size="14" font-weight="600" fill="#1f2430">STUSB4500</text>
+<text x="430.0" y="591.5" text-anchor="middle" font-size="12.5" font-weight="400" fill="#5b6372">USB-PD sink</text>
+<text x="430.0" y="608.5" text-anchor="middle" font-size="12.5" font-weight="400" fill="#5b6372">autonomous, NVM PDOs</text>
+<text x="430.0" y="625.5" text-anchor="middle" font-size="12.5" font-weight="400" fill="#5b6372">I2C readback</text>
+<rect x="580" y="565" width="130" height="60" rx="6" fill="#ffffff" stroke="#374151" stroke-width="1.6"/>
+<text x="645.0" y="591.5" text-anchor="middle" font-size="14" font-weight="600" fill="#1f2430">PCA9517A</text>
+<text x="645.0" y="608.5" text-anchor="middle" font-size="12.5" font-weight="400" fill="#5b6372">I2C buffer</text>
+<text x="645" y="645" text-anchor="middle" font-size="11" fill="#5b6372">EN low while J17 powered</text>
+<text x="645" y="659" text-anchor="middle" font-size="11" fill="#5b6372">→ K64 disconnected in hardware</text>
+<rect x="330" y="735" width="200" height="45" rx="6" fill="#ffedd5" stroke="#c2410c" stroke-width="1.6"/>
+<text x="430.0" y="754.0" text-anchor="middle" font-size="14" font-weight="600" fill="#1f2430">buck 1</text>
+<text x="430.0" y="771.0" text-anchor="middle" font-size="12.5" font-weight="400" fill="#5b6372">+5V_PORTS · 6 A</text>
+<rect x="330" y="800" width="200" height="45" rx="6" fill="#ffedd5" stroke="#c2410c" stroke-width="1.6"/>
+<text x="430.0" y="819.0" text-anchor="middle" font-size="14" font-weight="600" fill="#1f2430">buck 3</text>
+<text x="430.0" y="836.0" text-anchor="middle" font-size="12.5" font-weight="400" fill="#5b6372">+3V3 · 1.5 A</text>
+<rect x="330" y="865" width="200" height="45" rx="6" fill="#ffedd5" stroke="#c2410c" stroke-width="1.6"/>
+<text x="430.0" y="884.0" text-anchor="middle" font-size="14" font-weight="600" fill="#1f2430">buck 2</text>
+<text x="430.0" y="901.0" text-anchor="middle" font-size="12.5" font-weight="400" fill="#5b6372">+5V_TGT · 5 A</text>
+<path d="M 430,670 L 430,735" fill="none" stroke="#b45309" stroke-width="2.4" marker-end="url(#arrow)"/>
+<path d="M 430,705 L 310,705 L 310,887 L 330,887" fill="none" stroke="#b45309" stroke-width="2.4" marker-end="url(#arrow)"/>
+<text x="446" y="700" font-size="11.5" font-weight="600" fill="#b45309">VBUS_IN 5–20 V</text>
+<path d="M 430,780 L 430,800" fill="none" stroke="#b45309" stroke-width="2.4" marker-end="url(#arrow)"/>
+<rect x="540" y="747" width="208.4" height="20" rx="10" fill="#fff7ed" stroke="#c2410c" stroke-width="1"/>
+<text x="644.2" y="761" text-anchor="middle" font-size="11.5" font-weight="600" fill="#b45309">+5V_PORTS → switches, coils</text>
+<rect x="540" y="812" width="100.4" height="20" rx="10" fill="#fff7ed" stroke="#c2410c" stroke-width="1"/>
+<text x="590.2" y="826" text-anchor="middle" font-size="11.5" font-weight="600" fill="#b45309">+3V3 → logic</text>
+<rect x="540" y="877" width="122.0" height="20" rx="10" fill="#fff7ed" stroke="#c2410c" stroke-width="1"/>
+<text x="601.0" y="891" text-anchor="middle" font-size="11.5" font-weight="600" fill="#b45309">+5V_TGT → eFuse</text>
+<rect x="690" y="900" width="150" height="70" rx="6" fill="#ffffff" stroke="#374151" stroke-width="1.6"/>
+<text x="765" y="924" text-anchor="middle" font-size="14" font-weight="600" fill="#1f2430">optocoupler</text>
+<line x1="692" y1="935" x2="838" y2="935" stroke="#15803d" stroke-width="1.4" stroke-dasharray="7 5"/>
+<text x="765" y="958" text-anchor="middle" font-size="12.5" fill="#5b6372">PSU presence</text>
+<rect x="780" y="180" width="200" height="580" rx="10" fill="#fef3c7" stroke="#b45309" stroke-width="1.6"/>
+<text x="880.0" y="407.0" text-anchor="middle" font-size="14" font-weight="600" fill="#1f2430">MK64FN1M0VLL12</text>
+<text x="880.0" y="424.0" text-anchor="middle" font-size="12.5" font-weight="400" fill="#5b6372">Cortex-M4F · 120 MHz</text>
+<text x="880.0" y="441.0" text-anchor="middle" font-size="12.5" font-weight="400" fill="#5b6372">1 MB flash · 256 KB SRAM</text>
+<text x="880.0" y="458.0" text-anchor="middle" font-size="12.5" font-weight="400" fill="#5b6372"></text>
+<text x="880.0" y="475.0" text-anchor="middle" font-size="12.5" font-weight="400" fill="#5b6372">USB FS device</text>
+<text x="880.0" y="492.0" text-anchor="middle" font-size="12.5" font-weight="400" fill="#5b6372">10/100 ENET MAC</text>
+<text x="880.0" y="509.0" text-anchor="middle" font-size="12.5" font-weight="400" fill="#5b6372"></text>
+<text x="880.0" y="526.0" text-anchor="middle" font-size="12.5" font-weight="400" fill="#5b6372">Zephyr</text>
+<text x="880.0" y="543.0" text-anchor="middle" font-size="12.5" font-weight="400" fill="#5b6372">frdm-k64f-hid lineage</text>
+<rect x="1090" y="85" width="220" height="70" rx="6" fill="#ffffff" stroke="#374151" stroke-width="1.6"/>
+<text x="1200.0" y="116.5" text-anchor="middle" font-size="14" font-weight="600" fill="#1f2430">6× TPS2553</text>
+<text x="1200.0" y="133.5" text-anchor="middle" font-size="12.5" font-weight="400" fill="#5b6372">current-limited switch · 1.1 A each</text>
+<rect x="1095" y="160" width="78.8" height="20" rx="10" fill="#fff7ed" stroke="#c2410c" stroke-width="1"/>
+<text x="1134.4" y="174" text-anchor="middle" font-size="11.5" font-weight="600" fill="#b45309">+5V_PORTS</text>
+<rect x="1090" y="345" width="220" height="55" rx="6" fill="#ffffff" stroke="#374151" stroke-width="1.6"/>
+<text x="1200.0" y="369.0" text-anchor="middle" font-size="14" font-weight="600" fill="#1f2430">TXB0104</text>
+<text x="1200.0" y="386.0" text-anchor="middle" font-size="12.5" font-weight="400" fill="#5b6372">UART level shift · VREF from target</text>
+<rect x="1090" y="415" width="220" height="55" rx="6" fill="#ffffff" stroke="#374151" stroke-width="1.6"/>
+<text x="1200.0" y="439.0" text-anchor="middle" font-size="14" font-weight="600" fill="#1f2430">TXB0108 + PCA9306</text>
+<text x="1200.0" y="456.0" text-anchor="middle" font-size="12.5" font-weight="400" fill="#5b6372">GPIO push-pull · I2C open-drain</text>
+<rect x="1090" y="490" width="220" height="55" rx="6" fill="#ffffff" stroke="#374151" stroke-width="1.6"/>
+<text x="1200.0" y="514.0" text-anchor="middle" font-size="14" font-weight="600" fill="#1f2430">2× Omron G6K-1F-Y</text>
+<text x="1200.0" y="531.0" text-anchor="middle" font-size="12.5" font-weight="400" fill="#5b6372">SPDT signal relay · gold contacts · 1 A</text>
+<rect x="1090" y="565" width="220" height="55" rx="6" fill="#ffffff" stroke="#374151" stroke-width="1.6"/>
+<text x="1200.0" y="589.0" text-anchor="middle" font-size="14" font-weight="600" fill="#1f2430">eFuse</text>
+<text x="1200.0" y="606.0" text-anchor="middle" font-size="12.5" font-weight="400" fill="#5b6372">+5V_TGT · 5 A · /FAULT</text>
+<rect x="1095" y="625" width="64.4" height="20" rx="10" fill="#fff7ed" stroke="#c2410c" stroke-width="1"/>
+<text x="1127.2" y="639" text-anchor="middle" font-size="11.5" font-weight="600" fill="#b45309">+5V_TGT</text>
+<rect x="1090" y="880" width="220" height="120" rx="6" fill="#ffffff" stroke="#374151" stroke-width="1.6"/>
+<text x="1200" y="903" text-anchor="middle" font-size="14" font-weight="600" fill="#1f2430">SPDT power relay</text>
+<text x="1200" y="922" text-anchor="middle" font-size="12.5" fill="#5b6372">coil: +5V_PORTS · FET + flyback</text>
+<line x1="1092" y1="935" x2="1308" y2="935" stroke="#15803d" stroke-width="1.4" stroke-dasharray="7 5"/>
+<text x="1200" y="962" text-anchor="middle" font-size="12.5" fill="#5b6372">contacts: NC passes · 5 A · AgSnO2</text>
+<text x="1200" y="980" text-anchor="middle" font-size="12.5" fill="#5b6372">COM → NC when de-energized</text>
+<rect x="1470" y="85" width="240" height="70" rx="6" fill="#dbeafe" stroke="#2563eb" stroke-width="1.6"/>
+<text x="1590.0" y="116.5" text-anchor="middle" font-size="14" font-weight="600" fill="#1f2430">J4–J9  6× USB-A</text>
+<text x="1590.0" y="133.5" text-anchor="middle" font-size="12.5" font-weight="400" fill="#5b6372">bench devices · each switched</text>
+<rect x="1470" y="270" width="240" height="55" rx="6" fill="#dbeafe" stroke="#2563eb" stroke-width="1.6"/>
+<text x="1590.0" y="294.0" text-anchor="middle" font-size="14" font-weight="600" fill="#1f2430">J3  USB-C</text>
+<text x="1590.0" y="311.0" text-anchor="middle" font-size="12.5" font-weight="400" fill="#5b6372">HID kbd + mouse · VBUS sense-only</text>
+<rect x="1470" y="345" width="240" height="55" rx="6" fill="#dbeafe" stroke="#2563eb" stroke-width="1.6"/>
+<text x="1590.0" y="369.0" text-anchor="middle" font-size="14" font-weight="600" fill="#1f2430">J13  Phoenix 3.5</text>
+<text x="1590.0" y="386.0" text-anchor="middle" font-size="12.5" font-weight="400" fill="#5b6372">console: VREF · TXD · RXD · GND</text>
+<rect x="1470" y="415" width="240" height="55" rx="6" fill="#dbeafe" stroke="#2563eb" stroke-width="1.6"/>
+<text x="1590.0" y="439.0" text-anchor="middle" font-size="14" font-weight="600" fill="#1f2430">J15  2×6 header</text>
+<text x="1590.0" y="456.0" text-anchor="middle" font-size="12.5" font-weight="400" fill="#5b6372">6× GPIO · I2C · VREF · GND</text>
+<rect x="1470" y="490" width="240" height="55" rx="6" fill="#dbeafe" stroke="#2563eb" stroke-width="1.6"/>
+<text x="1590.0" y="514.0" text-anchor="middle" font-size="14" font-weight="600" fill="#1f2430">J11, J12  Phoenix 3.5</text>
+<text x="1590.0" y="531.0" text-anchor="middle" font-size="12.5" font-weight="400" fill="#5b6372">COM · NO · NC, per relay</text>
+<rect x="1470" y="565" width="240" height="55" rx="6" fill="#dbeafe" stroke="#2563eb" stroke-width="1.6"/>
+<text x="1590.0" y="589.0" text-anchor="middle" font-size="14" font-weight="600" fill="#1f2430">J14  Phoenix 5.08</text>
+<text x="1590.0" y="606.0" text-anchor="middle" font-size="12.5" font-weight="400" fill="#5b6372">+5V_TGT out · 5 A</text>
+<rect x="1470" y="950" width="240" height="70" rx="6" fill="#dbeafe" stroke="#2563eb" stroke-width="1.6"/>
+<text x="1590.0" y="973.0" text-anchor="middle" font-size="14" font-weight="600" fill="#1f2430">J19  Phoenix 5.08</text>
+<text x="1590.0" y="990.0" text-anchor="middle" font-size="12.5" font-weight="400" fill="#5b6372">PSU out</text>
+<text x="1590.0" y="1007.0" text-anchor="middle" font-size="12.5" font-weight="400" fill="#5b6372">V+ via NC · GND via bus</text>
+<path d="M 250,120 L 330,120" fill="none" stroke="#2b3340" stroke-width="1.6" marker-end="url(#arrow)"/>
+<path d="M 530,105 L 1090,105" fill="none" stroke="#2b3340" stroke-width="1.6" marker-end="url(#arrow)"/>
+<text x="810" y="99" text-anchor="middle" font-size="12" fill="#5b6372" paint-order="stroke" stroke="#ffffff" stroke-width="4" stroke-linejoin="round">ports 1–6</text>
+<path d="M 850,180 L 850,140 L 530,140" fill="none" stroke="#2b3340" stroke-width="1.6" marker-end="url(#arrow)"/>
+<text x="700" y="134" text-anchor="middle" font-size="12" fill="#5b6372" paint-order="stroke" stroke="#ffffff" stroke-width="4" stroke-linejoin="round">I2C</text>
+<path d="M 380,155 L 380,195" fill="none" stroke="#2b3340" stroke-width="1.6" marker-end="url(#arrow)"/>
+<text x="392" y="181" text-anchor="start" font-size="12" fill="#5b6372" paint-order="stroke" stroke="#ffffff" stroke-width="4" stroke-linejoin="round">port 7 · unswitched</text>
+<path d="M 530,225 L 780,225" fill="none" stroke="#2b3340" stroke-width="1.6" marker-end="url(#arrow)"/>
+<text x="655" y="219" text-anchor="middle" font-size="12" fill="#5b6372" paint-order="stroke" stroke="#ffffff" stroke-width="4" stroke-linejoin="round">SWD + UART</text>
+<path d="M 250,320 L 330,320" fill="none" stroke="#2b3340" stroke-width="1.6" marker-end="url(#arrow)"/>
+<path d="M 530,320 L 780,320" fill="none" stroke="#2b3340" stroke-width="1.6" marker-end="url(#arrow)"/>
+<text x="655" y="314" text-anchor="middle" font-size="12" fill="#5b6372" paint-order="stroke" stroke="#ffffff" stroke-width="4" stroke-linejoin="round">RMII</text>
+<path d="M 250,430 L 780,430" fill="none" stroke="#2b3340" stroke-width="1.6" marker-end="url(#arrow)"/>
+<text x="515" y="424" text-anchor="middle" font-size="12" fill="#5b6372" paint-order="stroke" stroke="#ffffff" stroke-width="4" stroke-linejoin="round">SWD, direct</text>
+<path d="M 250,550 L 330,550" fill="none" stroke="#b45309" stroke-width="2.4" marker-end="url(#arrow)"/>
+<text x="290" y="544" text-anchor="middle" font-size="12" fill="#5b6372" paint-order="stroke" stroke="#ffffff" stroke-width="4" stroke-linejoin="round">VBUS</text>
+<path d="M 250,640 L 330,640" fill="none" stroke="#2b3340" stroke-width="1.6" marker-end="url(#arrow)"/>
+<text x="290" y="634" text-anchor="middle" font-size="12" fill="#5b6372" paint-order="stroke" stroke="#ffffff" stroke-width="4" stroke-linejoin="round">I2C + VSYS</text>
+<path d="M 530,595 L 580,595" fill="none" stroke="#2b3340" stroke-width="1.6" marker-start="url(#arrowR)" marker-end="url(#arrow)"/>
+<path d="M 710,595 L 780,595" fill="none" stroke="#2b3340" stroke-width="1.6" marker-start="url(#arrowR)" marker-end="url(#arrow)"/>
+<text x="745" y="589" text-anchor="middle" font-size="12" fill="#5b6372" paint-order="stroke" stroke="#ffffff" stroke-width="4" stroke-linejoin="round">I2C</text>
+<path d="M 980,230 L 1200,230 L 1200,155" fill="none" stroke="#2b3340" stroke-width="1.6" marker-end="url(#arrow)"/>
+<text x="1090" y="224" text-anchor="middle" font-size="12" fill="#5b6372" paint-order="stroke" stroke="#ffffff" stroke-width="4" stroke-linejoin="round">6× EN · 6× /FAULT</text>
+<path d="M 980,297 L 1470,297" fill="none" stroke="#2b3340" stroke-width="1.6" marker-end="url(#arrow)"/>
+<text x="1225" y="291" text-anchor="middle" font-size="12" fill="#5b6372" paint-order="stroke" stroke="#ffffff" stroke-width="4" stroke-linejoin="round">USB FS device</text>
+<path d="M 980,372 L 1090,372" fill="none" stroke="#2b3340" stroke-width="1.6" marker-end="url(#arrow)"/>
+<text x="1035" y="366" text-anchor="middle" font-size="12" fill="#5b6372" paint-order="stroke" stroke="#ffffff" stroke-width="4" stroke-linejoin="round">UART</text>
+<path d="M 1310,372 L 1470,372" fill="none" stroke="#2b3340" stroke-width="1.6" marker-end="url(#arrow)"/>
+<path d="M 980,442 L 1090,442" fill="none" stroke="#2b3340" stroke-width="1.6" marker-end="url(#arrow)"/>
+<text x="1035" y="436" text-anchor="middle" font-size="12" fill="#5b6372" paint-order="stroke" stroke="#ffffff" stroke-width="4" stroke-linejoin="round">GPIO · I2C</text>
+<path d="M 1310,442 L 1470,442" fill="none" stroke="#2b3340" stroke-width="1.6" marker-end="url(#arrow)"/>
+<path d="M 980,517 L 1090,517" fill="none" stroke="#2b3340" stroke-width="1.6" marker-end="url(#arrow)"/>
+<text x="1035" y="511" text-anchor="middle" font-size="12" fill="#5b6372" paint-order="stroke" stroke="#ffffff" stroke-width="4" stroke-linejoin="round">2× FET + flyback</text>
+<path d="M 1310,517 L 1470,517" fill="none" stroke="#2b3340" stroke-width="1.6" marker-end="url(#arrow)"/>
+<text x="1390" y="511" text-anchor="middle" font-size="12" fill="#5b6372" paint-order="stroke" stroke="#ffffff" stroke-width="4" stroke-linejoin="round">dry contacts</text>
+<path d="M 980,592 L 1090,592" fill="none" stroke="#2b3340" stroke-width="1.6" marker-end="url(#arrow)"/>
+<text x="1035" y="586" text-anchor="middle" font-size="12" fill="#5b6372" paint-order="stroke" stroke="#ffffff" stroke-width="4" stroke-linejoin="round">EN · /FAULT</text>
+<path d="M 1310,592 L 1470,592" fill="none" stroke="#b45309" stroke-width="2.4" marker-end="url(#arrow)"/>
+<text x="1390" y="586" text-anchor="middle" font-size="12" fill="#5b6372" paint-order="stroke" stroke="#ffffff" stroke-width="4" stroke-linejoin="round">5 A</text>
+<path d="M 980,700 L 1200,700 L 1200,880" fill="none" stroke="#2b3340" stroke-width="1.6" marker-end="url(#arrow)"/>
+<text x="1212" y="800" text-anchor="start" font-size="12" fill="#5b6372" paint-order="stroke" stroke="#ffffff" stroke-width="4" stroke-linejoin="round">coil drive · FET + flyback</text>
+<path d="M 250,975 L 1090,975" fill="none" stroke="#15803d" stroke-width="2.6" marker-end="url(#arrow)"/>
+<text x="960" y="991" text-anchor="middle" font-size="12" fill="#5b6372" paint-order="stroke" stroke="#ffffff" stroke-width="4" stroke-linejoin="round">V+  →  COM</text>
+<path d="M 1310,975 L 1470,975" fill="none" stroke="#15803d" stroke-width="2.6" marker-end="url(#arrow)"/>
+<text x="1390" y="969" text-anchor="middle" font-size="12" fill="#5b6372" paint-order="stroke" stroke="#ffffff" stroke-width="4" stroke-linejoin="round">NC</text>
+<path d="M 250,1010 L 1470,1010" fill="none" stroke="#15803d" stroke-width="5"/>
+<text x="900" y="1028" text-anchor="middle" font-size="12" fill="#5b6372" paint-order="stroke" stroke="#ffffff" stroke-width="4" stroke-linejoin="round">GND · copper bus ≥ 5 mm, both outer layers</text>
+<line x1="740" y1="970" x2="740" y2="975" stroke="#15803d" stroke-width="1.6"/>
+<line x1="790" y1="970" x2="790" y2="1010" stroke="#15803d" stroke-width="1.6"/>
+<circle cx="740" cy="975" r="3.2" fill="#15803d"/><circle cx="790" cy="1010" r="3.2" fill="#15803d"/>
+<path d="M 765,900 L 765,850 L 820,850 L 820,760" fill="none" stroke="#2b3340" stroke-width="1.6" marker-end="url(#arrow)"/>
+<text x="700" y="854" text-anchor="end" font-size="12" fill="#5b6372" paint-order="stroke" stroke="#ffffff" stroke-width="4" stroke-linejoin="round">PSU present</text>
+<line x1="1455" y1="1095" x2="1483" y2="1095" stroke="#2b3340" stroke-width="1.6" marker-end="url(#arrow)"/>
+<text x="1489" y="1099" font-size="11.5" fill="#5b6372">signal</text>
+<line x1="1545" y1="1095" x2="1573" y2="1095" stroke="#b45309" stroke-width="2.6"/>
+<text x="1579" y="1099" font-size="11.5" fill="#5b6372">board power</text>
+<line x1="1661" y1="1095" x2="1689" y2="1095" stroke="#15803d" stroke-width="2.6"/>
+<text x="1695" y="1099" font-size="11.5" fill="#5b6372">isolated</text>
+</svg>

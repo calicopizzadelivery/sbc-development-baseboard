@@ -29,6 +29,8 @@ starting `OK` or `ERR`. See **[docs/protocol.md](docs/protocol.md)**.
 
 ## The shape of it
 
+[![Block diagram](docs/block-diagram.png)](docs/block-diagram.png)
+
 ```
 workstation ──USB-C──> hub ──> 6x USB-A (switched)     ──> whatever you hang on the bench
             ──RJ45───> K64 ──> USB-C device port       ──> target's USB host port
