@@ -27,7 +27,7 @@ each other. `CONSOLE` attach is the exception and is exclusive — see below.
 
 | Command | Effect |
 |---|---|
-| `PORT <1-6\|ALL> ON\|OFF\|TOGGLE` | Power a USB-A port |
+| `PORT <1-5\|ALL> ON\|OFF\|TOGGLE` | Power a USB-A port |
 | `PORT <n\|ALL> PULSE [ON\|OFF] <ms>` | Invert (or force a state) for *ms*, then revert |
 | `PORT <n>` | Report one port |
 | `RELAY <1-2\|ALL> ON\|OFF\|TOGGLE` | Energize a relay coil |
@@ -38,6 +38,9 @@ each other. `CONSOLE` attach is the exception and is exclusive — see below.
 | `TGT 5V\|PSU PULSE OFF <ms>` | Hold that supply dark for *ms* |
 | `TGT CYCLE [5V\|PSU] [<ms>]` | `PULSE OFF` on one supply, or both if none is named. Default 5000 ms |
 | `TGT` | Report both supplies |
+| `FTDI ON\|OFF\|TOGGLE` | VBUS to the FT231X behind J9 |
+| `FTDI CYCLE [<ms>]` | Power-cycle it, default 2000 ms; it re-enumerates on the workstation |
+| `FTDI` | Report it |
 
 Pulses are non-blocking and several can run at once; the console stays
 responsive throughout, and the revert happens even if the host wanders off. A
@@ -55,6 +58,13 @@ the relay is *passing*, which is its de-energized state, and also what an
 unpowered baseboard does. The protocol still says `ON`, because the thing the
 channel exists to do is happening. The polarity lives in one place in the
 firmware, as it does on the relay controller.
+
+`FTDI` is deliberately not `PORT 6`, though that is the hub port it sits on.
+`PORT ALL OFF` does not touch it: the bridge you are reading the boot log on
+must not be swept away by a script that is clearing the bench. `FTDI CYCLE`
+exists for one reason — a USB-UART bridge that stays enumerated and openable
+while delivering nothing, which the bench notes record happening and being
+misread as a dead target.
 
 `TGT CYCLE` with no supply named cycles both. A target uses one of the two, so
 cycling the other is a no-op — and if a target ever uses both, cycling both is
@@ -96,6 +106,9 @@ interactive session does not.
 
 Only one session may be attached at a time; a second gets
 `ERR CONSOLE BUSY <transport>`.
+
+This is J13. The other console, J9, is an FT231X that the workstation talks to
+directly as a serial device; it has no commands here beyond `FTDI`.
 
 ---
 
@@ -152,7 +165,7 @@ is disabled, and `GPIO` returns `ERR NO VREF` rather than pretending.
 
 ```
 > STATE
-STATE PORT 1=ON 2=ON 3=OFF 4=ON(pulse 480ms) 5=ON 6=ON RELAY 1=OFF 2=OFF TGT 5V=ON PSU=ON(present)
+STATE PORT 1=ON 2=ON 3=OFF 4=ON(pulse 480ms) 5=ON FTDI=ON RELAY 1=OFF 2=OFF TGT 5V=ON PSU=ON(present)
 > POWER
 OK POWER contract=20V/3.0A/60W src=pd budget=60W used=14W headroom=46W
 > INFO

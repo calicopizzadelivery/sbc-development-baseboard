@@ -2,7 +2,8 @@
 
 One board carrying the hardware you need to develop on and remotely manage an
 attached single-board computer: a microcontroller that is a USB device to the
-target and a console to you, six individually switched USB-A ports, two isolated
+target and a console to you, five individually switched USB-A ports, an FTDI
+header straight to the workstation, two isolated
 SPDT relays on screw terminals, a level-shifted serial console, and a switched
 supply for the target itself.
 
@@ -16,10 +17,11 @@ is replugged.
 | Function | How |
 |---|---|
 | Type at the target | USB HID keyboard + mouse from the K64's device port |
-| Cut power to any USB device | Six USB-A ports, each with its own current-limited switch |
+| Cut power to any USB device | Five USB-A ports, each with its own current-limited switch |
 | Hard power-cycle the target | Switched +5V_TGT rail up to 5 A, or any PSU up to 30 V / 5 A through an isolated relay |
 | Toggle target I/O — FORCE_RECOVERY and friends | Two SPDT relays, dry contacts, Phoenix terminals |
 | Read the target's serial console | MCU-owned UART, auto level translation 1.2–3.6 V |
+| Read it from the workstation directly | FT231X on an internal hub port, standard 6-pin FTDI header, 3.3 V |
 | Do all of it from somewhere else | 10/100 Ethernet to the workstation |
 | Do all of it with no network | USB CDC console over the onboard DAPLink |
 
@@ -32,7 +34,8 @@ starting `OK` or `ERR`. See **[docs/protocol.md](docs/protocol.md)**.
 [![Block diagram](docs/block-diagram.png)](docs/block-diagram.png)
 
 ```
-workstation ──USB-C──> hub ──> 6x USB-A (switched)     ──> whatever you hang on the bench
+workstation ──USB-C──> hub ──> 5x USB-A (switched)     ──> whatever you hang on the bench
+                           ──> FT231X, FTDI header     ──> target's console, direct
             ──RJ45───> K64 ──> USB-C device port       ──> target's USB host port
                            ──> UART + VREF             ──> target's console
                            ──> 2x SPDT dry contacts    ──> target's recovery/reset pins
@@ -42,7 +45,7 @@ workstation ──USB-C──> hub ──> 6x USB-A (switched)     ──> whate
 ```
 
 Two USB-C inlets, not one. A charger that offers 60 W carries no data, and a
-workstation port that carries data offers 15 W at best — and six switched ports
+workstation port that carries data offers 15 W at best — and five switched ports
 plus a target rail needs more than that. Splitting them also means the board
 stays alive when the workstation link is down, so the MCU can power-cycle the
 entire USB tree including its own path back to you.

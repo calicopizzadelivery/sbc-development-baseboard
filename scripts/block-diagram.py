@@ -9,8 +9,7 @@ gives orthogonal routing with no crossings, which an auto-layout never managed
 for this topology. When the configuration changes, change the boxes and paths
 here, run it, and commit all three files together.
 
-The PNG is the SVG rendered by headless Chrome at 2x. The stamp in the corner
-is the commit the configuration was read from, so a stale diagram says so.
+The PNG is the SVG rendered by headless Chrome at 2x and dated in the corner.
 """
 import os, pathlib, shutil, subprocess, sys, tempfile, datetime
 
@@ -18,12 +17,7 @@ ROOT = pathlib.Path(__file__).resolve().parent.parent
 SVG = ROOT / "docs" / "block-diagram.svg"
 PNG = ROOT / "docs" / "block-diagram.png"
 
-def git(*a):
-    return subprocess.run(["git", "-C", str(ROOT), *a], capture_output=True, text=True).stdout.strip()
-rev = git("rev-parse", "--short", "HEAD") or "unversioned"
-if git("status", "--porcelain", "--", "docs/hardware-spec.md", "docs/protocol.md"):
-    rev += "+"   # spec edited since that commit
-STAMP = f"spec rev 0.1 · as of {rev} · {datetime.date.today().isoformat()}"
+STAMP = f"spec rev 0.1 · {datetime.date.today().isoformat()}"
 
 W, H = 1760, 1120
 out = []
@@ -104,7 +98,7 @@ box(50, 610, 200, 60, "J17  JST SH 1.0 mm", "PD programming · Qwiic", "conn")
 box(50, 950, 200, 70, "J18  Phoenix 5.08", ["PSU in", "0–30 VDC · 5 A"], "conn")
 
 # ---------- center-left devices
-box(330, 85, 200, 70, "USB2517", "7-port USB 2.0 HS hub")
+box(330, 85, 200, 75, "USB2517", "7-port USB 2.0 HS hub")
 box(330, 195, 200, 60, "MK20DX128  DAPLink", "SWD · CDC · MSD")
 box(330, 290, 200, 60, "KSZ8081RNA", "RMII PHY")
 box(330, 520, 200, 150, "STUSB4500", ["USB-PD sink", "autonomous, NVM PDOs", "I2C readback"], "pwr")
@@ -134,8 +128,10 @@ e(f'<text x="765" y="958" text-anchor="middle" font-size="12.5" fill="{C["mute"]
 box(780, 180, 200, 580, "MK64FN1M0VLL12", ["Cortex-M4F · 120 MHz", "1 MB flash · 256 KB SRAM", "", "USB FS device", "10/100 ENET MAC", "", "Zephyr", "frdm-k64f-hid lineage"], "mcu", r=10)
 
 # ---------- center-right devices
-box(1090, 85, 220, 70, "6× TPS2553", "current-limited switch · 1.1 A each")
-tag(1095, 170, "+5V_PORTS")
+box(1090, 85, 220, 50, "FT231X", "USB-UART · 3.3 V I/O · TX/RX LEDs")
+box(1090, 155, 220, 50, "6× TPS2553", "5× USB-A at 1.1 A · 1× FT231X")
+tag(1215, 221, "+5V_PORTS")
+path([(1200, 155), (1200, 135)], width=2.4, color=C["power"])
 box(1090, 345, 220, 55, "TXB0104", "UART level shift · VREF from target")
 box(1090, 415, 220, 55, "TXB0108 + PCA9306", "GPIO push-pull · I2C open-drain")
 box(1090, 490, 220, 55, "2× Omron G6K-1F-Y", "SPDT signal relay · gold contacts · 1 A")
@@ -150,7 +146,8 @@ e(f'<text x="1200" y="962" text-anchor="middle" font-size="12.5" fill="{C["mute"
 e(f'<text x="1200" y="980" text-anchor="middle" font-size="12.5" fill="{C["mute"]}">COM → NC when de-energized</text>')
 
 # ---------- right column
-box(1470, 85, 240, 70, "J4–J9  6× USB-A", "bench devices · each switched", "conn")
+box(1470, 85, 240, 50, "J9  FTDI header · 6-pin 0.1″", "GND CTS VCC TXD RXD DTR · 3.3 V", "conn")
+box(1470, 155, 240, 50, "J4–J8  5× USB-A", "bench · each switched", "conn")
 box(1470, 270, 240, 55, "J3  USB-C", "HID kbd + mouse · VBUS sense-only", "conn")
 box(1470, 345, 240, 55, "J13  Phoenix 3.5", "console: VREF · TXD · RXD · GND", "conn")
 box(1470, 415, 240, 55, "J15  2×6 header", "6× GPIO · I2C · VREF · GND", "conn")
@@ -160,9 +157,12 @@ box(1470, 950, 240, 70, "J19  Phoenix 5.08", ["PSU out", "V+ via NC · GND via b
 
 # ---------- edges: USB / debug / ethernet
 path([(250, 120), (330, 120)])
-path([(530, 105), (1090, 105)], "ports 1–6", (810, 99))
-path([(850, 180), (850, 140), (530, 140)], "I2C", (700, 134))
-path([(380, 155), (380, 195)], "port 7 · unswitched", (392, 181), anchor="start")
+path([(530, 110), (1090, 110)], "port 6", (700, 104))
+path([(530, 130), (1050, 130), (1050, 180), (1090, 180)], "ports 1–5", (950, 124))
+path([(850, 180), (850, 150), (530, 150)], "I2C", (700, 144))
+path([(380, 160), (380, 195)], "port 7 · unswitched", (392, 183), anchor="start")
+path([(1310, 110), (1470, 110)], "UART · 3.3 V", (1390, 104))
+path([(1310, 180), (1470, 180)])
 path([(530, 225), (780, 225)], "SWD + UART", (655, 219))
 path([(250, 320), (330, 320)])
 path([(530, 320), (780, 320)], "RMII", (655, 314))
@@ -175,7 +175,7 @@ path([(530, 595), (580, 595)], arrow="both")
 path([(710, 595), (780, 595)], "I2C", (745, 589), arrow="both")
 
 # MCU outputs
-path([(980, 230), (1200, 230), (1200, 155)], "6× EN · 6× /FAULT", (1090, 224))
+path([(980, 230), (1200, 230), (1200, 205)], "6× EN · 6× /FAULT", (1090, 224))
 path([(980, 297), (1470, 297)], "USB FS device", (1225, 291))
 path([(980, 372), (1090, 372)], "UART", (1035, 366)); path([(1310, 372), (1470, 372)])
 path([(980, 442), (1090, 442)], "GPIO · I2C", (1035, 436)); path([(1310, 442), (1470, 442)])
