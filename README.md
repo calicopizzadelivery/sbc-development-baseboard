@@ -87,6 +87,8 @@ whether the 5 V rails need one buck or two.
 docs/hardware-spec.md   block diagram, part selection, power and pin budgets,
                         safe states, and the open questions
 docs/protocol.md        the console protocol, across both transports
+docs/block-diagram.*    the diagram above, SVG source and rendered PNG
+scripts/block-diagram.py regenerates both; run it with every configuration change
 hardware/kicad/         schematic and layout
 hardware/datasheets/    the parts that matter
 ```
