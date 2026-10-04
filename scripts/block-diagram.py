@@ -105,7 +105,7 @@ box(50, 610, 200, 60, "J17  JST SH 1.0 mm", "PD programming · Qwiic", "conn")
 box(50, 950, 200, 70, "J18  Phoenix 5.08", ["PSU in", "0–30 VDC · 5 A"], "conn")
 
 # ---------- center-left devices
-box(330, 85, 200, 75, "USB2517", "7-port USB 2.0 HS · port 5 n/c")
+box(330, 85, 200, 75, "USB2517", "7-port USB 2.0 HS · strap mode · port 3 n/c")
 box(330, 195, 200, 60, "MK20DX128  DAPLink", "SWD · CDC · MSD")
 box(330, 290, 200, 60, "KSZ8081RNA", "RMII PHY")
 box(330, 520, 200, 150, "STUSB4500", ["USB-PD sink", "autonomous, NVM PDOs", "I2C readback"], "pwr")
@@ -114,9 +114,9 @@ e(f'<text x="645" y="645" text-anchor="middle" font-size="11" fill="{C["mute"]}"
 e(f'<text x="645" y="659" text-anchor="middle" font-size="11" fill="{C["mute"]}">→ K64 disconnected in hardware</text>')
 
 # power tree
-box(330, 735, 200, 45, "buck 1", "+5V_PORTS · 6 A", "pwr")
-box(330, 800, 200, 45, "buck 3", "+3V3 · 1.5 A", "pwr")
-box(330, 865, 200, 45, "buck 2", "+5V_TGT · 5 A", "pwr")
+box(330, 735, 200, 45, "buck 1 · TPS54560B", "+5V_PORTS · 5 A", "pwr")
+box(330, 800, 200, 45, "buck 3 · TPS62823", "+3V3 · 3 A", "pwr")
+box(330, 865, 200, 45, "buck 2 · TPS54560B", "+5V_TGT · 5 A", "pwr")
 path([(430, 670), (430, 735)], width=2.4, color=C["power"])
 path([(430, 705), (310, 705), (310, 887), (330, 887)], width=2.4, color=C["power"])
 e(f'<text x="446" y="700" font-size="11.5" font-weight="600" fill="{C["power"]}">VBUS_IN 5–20 V</text>')
@@ -140,9 +140,9 @@ box(1090, 155, 220, 50, "5× TPS2553", "4× USB-A at 1.1 A · 1× FT231X")
 tag(1215, 221, "+5V_PORTS")
 path([(1200, 155), (1200, 135)], width=2.4, color=C["power"])
 box(1090, 345, 220, 55, "TXB0104", "UART level shift · VREF from target")
-box(1090, 415, 220, 55, "TXB0108 + PCA9306", "GPIO push-pull · I2C open-drain")
+box(1090, 415, 220, 55, "TXB0108 + TXS0102", "GPIO push-pull · I2C open-drain")
 box(1090, 490, 220, 55, "2× Omron G6K-1F-Y", "SPDT signal relay · gold contacts · 1 A")
-box(1090, 565, 220, 55, "eFuse", "+5V_TGT · 5 A · /FAULT")
+box(1090, 565, 220, 55, "TPS26630 eFuse", "+5V_TGT · 5 A · /FAULT · IMON")
 tag(1095, 635, "+5V_TGT")
 # power relay straddling the barrier
 e(f'<rect x="1090" y="880" width="220" height="120" rx="6" fill="{C["dev"]}" stroke="{C["dev_edge"]}" stroke-width="1.6"/>')
@@ -171,10 +171,9 @@ rgb(944, 192)                                                                # h
 
 # ---------- edges: USB / debug / ethernet
 path([(250, 120), (330, 120)])
-path([(530, 110), (1090, 110)], "port 6", (700, 104))
-path([(530, 130), (1050, 130), (1050, 180), (1090, 180)], "ports 1–4", (950, 124))
-path([(850, 180), (850, 150), (530, 150)], "I2C", (700, 144))
-path([(380, 160), (380, 195)], "port 7 · unswitched", (392, 183), anchor="start")
+path([(530, 110), (1090, 110)], "port 2", (700, 104))
+path([(530, 130), (1050, 130), (1050, 180), (1090, 180)], "ports 4–7", (950, 124))
+path([(380, 160), (380, 195)], "port 1 · unswitched", (392, 183), anchor="start")
 path([(1310, 110), (1470, 110)], "UART · 3.3 V", (1390, 104))
 path([(1310, 180), (1470, 180)])
 path([(530, 225), (780, 225)], "SWD + UART", (655, 219))

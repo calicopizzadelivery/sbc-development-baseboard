@@ -1,4 +1,8 @@
-build/
-*.kicad_prl
 *-backups/
+build/
 fp-info-cache
+hardware/kicad/gen/__pycache__/
+hardware/kicad/sbc-baseboard/*-backups/
+hardware/kicad/sbc-baseboard/fp-info-cache
+hardware/kicad/sbc-baseboard/*.kicad_prl
+*.kicad_prl

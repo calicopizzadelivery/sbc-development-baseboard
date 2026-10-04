@@ -41,10 +41,10 @@ flowchart LR
     BUF["PCA9517A<br/>I2C buffer"]
     SW["5x TPS2553<br/>4 ports + FT231X"]
     FTDI["FT231X<br/>USB-UART, 3.3 V"]
-    TSW["eFuse<br/>+5V_TGT"]
+    TSW["TPS26630 eFuse<br/>+5V_TGT"]
     RLY["2x SPDT<br/>signal relay"]
     PT["passthrough<br/>SPDT power relay, 5 A NO"]
-    LT["TXB0104 / TXB0108<br/>PCA9306"]
+    LT["TXB0104 / TXB0108<br/>TXS0102"]
   end
 
   subgraph TG["facing the target"]
@@ -59,10 +59,10 @@ flowchart LR
   end
 
   J1 --> HUB
-  HUB -->|"ports 1-4"| SW --> UA["J4, J5<br/>2x stacked USB-A"]
-  HUB -->|"port 6"| FTDI --> J9
+  HUB -->|"ports 4-7"| SW --> UA["J4, J5<br/>2x stacked USB-A"]
+  HUB -->|"port 2"| FTDI --> J9
   SW -.->|VBUS| FTDI
-  HUB -->|"port 7, unswitched"| DAP
+  HUB -->|"port 1, unswitched"| DAP
   DAP -->|"SWD + UART"| MCU
   J10 --> PHY --> MCU
   J2 --> PD
@@ -70,7 +70,6 @@ flowchart LR
   PD <-->|I2C| BUF <-->|I2C| MCU
 
   MCU -->|"6x EN + 6x /FAULT"| SW
-  MCU -->|I2C| HUB
   MCU -->|"USB FS device"| J3
   MCU -->|UART| LT --> J13
   MCU -->|"GPIO + I2C"| LT --> J15
@@ -236,14 +235,17 @@ The mechanical inset on the block diagram is to scale.
 | Block | Part | Notes |
 |---|---|---|
 | Application MCU | **MK64FN1M0VLL12** | 100-LQFP, Cortex-M4F 120 MHz, 1 MB flash, 256 KB SRAM, USB FS OTG, 10/100 MAC. Same die as the FRDM-K64F, whose schematic is public and serves as the reference design. |
-| Ethernet PHY | **KSZ8081RNA** | RMII, same part as the FRDM, so the Zephyr devicetree carries over. The `RNA` and `RND` suffixes differ in how the PHY is clocked (50 MHz reference in vs 25 MHz crystal) and are **not** interchangeable — confirm which one the FRDM fits and which one this clock tree wants, against the datasheet, at BOM time. See [open question 2](#8-open-questions). |
+| Ethernet PHY | **KSZ8081RNA** | RMII, same part as the FRDM, so the Zephyr devicetree carries over. Clocked the FRDM way: 25 MHz crystal on XI/XO, RMII 25 MHz mode (the RNA power-up default), REF_CLK outputs 50 MHz into the K64's EXTAL0. Zephyr's `frdm_k64f` board file says `microchip,interface-type = "rmii-25MHz"`, which is this arrangement. |
 | Debug/console MCU | **MK20DX128VFM5** running DAPLink | CMSIS-DAP SWD + USB CDC + mass-storage drag-drop, exactly as OpenSDA v2 does today. |
-| USB hub | **USB2517** (or USB2517i) | 7-port USB 2.0 HS. Ports 1–4 to the USB-A receptacles, port 5 unconnected and disabled in configuration, port 6 to the FT231X, port 7 to the DAPLink; 6 and 7 flagged non-removable. I2C/SMBus configuration, 24 MHz crystal. |
+| USB hub | **USB2517** (or USB2517i) | Strap-configured (CFG_SEL = 000), so the USB tree comes up with no firmware: port 1 DAPLink, port 2 FT231X, port 3 disabled by strap, ports 4–7 to the USB-A receptacles. NON_REM = 11 and LOCAL_PWR = 1 from three resistors. The hub's SMBus is not connected to the K64. 24 MHz crystal. |
 | Port switches, 5× | **TPS2553** | Four USB-A ports and the FT231X's VBUS. Adjustable current limit via `ILIM`, soft-start, open-drain `/FAULT`. |
 | USB-A receptacles, 2× | double-stacked USB 2.0 Type-A, through-hole | Würth WR-COM dual-port class (61400826021). Two ports per body, shield tabs to chassis. Four ports on two bodies rather than five with one on its own. |
 | USB-UART bridge | **FT231XS** | SSOP-20 (`FT231XQ` for QFN). Bus-powered from hub port 6; `3V3OUT` feeds `VCCIO`. CBUS0/1 drive TX/RX LEDs. |
 | FTDI header | 6-pin 0.1″, right-angle, board edge | J9. Two solder jumpers: pin 6 RTS#/DTR#, pin 3 VCC. 470 Ω series on TXD and pin 6. |
-| Target rail switch | eFuse or load switch, ≥5 A | Adjustable limit, `/FAULT` back to the MCU. Candidate: TPS25940 family. |
+| Target rail switch | **TPS26630RGE** | 4.5–60 V, 0.6–6 A eFuse, in the KiCad library (TPS25940 is not). ILIM 3.65 kΩ → 5 A, UVLO 4.3 V, `/FLT` to the K64, IMON into a K64 ADC pin for target current. |
+| Bucks 1 and 2 | **TPS54560BDDA** | 4.5–60 V, 5 A, non-synchronous, 400 kHz; in the library where LM61460 is not. At four ports 5 A is enough (§4). EN gated by the STUSB4500's VBUS_EN_SNK, so there is no series VBUS FET. |
+| Buck 3 | **TPS62823DLC** | 3 A synchronous, +5V_PORTS → +3V3. |
+| Magjack | **Kycon G7LX-A88S7-BP-GY** | 10/100 with LEDs. Chosen over the Würth part because its library symbol names the LED pins. |
 | PD sink | **STUSB4500** | Autonomous — negotiates from NVM-stored PDOs with no MCU involvement, so the board is powered before firmware runs. I2C readback lets the MCU learn the contract. Alternate: Infineon CYPD3177. |
 | PD programming header | **JST SM04B-SRSS-TB** | The Qwiic / STEMMA QT connector, side entry; `BM04B-SRSS-TB` if placement wants top entry. Stock cables fit either. |
 | PD bus buffer | **PCA9517A** | Isolates the K64 from the PD sink's I2C whenever the board is unpowered or a programmer is on J17. See §4. |
@@ -252,7 +254,7 @@ The mechanical inset on the block diagram is to scale.
 | Relay drivers, 3× | AO3400 + 1N4148 flyback | One FET for all three coils. Gate pulldown to ground — see §5. |
 | PSU presence detect | LTV-817-class optocoupler | Optional. The only component that touches the passthrough, across an isolation barrier — see §4. |
 | UART translation | **TXB0104** | Auto-direction, push-pull. `VCCA` from J13's VREF pin. |
-| I2C translation | **PCA9306** | Open-drain pass-through. **Do not** use a TXB part for I2C. |
+| I2C translation | **TXS0102** | Open-drain auto-direction with internal pull-ups. Chosen over PCA9306 because a 3.3 V target makes VREF equal to the K64 rail, and PCA9306 needs VREF2 > VREF1. Range 1.65–3.6 V. **Do not** use a TXB part for I2C. |
 | GPIO translation | **TXB0108** | Same VREF as the console. |
 | ESD | USBLC6-2SC6 or TPD2E2U06 per USB pair | Plus TVS on the screw-terminal nets. |
 
@@ -309,7 +311,7 @@ sized for the whole range. `psu=present` on the console is the indicator.
 
 ```
 J2 ──> STUSB4500 ──> VBUS_IN (5-20 V) ──┬──> buck 1 ──> +5V_PORTS ──┬──> 4x TPS2553 ──> J4, J5
-        reverse-polarity + OVP          │                            ├──> 1x TPS2553 ──> FT231X
+        TVS; EN-gated bucks             │                            ├──> 1x TPS2553 ──> FT231X
                                         │                            ├──> relay coils
                                         │                            └──> buck 3 ──> +3V3
                                         └──> buck 2 ──> +5V_TGT ──> switch ──> J14
@@ -323,6 +325,11 @@ them costs one converter and removes a whole class of confusing failure.
 
 `+3V3` hangs off `+5V_PORTS` rather than `VBUS_IN` so the logic supply sees a
 pre-regulated input and a narrow conversion ratio.
+
+There is no series FET on VBUS. The STUSB4500's `VBUS_EN_SNK` (open drain,
+low once a sink contract — or plain Type-C 5 V — is valid) drives a small
+inverter on the bucks' EN pins, so the rails only come up when the inlet is
+happy, and nothing in the 5 A path is a FET dropping volts.
 
 The target passthrough (J18 → J19) is deliberately absent from this tree. It is
 not a board rail and draws nothing from the PD contract; see below.
@@ -582,6 +589,27 @@ target that hangs SDA low must not take out the board's own configuration path;
 and the port LEDs can move behind a shift register if layout wants the pins
 back, since their timing does not matter.
 
+### Allocation (as captured)
+
+| K64 pins | Function |
+|---|---|
+| PTA5, PTA12–17, PTB0, PTB1 | RMII (same as FRDM-K64F) |
+| PTA18 (EXTAL0) | 50 MHz REF_CLK from the PHY |
+| PTA0, PTA3, RESET_b | SWD (J16 and DAPLink) |
+| PTB16, PTB17 | UART0 to the DAPLink CDC |
+| PTC3, PTC4 | UART1 to the target console (J13) |
+| PTE24, PTE25 | I2C0 to the PD segment through the PCA9517A |
+| PTC10, PTC11 | I2C1 to the target (J15) through the TXS0102 |
+| PTC0, PTC1, PTC2, PTC5 / PTC6–PTC9 | PORT1–4 EN / FAULT |
+| PTC12, PTC13 | FTDI EN / FAULT |
+| PTC14, PTC15, PTB2 | TGT_EN, TGT_FAULT, TGT_IMON (ADC0_SE12) |
+| PTC16, PTC17, PTC18 | relay 1, relay 2, passthrough coil |
+| PTB3, PTB9, PTB10, PTB11 | PSU_PRESENT, PD_ATTACH, PD_ALERT, PD_PROG_DET |
+| PTB18, PTB22 | HUB_RESET, PHY_INT |
+| PTB19, PTB20, PTB21 | heartbeat RGB |
+| PTD0–PTD5, PTD6 | GPIO1–6 to J15, J3 VBUS sense |
+| spare | PTA1, PTA2, PTB23, PTD7, PTE0–6, PTE26, the ADC/DAC pins |
+
 ---
 
 ## 7. Firmware
@@ -616,7 +644,7 @@ firmware is running and its loop is not wedged.
 | # | Question | Blocks |
 |---|---|---|
 | 1 | ~~Per-port current limit — 0.75 A or 1.1 A?~~ **Resolved** at four ports: 1.1 A, and a 6 A buck 1 fits with margin. See §4. | — |
-| 2 | Verify the FRDM-K64F clocking: one 50 MHz oscillator into both K64 `EXTAL0` and PHY `XI`? Read it off the rev E schematic, do not assume. | Clock tree |
+| 2 | ~~Clock tree~~ **Resolved** from Zephyr's `frdm_k64f` board file (`rmii-25MHz`): 25 MHz crystal on the PHY, its 50 MHz REF_CLK into the K64. Captured that way. | — |
 | 3 | DAPLink board ID and MSD volume name. A custom DAPLink build can name the volume anything; `frdm-k64f-hid/scripts/flash.sh` already reads `LABEL=${MBED_LABEL:-MBED}`, so agreeing with it is one environment variable rather than a change. Decide the name. | Firmware tooling |
 | 4 | USB VID/PID. **Deferred indefinitely, by decision (2026-10-03).** `frdm-k64f-hid` ships `2fe3:0001`, the Zephyr project's VID, and the hub and DAPLink will want identifiers too; all of it stays as-is on the bench. Revisit only if a board leaves the lab. | — |
 | 5 | K64 lead time. If it is bad, the fallback is an RP2350 + W5500, which costs the Zephyr board port and the FRDM tooling. | BOM |
@@ -624,6 +652,8 @@ firmware is running and its loop is not wedged.
 | 7 | ~~Form factor and mounting~~ **Resolved:** 140 × 80 mm, four M3 at 10 mm from each corner, you on the left edge, the target on the right, overflow to the front edge. §2. | — |
 | 8 | Authentication on the TCP transport. Today anything that can reach the port can cut the target's power and assert its recovery pins. A trusted segment is the assumption; decide whether that is good enough. | Remote management outside the lab |
 | 9 | Should the K64 be able to rewrite the STUSB4500 NVM itself, over the buffered bus? Then J17 is bring-up and recovery only, and PDO changes become a console command. | Firmware scope |
+| 14 | DAPLink k20dx HIC pin assignments as captured (SWCLK PTC5, SWDIO PTC6, nRESET PTB1, LED PTD4, UART1 PTC3/PTC4) — verify against `source/hic_hal/freescale/k20dx/IO_Config.h`. | daplink.kicad_sch |
+| 15 | TPS54560B compensation values are placeholders (19.1k / 3.3n / 47p); run the datasheet procedure or WEBENCH before fab. Also at bring-up: TPS2553 ILIM, TPS26630 UVLO/ILIM, USB2517 VBUS_DET divider, KSZ8081 crystal load, JW1FSN pad mapping. | power / hub / target sheets |
 | 10 | Verify at bring-up, against the datasheets: the STUSB4500 runs and answers I2C from `VSYS` alone with no VBUS; what it asks of an unused `VSYS`; and the PCA9517A's B side with `VCCA` at 0 V. The J17 circuit assumes all three. | J17 circuit |
 | 11 | ~~Power relay NC rating~~ **Resolved** against the datasheets: Panasonic JW1FSN-DC5V, 10 A at 30 VDC on the form C with no NC derate, AgSnO2. G2R-1 and G5LE-1 also pass; G5Q-1, at 3 A NC, does not. The load has since moved to the NO contact, where the headline figure applies. Table in §4. | — |
 | 12 | J9 pin 3: a third jumper position that makes it a VREF *input* feeding the FT231X's `VCCIO`, so the header follows a 1.8 V target. Needs the FT231X's behaviour with `VCCIO` at 0 V (target off) verified first; J13 already covers 1.8 V, so this is convenience, not capability. | J9 |
@@ -631,3 +661,17 @@ firmware is running and its loop is not wedged.
 
 Item 4 is deferred on purpose. It only becomes expensive if a board leaves the
 lab, and a VID has lead time of its own, so that is the moment to start it.
+
+---
+
+## 9. Schematic
+
+First pass captured 2026-10-04 in KiCad 10, under
+[`hardware/kicad/sbc-baseboard/`](../hardware/kicad/sbc-baseboard/): a root
+sheet and seven sub-sheets (power, MCU, Ethernet, hub, FTDI, DAPLink, target
+I/O), 331 parts, 354 nets, **ERC clean at every severity**, with
+[`sbc-baseboard.pdf`](../hardware/kicad/sbc-baseboard/sbc-baseboard.pdf) for
+review and a BOM. Reference designators are numbered by sheet (1xx power …
+7xx target). How it was generated, and the rule that the KiCad files become
+the source of truth the moment they are hand-edited, is in
+[`hardware/kicad/README.md`](../hardware/kicad/README.md).

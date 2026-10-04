@@ -82,11 +82,12 @@ preferences. They are written up in full in
 
 ## Status
 
-Specification. No schematic yet, no board, no firmware.
+Specification, and a first-pass schematic: KiCad 10, eight sheets, ERC clean,
+in [`hardware/kicad/sbc-baseboard/`](hardware/kicad/sbc-baseboard/) with a
+[PDF](hardware/kicad/sbc-baseboard/sbc-baseboard.pdf) for review. No board,
+no firmware.
 
-Next: schematic capture in KiCad against `docs/hardware-spec.md`, starting with
-the power tree and the PD contract, since the current budget is what decides
-whether the 5 V rails need one buck or two.
+Next: review the schematic, then layout.
 
 ## Layout
 
@@ -96,7 +97,8 @@ docs/hardware-spec.md   block diagram, part selection, power and pin budgets,
 docs/protocol.md        the console protocol, across both transports
 docs/block-diagram.*    the diagram above, SVG source and rendered PNG
 scripts/block-diagram.py regenerates both; run it with every configuration change
-hardware/kicad/         schematic and layout
+hardware/kicad/         the KiCad project (sbc-baseboard/) and the generator that
+                        produced its first pass (gen/) — see hardware/kicad/README.md
 hardware/datasheets/    the parts that matter
 ```
 
