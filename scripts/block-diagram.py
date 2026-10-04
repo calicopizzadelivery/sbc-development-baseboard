@@ -139,10 +139,10 @@ box(1090, 565, 220, 55, "eFuse", "+5V_TGT · 5 A · /FAULT")
 tag(1095, 635, "+5V_TGT")
 # power relay straddling the barrier
 e(f'<rect x="1090" y="880" width="220" height="120" rx="6" fill="{C["dev"]}" stroke="{C["dev_edge"]}" stroke-width="1.6"/>')
-e(f'<text x="1200" y="903" text-anchor="middle" font-size="14" font-weight="600" fill="{C["ink"]}">SPDT power relay</text>')
+e(f'<text x="1200" y="903" text-anchor="middle" font-size="14" font-weight="600" fill="{C["ink"]}">JW1FSN-DC5V · SPDT power relay</text>')
 e(f'<text x="1200" y="922" text-anchor="middle" font-size="12.5" fill="{C["mute"]}">coil: +5V_PORTS · FET + flyback</text>')
 e(f'<line x1="1092" y1="935" x2="1308" y2="935" stroke="{C["iso_edge"]}" stroke-width="1.4" stroke-dasharray="7 5"/>')
-e(f'<text x="1200" y="962" text-anchor="middle" font-size="12.5" fill="{C["mute"]}">contacts: NC passes · 5 A · AgSnO2</text>')
+e(f'<text x="1200" y="962" text-anchor="middle" font-size="12.5" fill="{C["mute"]}">NC passes · 10 A at 30 VDC · AgSnO2</text>')
 e(f'<text x="1200" y="980" text-anchor="middle" font-size="12.5" fill="{C["mute"]}">COM → NC when de-energized</text>')
 
 # ---------- right column

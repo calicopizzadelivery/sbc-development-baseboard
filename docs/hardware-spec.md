@@ -212,7 +212,7 @@ activity at the header. TVS on all four signals; the header will be hot-plugged.
 | PD programming header | **JST SM04B-SRSS-TB** | The Qwiic / STEMMA QT connector, side entry; `BM04B-SRSS-TB` if placement wants top entry. Stock cables fit either. |
 | PD bus buffer | **PCA9517A** | Isolates the K64 from the PD sink's I2C whenever the board is unpowered or a programmer is on J17. See §4. |
 | Relays, 2× | **Omron G6K-1F-Y**, 5 V coil | 1 Form C (SPDT), gold-clad contacts, 1 A / 30 VDC, ~30 mA coil. |
-| Power relay | SPDT, **NC contact ≥5 A at 30 VDC** | Candidates: Omron G5LE-1, G2R-1, Panasonic JW1FSN; 5 V coil, ~80 mA, AgSnO2 contacts. **Read the NC figure specifically** — see §4. |
+| Power relay | **Panasonic JW1FSN-DC5V** | 1 Form C, 10 A at 30 VDC resistive on the form C with no NC derate, AgSnO2, sealed. 530 mW coil, 106 mA at 5 V. Also pass: Omron G2R-1 DC5, G5LE-1 DC5. **Not** G5Q-1 — 3 A on NC. Verified in §4. |
 | Relay drivers, 3× | AO3400 + 1N4148 flyback | One FET for all three coils. Gate pulldown to ground — see §5. |
 | PSU presence detect | LTV-817-class optocoupler | Optional. The only component that touches the passthrough, across an isolation barrier — see §4. |
 | UART translation | **TXB0104** | Auto-direction, push-pull. `VCCA` from J13's VREF pin. |
@@ -269,7 +269,7 @@ not a board rail and draws nothing from the PD contract; see below.
 |---|---|---|---|
 | +5V_PORTS | 4× USB-A | 4 × 0.5 A = 2.0 A | 4 × 1.0 A = 4.0 A |
 | | FT231X, and J9 VCC if jumpered | 10 mA | 60 mA |
-| | 3× relay coil | 140 mA | 140 mA |
+| | 3× relay coil — 2× G6K at 30 mA, JW1FSN at 106 mA | 170 mA | 170 mA |
 | +5V_TGT | target SBC | 2.0 A | 5.0 A |
 | +3V3 | K64 ~100 mA, KSZ8081 ~60 mA, USB2517 ~250 mA, DAPLink ~30 mA, translators ~20 mA | 0.30 A | 0.50 A |
 | **Total at 5 V** | | **≈4.5 A (22 W)** | **≈9.7 A (49 W)** |
@@ -381,13 +381,26 @@ be cut. That is the right way round for a development bench.
 
 **The NC rating is the selection criterion, and it is easy to get wrong.** SPDT
 power relays are commonly rated on the NO contact — the "10 A" on the front of
-the datasheet — with the NC contact derated to 3 or 5 A in a table further in.
-Candidates that advertise 10 A can fail 5 A on NC. Read the NC figure, at 30 VDC
-resistive, before choosing. Prefer AgSnO2 contacts: an SBC's input is a bank of
-bulk capacitance, so the contact closes into an inrush of tens of amps for
-microseconds, which AgSnO2 tolerates and AgNi pits under. Resistive and
-capacitive loads are assumed and no snubber is fitted, so an inductive load on
-J19 needs its own.
+the datasheet — with the NC contact derated in a table further in. Read off the
+datasheets, 2026-10-03:
+
+| Relay | Form C at 30 VDC, resistive | NC derated? | Contacts | 5 V coil |
+|---|---|---|---|---|
+| **Panasonic JW1FSN** | **10 A** | no | **AgSnO2** | 530 mW |
+| Omron G2R-1 | 10 A | no | Ag-alloy | 530 mW |
+| Omron G5LE-1 | 8 A, carry 10 A | no | Ag-alloy | ≈400 mW |
+| Schrack RT314005 | 16 A rated; ≈10 A at 30 VDC off the breaking curve | no — NC rated 16 A | AgNi 90/10 | 400 mW |
+| Omron G5Q-1 | 5 A NO | **3 A NC** | — | — |
+| Omron G5LE-1-E | 16 A NO at 250 VAC | **12 A NC** | — | — |
+
+The G5Q-1 is the trap in one line: a "10 A" relay whose NC contact carries 3 A.
+The JW1FSN is the pick — the only passing part with AgSnO2, which matters
+because an SBC's input is a bank of bulk capacitance, so the contact closes into
+an inrush of tens of amps for microseconds, which AgSnO2 tolerates and AgNi pits
+under. At an AGX's 3 A its contact runs at 30 % of rating; at the design figure
+of 5 A, 50 %. Both are the margins a relay should run at, so the 5 A design
+rating stays, and the copper with it. Resistive and capacitive loads are assumed
+and no snubber is fitted, so an inductive load on J19 needs its own.
 
 **Copper.** 5 A continuous at a 10 °C rise wants about 2.7 mm of 1 oz outer
 copper by IPC-2221. Use ≥5 mm on both outer layers, via-stitched, for GND and
@@ -525,15 +538,15 @@ firmware is running and its loop is not wedged.
 | 1 | ~~Per-port current limit — 0.75 A or 1.1 A?~~ **Resolved** at four ports: 1.1 A, and a 6 A buck 1 fits with margin. See §4. | — |
 | 2 | Verify the FRDM-K64F clocking: one 50 MHz oscillator into both K64 `EXTAL0` and PHY `XI`? Read it off the rev E schematic, do not assume. | Clock tree |
 | 3 | DAPLink board ID and MSD volume name. A custom DAPLink build can name the volume anything; `frdm-k64f-hid/scripts/flash.sh` already reads `LABEL=${MBED_LABEL:-MBED}`, so agreeing with it is one environment variable rather than a change. Decide the name. | Firmware tooling |
-| 4 | USB VID/PID. `frdm-k64f-hid` currently ships `2fe3:0001`, which is **the Zephyr project's VID** and was already flagged as unshippable. This board needs its own, and now has a hub and a DAPLink wanting identifiers too. | Anything leaving the lab |
+| 4 | USB VID/PID. **Deferred indefinitely, by decision (2026-10-03).** `frdm-k64f-hid` ships `2fe3:0001`, the Zephyr project's VID, and the hub and DAPLink will want identifiers too; all of it stays as-is on the bench. Revisit only if a board leaves the lab. | — |
 | 5 | K64 lead time. If it is bad, the fallback is an RP2350 + W5500, which costs the Zephyr board port and the FRDM tooling. | BOM |
 | 6 | ~~Does J14 need a raw `VBUS_IN` pass-through for 12 V targets?~~ **Resolved** by J18/J19: any PSU passes through, isolated. J14 stays for 5 V targets that want to live inside the PD budget without a PSU of their own. | — |
 | 7 | Form factor and mounting. Standalone with a mounting pattern, or does it want to sit under a specific carrier? | Layout |
 | 8 | Authentication on the TCP transport. Today anything that can reach the port can cut the target's power and assert its recovery pins. A trusted segment is the assumption; decide whether that is good enough. | Remote management outside the lab |
 | 9 | Should the K64 be able to rewrite the STUSB4500 NVM itself, over the buffered bus? Then J17 is bring-up and recovery only, and PDO changes become a console command. | Firmware scope |
 | 10 | Verify at bring-up, against the datasheets: the STUSB4500 runs and answers I2C from `VSYS` alone with no VBUS; what it asks of an unused `VSYS`; and the PCA9517A's B side with `VCCA` at 0 V. The J17 circuit assumes all three. | J17 circuit |
-| 11 | Power relay: confirm on the chosen part's datasheet that the **NC** contact is rated ≥5 A at 30 VDC resistive, and the contact material. The headline figure is usually NO. | J18/J19 |
+| 11 | ~~Power relay NC rating~~ **Resolved** against the datasheets: Panasonic JW1FSN-DC5V, 10 A at 30 VDC on the form C with no NC derate, AgSnO2. G2R-1 and G5LE-1 also pass; G5Q-1, at 3 A NC, does not. Table in §4. | — |
 | 12 | J9 pin 3: a third jumper position that makes it a VREF *input* feeding the FT231X's `VCCIO`, so the header follows a 1.8 V target. Needs the FT231X's behaviour with `VCCIO` at 0 V (target off) verified first; J13 already covers 1.8 V, so this is convenience, not capability. | J9 |
 
-Item 4 is the one that is easy to defer and expensive to defer — a VID has lead
-time of its own.
+Item 4 is deferred on purpose. It only becomes expensive if a board leaves the
+lab, and a VID has lead time of its own, so that is the moment to start it.
