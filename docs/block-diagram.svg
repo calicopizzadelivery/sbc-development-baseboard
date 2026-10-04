@@ -1,6 +1,6 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="1760" height="1120" viewBox="0 0 1760 1120" font-family="Inter, Helvetica, Arial, DejaVu Sans, sans-serif">
+<svg xmlns="http://www.w3.org/2000/svg" width="1760" height="1600" viewBox="0 0 1760 1600" font-family="Inter, Helvetica, Arial, DejaVu Sans, sans-serif">
 <defs><marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse"><path d="M0,1 L9,5 L0,9 z" fill="#2b3340"/></marker><marker id="arrowR" viewBox="0 0 10 10" refX="1" refY="5" markerWidth="8" markerHeight="8" orient="auto"><path d="M10,1 L1,5 L10,9 z" fill="#2b3340"/></marker></defs>
-<rect width="1760" height="1120" fill="#ffffff"/>
+<rect width="1760" height="1600" fill="#ffffff"/>
 <text x="30" y="34" font-size="20" font-weight="700" fill="#1f2430">SBC development baseboard — block diagram</text>
 <text x="1730" y="34" text-anchor="end" font-size="12.5" fill="#5b6372">spec rev 0.1 · 2026-10-03</text>
 <rect x="30" y="52" width="240" height="1030" rx="10" fill="#f5f6f8" stroke="#d6d9de"/>
@@ -10,7 +10,7 @@
 <rect x="1450" y="52" width="280" height="1030" rx="10" fill="#f5f6f8" stroke="#d6d9de"/>
 <text x="1464" y="74" font-size="13" font-weight="700" letter-spacing="1.5" fill="#5b6372">FACING THE TARGET</text>
 <rect x="312" y="935" width="1096" height="130" rx="8" fill="#ecfdf5" stroke="#15803d" stroke-width="1.4" stroke-dasharray="7 5"/>
-<text x="326" y="1052" font-size="12" font-weight="600" fill="#15803d">ISOLATED — the passthrough nets connect to no board net. Not the ground plane, not a rail.</text>
+<text x="326" y="1052" font-size="12" font-weight="600" fill="#15803d">ISOLATED — the passthrough nets connect to no board net. Not the ground plane, not a rail. No indicator LED: the voltage is unknown.</text>
 <rect x="50" y="90" width="200" height="60" rx="6" fill="#dbeafe" stroke="#2563eb" stroke-width="1.6"/>
 <text x="150.0" y="116.5" text-anchor="middle" font-size="14" font-weight="600" fill="#1f2430">J1  USB-C</text>
 <text x="150.0" y="133.5" text-anchor="middle" font-size="12.5" font-weight="400" fill="#5b6372">upstream data · USB 2.0</text>
@@ -106,7 +106,7 @@
 <rect x="1095" y="625" width="64.4" height="20" rx="10" fill="#fff7ed" stroke="#c2410c" stroke-width="1"/>
 <text x="1127.2" y="639" text-anchor="middle" font-size="11.5" font-weight="600" fill="#b45309">+5V_TGT</text>
 <rect x="1090" y="880" width="220" height="120" rx="6" fill="#ffffff" stroke="#374151" stroke-width="1.6"/>
-<text x="1200" y="903" text-anchor="middle" font-size="14" font-weight="600" fill="#1f2430">JW1FSN · SPDT power relay</text>
+<text x="1200" y="903" text-anchor="middle" font-size="14" font-weight="600" fill="#1f2430">JW1FSN power relay</text>
 <text x="1200" y="922" text-anchor="middle" font-size="12.5" fill="#5b6372">coil: +5V_PORTS · FET + flyback</text>
 <line x1="1092" y1="935" x2="1308" y2="935" stroke="#15803d" stroke-width="1.4" stroke-dasharray="7 5"/>
 <text x="1200" y="962" text-anchor="middle" font-size="12.5" fill="#5b6372">NO · 10 A at 30 VDC · AgSnO2</text>
@@ -136,6 +136,19 @@
 <text x="1590.0" y="973.0" text-anchor="middle" font-size="14" font-weight="600" fill="#1f2430">J19  Phoenix 5.08</text>
 <text x="1590.0" y="990.0" text-anchor="middle" font-size="12.5" font-weight="400" fill="#5b6372">PSU out</text>
 <text x="1590.0" y="1007.0" text-anchor="middle" font-size="12.5" font-weight="400" fill="#5b6372">V+ via NO · GND via bus</text>
+<circle cx="1298" cy="95" r="5.5" fill="#16a34a" stroke="#1f2430" stroke-width="1"/>
+<circle cx="1298" cy="165" r="5.5" fill="#16a34a" stroke="#1f2430" stroke-width="1"/>
+<circle cx="1298" cy="575" r="5.5" fill="#16a34a" stroke="#1f2430" stroke-width="1"/>
+<circle cx="518" cy="745" r="5.5" fill="#d97706" stroke="#1f2430" stroke-width="1"/>
+<circle cx="518" cy="810" r="5.5" fill="#d97706" stroke="#1f2430" stroke-width="1"/>
+<circle cx="518" cy="875" r="5.5" fill="#d97706" stroke="#1f2430" stroke-width="1"/>
+<circle cx="560" cy="696" r="5.5" fill="#d97706" stroke="#1f2430" stroke-width="1"/>
+<circle cx="698" cy="575" r="5.5" fill="#d97706" stroke="#1f2430" stroke-width="1"/>
+<circle cx="1298" cy="500" r="5.5" fill="#dc2626" stroke="#1f2430" stroke-width="1"/>
+<circle cx="1298" cy="890" r="5.5" fill="#dc2626" stroke="#1f2430" stroke-width="1"/>
+<circle cx="944" cy="192" r="4" fill="#dc2626" stroke="#1f2430" stroke-width="0.8"/>
+<circle cx="956" cy="192" r="4" fill="#16a34a" stroke="#1f2430" stroke-width="0.8"/>
+<circle cx="968" cy="192" r="4" fill="#2563eb" stroke="#1f2430" stroke-width="0.8"/>
 <path d="M 250,120 L 330,120" fill="none" stroke="#2b3340" stroke-width="1.6" marker-end="url(#arrow)"/>
 <path d="M 530,110 L 1090,110" fill="none" stroke="#2b3340" stroke-width="1.6" marker-end="url(#arrow)"/>
 <text x="700" y="104" text-anchor="middle" font-size="12" fill="#5b6372" paint-order="stroke" stroke="#ffffff" stroke-width="4" stroke-linejoin="round">port 6</text>
@@ -193,6 +206,68 @@
 <circle cx="740" cy="975" r="3.2" fill="#15803d"/><circle cx="790" cy="1010" r="3.2" fill="#15803d"/>
 <path d="M 765,900 L 765,850 L 820,850 L 820,760" fill="none" stroke="#2b3340" stroke-width="1.6" marker-end="url(#arrow)"/>
 <text x="700" y="854" text-anchor="end" font-size="12" fill="#5b6372" paint-order="stroke" stroke="#ffffff" stroke-width="4" stroke-linejoin="round">PSU present</text>
+<text x="40" y="1143" font-size="14" font-weight="700" fill="#1f2430">Mechanical — 140 × 80 mm · 4× M3, 10 mm from each corner · to scale · component side</text>
+<rect x="40" y="1165" width="700" height="400" rx="6" fill="#ffffff" stroke="#1f2430" stroke-width="2"/>
+<circle cx="90" cy="1215" r="15" fill="none" stroke="#5b6372" stroke-dasharray="3 3"/>
+<circle cx="90" cy="1215" r="8.0" fill="#ffffff" stroke="#1f2430" stroke-width="1.5"/>
+<circle cx="690" cy="1215" r="15" fill="none" stroke="#5b6372" stroke-dasharray="3 3"/>
+<circle cx="690" cy="1215" r="8.0" fill="#ffffff" stroke="#1f2430" stroke-width="1.5"/>
+<circle cx="90" cy="1515" r="15" fill="none" stroke="#5b6372" stroke-dasharray="3 3"/>
+<circle cx="90" cy="1515" r="8.0" fill="#ffffff" stroke="#1f2430" stroke-width="1.5"/>
+<circle cx="690" cy="1515" r="15" fill="none" stroke="#5b6372" stroke-dasharray="3 3"/>
+<circle cx="690" cy="1515" r="8.0" fill="#ffffff" stroke="#1f2430" stroke-width="1.5"/>
+<text x="108" y="1201" font-size="10" fill="#5b6372">M3 · 6 mm pad</text>
+<rect x="40" y="1235" width="40" height="80" fill="#dbeafe" stroke="#2563eb"/>
+<text x="86" y="1279.0" font-size="11" fill="#1f2430">J10 RJ45</text>
+<rect x="40" y="1330" width="40" height="45" fill="#dbeafe" stroke="#2563eb"/>
+<text x="86" y="1356.5" font-size="11" fill="#1f2430">J1 upstream</text>
+<rect x="40" y="1390" width="40" height="45" fill="#dbeafe" stroke="#2563eb"/>
+<text x="86" y="1416.5" font-size="11" fill="#1f2430">J2 PD in</text>
+<rect x="40" y="1450" width="40" height="32.5" fill="#dbeafe" stroke="#2563eb"/>
+<text x="86" y="1470.25" font-size="11" fill="#1f2430">J17 prog</text>
+<rect x="700" y="1235" width="40" height="45" fill="#dbeafe" stroke="#2563eb"/>
+<text x="694" y="1261.5" text-anchor="end" font-size="11" fill="#1f2430">J3 HID</text>
+<rect x="700" y="1295" width="40" height="77.5" fill="#dbeafe" stroke="#2563eb"/>
+<text x="694" y="1337.75" text-anchor="end" font-size="11" fill="#1f2430">J13 console</text>
+<rect x="700" y="1387.5" width="40" height="62.0" fill="#dbeafe" stroke="#2563eb"/>
+<text x="694" y="1422.5" text-anchor="end" font-size="11" fill="#1f2430">J19 PSU out</text>
+<rect x="110" y="1525" width="66.5" height="40" fill="#dbeafe" stroke="#2563eb"/>
+<text x="143.25" y="1519" text-anchor="middle" font-size="11" fill="#1f2430">J4</text>
+<rect x="187.5" y="1525" width="66.5" height="40" fill="#dbeafe" stroke="#2563eb"/>
+<text x="220.75" y="1519" text-anchor="middle" font-size="11" fill="#1f2430">J5</text>
+<rect x="270" y="1525" width="62.0" height="40" fill="#dbeafe" stroke="#2563eb"/>
+<text x="301.0" y="1519" text-anchor="middle" font-size="11" fill="#1f2430">J18</text>
+<rect x="370" y="1525" width="76.0" height="40" fill="#dbeafe" stroke="#2563eb"/>
+<text x="408.0" y="1519" text-anchor="middle" font-size="11" fill="#1f2430">J9</text>
+<rect x="460" y="1525" width="60" height="40" fill="#dbeafe" stroke="#2563eb"/>
+<text x="490.0" y="1519" text-anchor="middle" font-size="11" fill="#1f2430">J11</text>
+<rect x="532.5" y="1525" width="60" height="40" fill="#dbeafe" stroke="#2563eb"/>
+<text x="562.5" y="1519" text-anchor="middle" font-size="11" fill="#1f2430">J12</text>
+<rect x="605" y="1525" width="62.0" height="40" fill="#dbeafe" stroke="#2563eb"/>
+<text x="636.0" y="1519" text-anchor="middle" font-size="11" fill="#1f2430">J14</text>
+<rect x="200" y="1345" width="40" height="25" fill="#ffffff" stroke="#374151"/>
+<text x="246" y="1361.5" font-size="11" fill="#1f2430">J16 SWD</text>
+<rect x="570" y="1455" width="76.0" height="25" fill="#ffffff" stroke="#374151"/>
+<text x="652.0" y="1471.5" font-size="11" fill="#1f2430">J15 GPIO</text>
+<text transform="rotate(-90 24 1365)" x="24" y="1365" text-anchor="middle" font-size="12" font-weight="700" letter-spacing="1.5" fill="#5b6372">FACING YOU</text>
+<text transform="rotate(90 758 1365)" x="758" y="1365" text-anchor="middle" font-size="12" font-weight="700" letter-spacing="1.5" fill="#5b6372">FACING THE TARGET</text>
+<text x="390" y="1585" text-anchor="middle" font-size="11.5" fill="#5b6372">front edge — overflow from the short edges; your end on the left, the target's on the right · back edge clear</text>
+<text x="800" y="1150" font-size="14" font-weight="700" fill="#1f2430">Indicators — on the net, not on a pin</text>
+<circle cx="808" cy="1176" r="5.5" fill="#16a34a" stroke="#1f2430" stroke-width="1"/>
+<text x="840" y="1180" font-size="12.5" fill="#1f2430">Switched outputs, green — PORT 1–4, FT231X, +5V_TGT at the eFuse (6)</text>
+<circle cx="808" cy="1203" r="5.5" fill="#d97706" stroke="#1f2430" stroke-width="1"/>
+<text x="840" y="1207" font-size="12.5" fill="#1f2430">Rails, amber — VBUS_IN, +5V_PORTS, +5V_TGT, +3V3, +3V3_PD (5)</text>
+<circle cx="808" cy="1230" r="5.5" fill="#dc2626" stroke="#1f2430" stroke-width="1"/>
+<text x="840" y="1234" font-size="12.5" fill="#1f2430">Coils, red — relay 1, relay 2, passthrough (3)</text>
+<circle cx="806" cy="1257" r="4" fill="#dc2626" stroke="#1f2430" stroke-width="0.8"/>
+<circle cx="818" cy="1257" r="4" fill="#16a34a" stroke="#1f2430" stroke-width="0.8"/>
+<circle cx="830" cy="1257" r="4" fill="#2563eb" stroke="#1f2430" stroke-width="0.8"/>
+<text x="840" y="1261" font-size="12.5" fill="#1f2430">Heartbeat — K64 RGB, firmware alive (1)</text>
+<circle cx="808" cy="1284" r="5.5" fill="#16a34a" stroke="#1f2430" stroke-width="1"/>
+<text x="840" y="1288" font-size="12.5" fill="#1f2430">TX / RX — FT231X CBUS, beside J9 (2)</text>
+<text x="840" y="1315" font-size="12.5" fill="#5b6372">Link / activity — in the RJ45</text>
+<text x="840" y="1342" font-size="12.5" fill="#5b6372">None on J18 / J19 — the voltage is whatever was plugged in</text>
+<text x="840" y="1369" font-size="12.5" fill="#5b6372">An LED shows the actual state: a switch tripped on overcurrent goes dark even if firmware thinks it is on.</text>
 <line x1="1455" y1="1095" x2="1483" y2="1095" stroke="#2b3340" stroke-width="1.6" marker-end="url(#arrow)"/>
 <text x="1489" y="1099" font-size="11.5" fill="#5b6372">signal</text>
 <line x1="1545" y1="1095" x2="1573" y2="1095" stroke="#b45309" stroke-width="2.6"/>

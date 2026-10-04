@@ -193,6 +193,42 @@ Hub ports 6 and 7 are flagged non-removable in the USB2517's configuration,
 which is what they are. Two LEDs on the FT231X's CBUS pins show TX and RX
 activity at the header. TVS on all four signals; the header will be hot-plugged.
 
+### Placement and form factor
+
+**140 × 80 mm, four M3 mounting holes 10 mm in from each corner, components on
+one side.** Connectors that face you leave the **left** edge; connectors that
+face the target leave the **right** edge. Those are the rules. Here is what
+they produce once the arithmetic is done.
+
+A 10 mm corner hole with a 6 mm standoff pad keeps edge connectors out of the
+first ~13 mm at each end of an edge, so each 80 mm edge has about **54 mm** of
+usable length and each 140 mm edge about **114 mm**. The target-side connectors
+alone — J3, J13, J11, J12, J14, J19, at Phoenix 3.5 and 5.08 mm body widths —
+come to **73 mm**. They do not fit on an 80 mm edge, in any order.
+
+So the short edges carry the primary cable connectors, and the rest go on the
+**front** long edge at the end that matches their direction — your things at
+the left end, the target's at the right. The back edge carries nothing, so the
+board can sit against a wall or a DIN rail.
+
+| Edge | Connectors | Bodies |
+|---|---|---|
+| Left, 54 mm usable | J10 RJ45 · J1 upstream · J2 PD in · J17 programming | 41 mm |
+| Right, 54 mm usable | J3 HID · J13 console · J19 PSU out | 37 mm |
+| Front, left end | J4, J5 USB-A stacks · J18 PSU in | 39 mm |
+| Front, right end | J9 FTDI (right-angle) · J11, J12 relays · J14 +5V_TGT | 52 mm |
+| Inboard, vertical | J16 Cortex debug · J15 GPIO header | — |
+
+J16 and J15 are pin headers that take a ribbon or jumpers from any direction,
+so they earn no edge. J9 is right-angle because that is what an FTDI header is.
+
+If everything must leave the short edges, the board needs to be **100 mm**
+tall: 74 mm usable per edge takes the target-side set with 13 mm of gaps to
+spare. That is the alternative to the front-edge overflow, and a one-line
+change here.
+
+The mechanical inset on the block diagram is to scale.
+
 ---
 
 ## 3. Part selection
@@ -236,6 +272,34 @@ open-drain net it simply does not work. The console is push-pull, so TXB is
 right there; I2C is open-drain, so it gets a PCA9306. The GPIO breakout is TXB,
 which means **the header's pins are push-pull and must not be used as
 open-drain** — document that on the silkscreen.
+
+### Indicators
+
+An LED on every load switch output, every power rail, and every relay coil, so
+a glance at the board answers "is it powered" and "is it asserted" without a
+console. Colour says which kind:
+
+| Colour | Means | On | Count |
+|---|---|---|---|
+| **Green** | a switched output is live | PORT 1–4 switched VBUS · FT231X switched VBUS · +5V_TGT at the eFuse output | 6 |
+| **Amber** | a rail is up | VBUS_IN · +5V_PORTS · +5V_TGT · +3V3 · +3V3_PD | 5 |
+| **Red** | a coil is energized | relay 1 · relay 2 · passthrough relay | 3 |
+| RGB | heartbeat | K64 — firmware alive, which profile | 1 |
+| Green ×2 | TX / RX | FT231X CBUS, beside J9 | 2 |
+| Link / act | | in the RJ45 | — |
+
+The output and coil LEDs sit **on the net, not on an MCU pin**: a port LED
+hangs off the switched VBUS, a coil LED sits across the coil and is driven by
+the FET. They show the actual state rather than the commanded one — a switch
+that has tripped on overcurrent goes dark even though firmware thinks it is on
+— and they cost no pins. About 25 mA in total; not budgeted separately. The
+VBUS_IN LED sees 5–20 V and is sized for 20 V.
+
+**No LED on the passthrough.** J18 and J19 carry whatever the target's PSU is,
+5 to 30 V, and an indicator sized for one end of that range is wrong at the
+other. The only element across the passthrough is the optocoupler's emitter,
+which exists *because* the voltage is unknown and has its series resistance
+sized for the whole range. `psu=present` on the console is the indicator.
 
 ---
 
@@ -414,11 +478,13 @@ design rating stays, and the copper with it. Resistive and capacitive loads are
 assumed and no snubber is fitted, so an inductive load on J19 needs its own.
 
 **Copper.** 5 A continuous at a 10 °C rise wants about 2.7 mm of 1 oz outer
-copper by IPC-2221. Use ≥5 mm on both outer layers, via-stitched, for GND and
-for the V+ runs to and from the relay, and keep J18, the relay and J19 within a
-few centimetres of one another so those runs are short. The relay's contact pins
-get solid pads, no thermal relief. Keep ≥1 mm from every board net, so the
-isolation is visible in the layout and not only in the netlist.
+copper by IPC-2221. The run is not short: J18 is at the front-left and J19 on
+the right edge (§2), so V+ and GND each cover about 110 mm. At **8 mm** wide on
+both outer layers, via-stitched and paralleled, that is roughly 4 mΩ per
+conductor — 20 mV and 0.1 W each at 5 A. Use ≥8 mm, and put the relay next to
+J19 so the switched segment is the short one. The relay's contact pins get solid
+pads, no thermal relief. Keep ≥1 mm from every board net, so the isolation is
+visible in the layout and not only in the netlist.
 
 **Presence detect, optional, fitted by default.** An optocoupler across J18: LED
 in series with a resistor sized to stay within limits from 5 to 30 V (split for
@@ -507,8 +573,8 @@ during capture.
 | Hub `RESET_N`, PD `ATTACH`/alert | 2 |
 | `PD_PROG_DET` — programmer on J17 | 1 |
 | SWD — SWCLK, SWDIO, `RESET_b` | 3 |
-| Status — RGB heartbeat, 4× port LED, 3× relay LED | 10 |
-| **Total signal** | **60** |
+| Status — RGB heartbeat; every other LED is on its net, §3 | 3 |
+| **Total signal** | **53** |
 
 Comfortable in a 100-LQFP after power and analogue pins. Two things to note: the
 target's I2C is a **separate bus** from the hub and PD controller's, because a
@@ -555,13 +621,13 @@ firmware is running and its loop is not wedged.
 | 4 | USB VID/PID. **Deferred indefinitely, by decision (2026-10-03).** `frdm-k64f-hid` ships `2fe3:0001`, the Zephyr project's VID, and the hub and DAPLink will want identifiers too; all of it stays as-is on the bench. Revisit only if a board leaves the lab. | — |
 | 5 | K64 lead time. If it is bad, the fallback is an RP2350 + W5500, which costs the Zephyr board port and the FRDM tooling. | BOM |
 | 6 | ~~Does J14 need a raw `VBUS_IN` pass-through for 12 V targets?~~ **Resolved** by J18/J19: any PSU passes through, isolated. J14 stays for 5 V targets that want to live inside the PD budget without a PSU of their own. | — |
-| 7 | Form factor and mounting. Standalone with a mounting pattern, or does it want to sit under a specific carrier? | Layout |
+| 7 | ~~Form factor and mounting~~ **Resolved:** 140 × 80 mm, four M3 at 10 mm from each corner, you on the left edge, the target on the right, overflow to the front edge. §2. | — |
 | 8 | Authentication on the TCP transport. Today anything that can reach the port can cut the target's power and assert its recovery pins. A trusted segment is the assumption; decide whether that is good enough. | Remote management outside the lab |
 | 9 | Should the K64 be able to rewrite the STUSB4500 NVM itself, over the buffered bus? Then J17 is bring-up and recovery only, and PDO changes become a console command. | Firmware scope |
 | 10 | Verify at bring-up, against the datasheets: the STUSB4500 runs and answers I2C from `VSYS` alone with no VBUS; what it asks of an unused `VSYS`; and the PCA9517A's B side with `VCCA` at 0 V. The J17 circuit assumes all three. | J17 circuit |
 | 11 | ~~Power relay NC rating~~ **Resolved** against the datasheets: Panasonic JW1FSN-DC5V, 10 A at 30 VDC on the form C with no NC derate, AgSnO2. G2R-1 and G5LE-1 also pass; G5Q-1, at 3 A NC, does not. The load has since moved to the NO contact, where the headline figure applies. Table in §4. | — |
 | 12 | J9 pin 3: a third jumper position that makes it a VREF *input* feeding the FT231X's `VCCIO`, so the header follows a 1.8 V target. Needs the FT231X's behaviour with `VCCIO` at 0 V (target off) verified first; J13 already covers 1.8 V, so this is convenience, not capability. | J9 |
-| 13 | Passthrough at boot: restore the last commanded state (the default — a watchdog reset must not strand a remote target), or stay off until commanded again? And is the reset gap worth fitting the G2RK-1 latching relay instead? | Firmware policy, §4 |
+| 13 | ~~Passthrough at boot~~ **Resolved:** restore the last commanded state. A watchdog reset must not strand a remote target. The G2RK-1 latching relay stays unfitted unless the reset gap proves to matter. | — |
 
 Item 4 is deferred on purpose. It only becomes expensive if a board leaves the
 lab, and a VID has lead time of its own, so that is the moment to start it.

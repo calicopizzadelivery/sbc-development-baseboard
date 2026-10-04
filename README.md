@@ -44,6 +44,10 @@ workstation ──USB-C──> hub ──> 4x USB-A (switched)     ──> whate
  PD charger ──USB-C──> PD sink ──> 5 V rails
 ```
 
+140 × 80 mm, four M3 corner holes. Your connectors leave the left edge, the
+target's the right; an LED on every rail, every switched output and every relay
+coil, and none on the passthrough, whose voltage is whatever you plugged in.
+
 Two USB-C inlets, not one. A charger that offers 60 W carries no data, and a
 workstation port that carries data offers 15 W at best — and four switched ports
 plus a target rail needs more than that. Splitting them also means the board
