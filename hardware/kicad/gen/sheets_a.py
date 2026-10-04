@@ -2,7 +2,7 @@
 net fans out of its hub to whatever it connects to."""
 from kit import Sheet, FP
 from sch import snap
-from fanout import fan, chain, L, P, Ser, Pull, PullLED, Tag, Flag, Conn, End, To, BusEnd, bus_join, rail_bus, decap_row, join_pins, top_caps, top_bus, Skip, Ladder, jog, mark_end
+from fanout import fan, chain, L, P, Ser, Pull, PullLED, Tag, Flag, Conn, End, To, BusEnd, bus_join, rail_bus, decap_row, join_pins, top_caps, top_bus, Skip, Ladder, jog, mark_end, Gap
 
 AMBER, GREEN, RED = "LED AMBER", "LED GREEN", "LED RED"
 def TVS(v="PESD5V0S1UL"):
@@ -56,9 +56,9 @@ def power(project, num, page, sheet_path, plib):
                 11: chain(Pull("+3V3_PD", "R", "10k", None), L("PD_ATTACH_N")),
                 10: P("GND"), 25: P("GND")}, align={"L": "top"})
     jog(s, u1, 24, "VBUS_IN", up=2.54, over=-7.62)
-    jog(s, u1, 22, "+3V3_PRG", up=7.62, over=-12.7)
+    jog(s, u1, 22, "+3V3_PRG", up=7.62, over=-20.32)
     top_caps(s, u1, 21, [("1u", None)], height=20.32, sx=-1)
-    top_caps(s, u1, 23, [("1u", None)], height=12.7, sx=1)
+    top_caps(s, u1, 23, [("1u", None)], height=17.78, sx=1)
     fan(s, q1, {2: P("GND"), 3: L("BUCK_EN")})
     s.note(["BUCK_EN: VBUS_EN_SNK released (no contract) -> Q101 on -> EN low -> bucks off.",
             "Contract valid -> VBUS_EN_SNK low -> Q101 off -> EN floats high (internal pull-up) -> bucks on.",
@@ -107,21 +107,21 @@ def mcu(project, num, page, sheet_path, plib):
             "USB regulator: VREGIN fed only from J3 VBUS through D201, so the K64 cannot back-feed the target and the D+ pull-up",
             "disappears when the target is off. VOUT33 powers the transceiver. Pin allocation in docs/hardware-spec.md.",
             "Spare pins (PTA1, PTA2, PTB23, PTD7, PTE0-6, PTE26, ADC, DAC) are left no-connect."], (15, 15), 1.5)
-    u = s.add("sbcbb", "MK64FN1M0VLL12", "U201", "MK64FN1M0VLL12", (190, 150), footprint="Package_QFP:LQFP-100_14x14mm_P0.5mm")
-    j3 = s.add("Connector", "USB_C_Receptacle_USB2.0_16P", "J3", "USB-C HID to target", (40, 118), footprint=FP["USBC"])
-    esd = s.add("Power_Protection", "USBLC6-2SC6", "U202", "USBLC6-2SC6", (74.93, 118.11), footprint=FP["SOT236"])  # I/O rows = J3 B7 (D-) and A6 (D+)
+    u = s.add("sbcbb", "MK64FN1M0VLL12", "U201", "MK64FN1M0VLL12", (200, 150), footprint="Package_QFP:LQFP-100_14x14mm_P0.5mm")
+    j3 = s.add("Connector", "USB_C_Receptacle_USB2.0_16P", "J3", "USB-C HID to target", (35, 118), footprint=FP["USBC"])
     j16 = s.add("Connector", "Conn_ARM_JTAG_SWD_10", "J16", "SWD", (335, 60), 0, mirror="y", footprint=FP["SWD10"])   # signals face the K64, VTref up, GND down
     rgb = s.add("Device", "LED_RGBA", "D202", "RGB heartbeat", (335, 225), footprint=FP["RGB"])
-    yx = s.add("Device", "Crystal", "Y201", "32.768kHz", (95, 182), 90, footprint=FP["XTAL2"])
+    yx = s.add("Device", "Crystal", "Y201", "32.768kHz", (70, 182), 90, footprint=FP["XTAL2"])
     for pin in (51, 14, 15, 16, 17, 18, 19, 20, 21, 26, 27, 35, 36, 69, 100, 1, 2, 3, 4, 5, 6, 7, 33): s.pin_nc(u, str(pin))
     for pin in ("A8", "B8"): s.pin_nc(j3, pin)
     for pin in (6, 7, 8): s.pin_nc(j16, str(pin))
     join_pins(s, j3, ["A6", "B6"], length=7.62); join_pins(s, j3, ["A7", "B7"], length=7.62)
     fan(s, j3, {"A6": Skip(), "B6": Skip(), "A7": Skip(), "B7": Skip(),
-                "A4": chain(Flag(None), Ser("R", "100k", None), Pull("GND", "R", "47k", None), L("VBUS_SENSE")),
-                "A5": chain(Ser("R", "5.1k", None), BusEnd("cc_gnd")), "B5": chain(Ser("R", "5.1k", None), BusEnd("cc_gnd")),
+                "A4": chain(Flag(None), Gap(22.86), L("J3_VBUS")),
+                "A5": chain(Ser("R", "5.1k", None, step=12.7), P("GND")),       # the upper GND lands past the lower row's end
+                "B5": chain(Ser("R", "5.1k", None, step=7.62), P("GND")),
                 "A1": P("GND"), "SH": P("GND")}, align="top")
-    bus_join(s, "cc_gnd", then=P("GND"), sx=1)
+    esd = s.add("Power_Protection", "USBLC6-2SC6", "U202", "USBLC6-2SC6", (80.01, 118.11), footprint=FP["SOT236"])  # I/O rows = J3 B7 (D-) and A6 (D+); VBUS pin lands on J3's VBUS lane
     jx = snap(j3.pin("A6")[0] + 7.62)                                   # the joined pairs continue straight into the ESD array
     for pin, row in (("1", j3.pin("B7")[1]), ("3", j3.pin("A6")[1])):
         s.wire((jx, row), esd.pin(pin)); s.junction((jx, row))
@@ -149,11 +149,12 @@ def mcu(project, num, page, sheet_path, plib):
         68: L("PHY_INT_N"),
         70: L("PORT1_EN"), 71: L("PORT2_EN"), 72: L("PORT3_EN"), 73: L("TGT_UART_RX"), 76: L("TGT_UART_TX"), 77: L("PORT4_EN"),
         78: L("PORT1_FAULT_N"), 79: L("PORT2_FAULT_N"), 80: L("PORT3_FAULT_N"), 81: L("PORT4_FAULT_N"),
-        82: chain(Pull("+3V3", "R", "4.7k", None), L("I2C1_SCL")), 83: chain(Pull("+3V3", "R", "4.7k", None), L("I2C1_SDA")),
+        82: chain(Pull("+3V3", "R", "4.7k", None), Gap(17.78), L("I2C1_SCL")), 83: chain(Gap(7.62), Pull("+3V3", "R", "4.7k", None), L("I2C1_SDA")),
         84: L("FTDI_EN"), 85: L("FTDI_FAULT_N"), 86: L("TGT_EN"), 87: L("TGT_FAULT_N"),
         90: L("RLY1_DRV"), 91: L("RLY2_DRV"), 92: L("RLY_PSU_DRV"),
-        93: L("GPIO1"), 94: L("GPIO2"), 95: L("GPIO3"), 96: L("GPIO4"), 97: L("GPIO5"), 98: L("GPIO6"), 99: L("VBUS_SENSE"),
-        31: chain(Pull("+3V3", "R", "4.7k", None), L("I2C0_SCL")), 32: chain(Pull("+3V3", "R", "4.7k", None), L("I2C0_SDA")),
+        93: L("GPIO1"), 94: L("GPIO2"), 95: L("GPIO3"), 96: L("GPIO4"), 97: L("GPIO5"), 98: L("GPIO6"),
+        99: chain(Pull("GND", "R", "47k", None), Ser("R", "100k", None), L("J3_VBUS")),      # VBUS sense divider at the ADC pin
+        31: chain(Pull("+3V3", "R", "4.7k", None), Gap(17.78), L("I2C0_SCL")), 32: chain(Gap(7.62), Pull("+3V3", "R", "4.7k", None), L("I2C0_SDA")),
     }, align={"L": "top"})
     top_bus(s, u, [8, 40, 48, 61, 75, 89, 30], "+3V3", caps_left=[("100n", None)] * 6 + [("10u", FP["C0805"])], rail_at="left", height=12.7)
     top_bus(s, u, [22, 23], "+3V3A", caps_right=[("100n", None), ("10u", FP["C0805"])], rail_at="left", height=22.86, margin=2.54,

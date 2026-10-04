@@ -41,6 +41,7 @@ class Att:
     h_down = 0.0
     lext = 1.27       # how far a hanging element spreads back toward the pin
     ew = None         # how far it spreads onward (default: end_w)
+    zones = None      # [(lo, hi)] distances from the lane where a wire may not cross (part body, symbol); None = all
     step = 5.08
     end_w = 1.27
     route = False
@@ -62,20 +63,27 @@ class Att:
 
 def analyse(att):
     """Walk a chain: hanging elements [(offset, up, down, lext, ew)], whether the
-    row is finite, and the offset of the end of its content (text included)."""
+    row is finite, the offset of the end of its content (text included), and the
+    stretches [(a, b)] of the lane that carry a part or text (plain wire between
+    them may be crossed)."""
     elems, off, n = [], 0.0, att
-    finite, end = True, 0.0
+    finite, end, occ = True, 0.0, []
     while n is not None:
+        ew = n.ew if n.ew is not None else n.end_w
         if n.h_up > 0 or n.h_down > 0:
-            elems.append((off, n.h_up, n.h_down, n.lext, n.ew if n.ew is not None else n.end_w))
+            z = n.zones if n.zones is not None else [(0.0, max(n.h_up, n.h_down))]
+            elems.append((off, n.h_up, n.h_down, n.lext, ew, z))
+        if not isinstance(n, (Gap, Conn, To, End, BusEnd, Skip, NC)):
+            occ.append((off - n.lext, off + (n.end_w if n.next is None else max(ew, n.lext + 0.1))))
+            end = max(end, off + (n.end_w if n.next is None else ew))
         if n.route:
             finite = False
         if n.next is None:
-            end = off + n.end_w
+            end = max(end, off + n.end_w)
         else:
             off += n.step
         n = n.next
-    return elems, finite, end
+    return elems, finite, end, occ
 
 
 class L(Att):
@@ -90,9 +98,11 @@ class L(Att):
 
 
 class P(Att):
-    """Power symbol at the lane end."""
-    def __init__(self, rail):
-        super().__init__(None); self.rail = rail
+    """Power symbol at the lane end. `hook` = (dx, dy) moves it off the lane
+    end by a stub up/down then sideways, for when the symbol would otherwise
+    hang over a neighbouring wire."""
+    def __init__(self, rail, hook=None):
+        super().__init__(None); self.rail = rail; self.hook = hook
         if rail == "GND" or rail.endswith("GND"):
             self.h_down = 3.81
             self.lext = 2.0
@@ -102,6 +112,12 @@ class P(Att):
         self.end_w = self.lext
 
     def render(self, s, E, sx, lane):
+        if self.hook:
+            dx, dy = self.hook
+            p1 = (E[0], snap(E[1] + dy)); p2 = (snap(E[0] + dx), p1[1])
+            s.wire(E, p1, p2)
+            s.power(self.rail, p2, 0)
+            return p2
         s.power(self.rail, E, 0)
         return E
 
@@ -111,16 +127,23 @@ class Ser(Att):
     kind: 'R','C','L','FB','D' (Device:D_* via name), with lib/name overridable."""
     width = 7.62
     lext = 1.5            # the reference, right-justified, reaches back a little past the lane end
-    h_up = 1.7            # the texts sit above the part, so the row above must be clear there
+    h_up = 2.2            # the texts sit above the part (outline is +-1.0), so the row above must be clear there
+    zones = [(1.0, 2.2)]
 
-    def __init__(self, kind, value, next, fp=None, lib=None, name=None, near="1", flip=False):
+    def __init__(self, kind, value, next, fp=None, lib=None, name=None, near="1", flip=False, tight=False, step=None):
+        """tight: do not reserve the row above for the text (for columns of identical
+        resistors at pin pitch, where the text just touches the neighbour's outline).
+        step: override where the next element starts."""
         super().__init__(next)
         self.kind, self.value, self.fp, self.lib, self.name, self.near, self.flip = kind, value, fp, lib, name, near, flip
         self.ew = 4.2 + text_w(value)
-        self.step = max(7.62, snap(self.ew + 1.0 + 1.26))
+        self.lext = 0.4 + text_w("R000")                                   # the reference, left of centre
+        self.step = step if step is not None else max(7.62, snap(self.ew + 2.5 + 1.26))
+        if tight:
+            self.h_up = 0.0
 
     def render(self, s, E, sx, lane):
-        far = (snap(E[0] + sx * 7.62), E[1])
+        far = (snap(E[0] + sx * self.step), E[1])
         # vertical-library parts (R, C, L, FB) at rot 90 put pin 1 on the left; horizontal ones
         # (diodes, LED) at rot 0 put pin 1 (K) on the left.
         if self.kind in ("R", "C", "L", "FB"):
@@ -141,12 +164,8 @@ class Ser(Att):
         # both texts above the part, small, inside the row pitch: the reference on the side the
         # lane came from, the (longer) value on the side it continues to
         inst.field_size = 1.0
-        if sx > 0:
-            inst.ref_at = (inst.X - 0.4, E[1] - 1.1); inst.ref_just = "right"
-            inst.val_at = (inst.X + 0.4, E[1] - 1.1); inst.val_just = "left"
-        else:
-            inst.ref_at = (inst.X + 0.4, E[1] - 1.1); inst.ref_just = "left"
-            inst.val_at = (inst.X - 0.4, E[1] - 1.1); inst.val_just = "right"
+        inst.ref_at = (inst.X - 0.4, E[1] - 1.6); inst.ref_just = "right"
+        inst.val_at = (inst.X + 0.4, E[1] - 1.6); inst.val_just = "left"
         return self.next.render(s, far, sx, lane) if self.next else far
 
 
@@ -159,14 +178,15 @@ class Pull(Att):
         self.rail, self.kind, self.value, self.fp, self.ref_letter = rail, kind, value, fp, ref_letter
         self.down = rail == "GND" or rail.endswith("GND")
         if self.down:
-            self.h_down = 16.51
+            self.h_down = 17.78
         else:
-            self.h_up = 17.78
+            self.h_up = 19.05
+        self.zones = [(3.0, 12.2), (13.5, 19.5)]                     # body with its pins; rail symbol and its name
         self.end_w = 2.54 + max(text_w(value), 5.0)
         self.text_step = max(5.08, snap(self.end_w + 1.5 + 1.26))   # used when the next part hangs the same way
 
     def render(self, s, E, sx, lane):
-        y = snap(E[1] + (6.35 if self.down else -6.35))
+        y = snap(E[1] + (7.62 if self.down else -7.62))
         if self.kind in ("R", "C"):
             make = {"R": s.R, "C": s.C}[self.kind]
             top, bot = "1", "2"
@@ -207,6 +227,7 @@ class PullLED(Att):
             self.h_down = 22.86
         else:
             self.h_up = 22.86
+        self.zones = [(0.0, 22.86)]
         self.end_w = 2.54 + max(text_w(r_value), text_w(color))
         self.text_step = max(5.08, snap(self.end_w + 1.5 + 1.26))
 
@@ -250,7 +271,7 @@ class Tag(Att):
     """A net label dropped on the lane; the lane carries on."""
     def __init__(self, net, next, glob=None):
         super().__init__(next); self.net, self.glob = net, glob
-        self.step = max(5.08, snap(text_w(net, True) + 1.27))
+        self.step = max(5.08, snap(text_w(net, True) + 3.81))
         self.end_w = text_w(net, True)
 
     def render(self, s, E, sx, lane):
@@ -274,16 +295,20 @@ class BusEnd(Att):
         return E
 
 
-def bus_join(s, key, then=None, sx=1):
-    """Vertical wire through every BusEnd(key) point; `then` renders from the bottom end."""
+def bus_join(s, key, then=None, sx=1, then_down=False):
+    """Vertical wire through every BusEnd(key) point; `then` renders from the
+    bottom end, sideways by default or straight down with `then_down`."""
     pts = sorted(BusEnd.registry.pop((id(s), key)), key=lambda p: p[1])
     x = pts[0][0]
     s.wire((x, pts[0][1]), (x, pts[-1][1]))
     for p in pts[1:-1]:
         s.junction(p)
     if then is not None:
-        s.junction(pts[-1])
-        far = (snap(x + sx * 5.08), pts[-1][1]); s.wire(pts[-1], far)
+        if then_down:
+            far = (x, snap(pts[-1][1] + 2.54)); s.wire(pts[-1], far)
+        else:
+            s.junction(pts[-1])
+            far = (snap(x + sx * 5.08), pts[-1][1]); s.wire(pts[-1], far)
         then.render(s, far, sx, 0)
 
 
@@ -315,6 +340,16 @@ class Conn(Att):
 class NC(Att):
     def render(self, s, E, sx, lane):
         s.nc(E); return E
+
+
+class Gap(Att):
+    """A plain stretch of wire, to leave room on the lane (for a junction, say)."""
+    def __init__(self, width, next=None):
+        super().__init__(next); self.step = width; self.end_w = width
+
+    def render(self, s, E, sx, lane):
+        far = (snap(E[0] + sx * self.step), E[1]); s.wire(E, far)
+        return self.next.render(s, far, sx, lane) if self.next else far
 
 
 class Skip(Att):
@@ -422,7 +457,7 @@ class To(Att):
         return T
 
 
-def fan(s, hub, atts, reach=None, min_pitch=PITCH, group_gap=0, align="center", channels=None):
+def fan(s, hub, atts, reach=None, min_pitch=PITCH, group_gap=0, align="center", channels=None, side_dir=None):
     """Fan every pin in `atts` {pin: Att} out of the hub.
 
     Lanes on a side keep pin pitch wherever they can. A hanging element (pull,
@@ -434,7 +469,8 @@ def fan(s, hub, atts, reach=None, min_pitch=PITCH, group_gap=0, align="center", 
     crosses. `align` places a spread stack: "center" on the pin group, "top" or
     "bottom" flush with its first or last pin. `channels` fixes the x where routes
     turn (a value, or {side: value}) when the default would land on something
-    else. Returns {pin: lane-end point}."""
+    else. `side_dir` {pin: -1|1} says which way a chain on a top or bottom pin
+    runs (default: to the right). Returns {pin: lane-end point}."""
     ends = {}
     by_side = {}
     seen_pos = set()
@@ -463,7 +499,11 @@ def fan(s, hub, atts, reach=None, min_pitch=PITCH, group_gap=0, align="center", 
                 elif isinstance(att, L):
                     s.label(att.net, end, 90 if d == "U" else 270, att.glob)
                 else:
-                    att.render(s, end, 1, j)
+                    # a chain on a top or bottom pin: run sideways first so nothing hangs into the body
+                    sxd = (side_dir or {}).get(int(pin) if pin.isdigit() else pin, 1)
+                    lead = (snap(end[0] + sxd * 10.16), end[1])
+                    s.wire(end, lead)
+                    att.render(s, lead, sxd, j)
                 ends[pin] = end
             continue
         sx = 1 if d == "R" else -1
@@ -471,24 +511,38 @@ def fan(s, hub, atts, reach=None, min_pitch=PITCH, group_gap=0, align="center", 
         n = len(items)
         ys = [hub.pin(p)[1] for p, _ in items]
         info = [analyse(a) for _, a in items]                   # (elems, finite, end_w)
-        up_reach = [max((e[1] for e in el), default=0.0) for el, _, _ in info]
-        dn_reach = [max((e[2] for e in el), default=0.0) for el, _, _ in info]
-        finite = [f for _, f, _ in info]
+        up_reach = [max((e[1] for e in inf[0]), default=0.0) for inf in info]
+        dn_reach = [max((e[2] for e in inf[0]), default=0.0) for inf in info]
+        finite = [inf[1] for inf in info]
         # 1) vertical placement: track the pins, spread only where an element would
         #    cross a row that cannot get out of its way
         rel = [0.0] * n
         facing = set()
         for i in range(1, n):
-            r = max(rel[i - 1] + min_pitch, ys[i] - ys[0])
+            r = max(rel[i - 1] + max(min_pitch, ys[i] - ys[i - 1]), ys[i] - ys[0])
             for j in range(i):
-                dj, ui = dn_reach[j], up_reach[i]
                 dist = r - rel[j]
-                if dj > 0 and ui > 0 and dj + ui + 1.27 > dist:
-                    # elements facing each other across the band between the rows
-                    if min(dj, ui) <= 7.62:
-                        r = max(r, rel[j] + dj + ui + 1.27)          # a small one (power symbol, flag): stack them
+                dj, ui = dn_reach[j], up_reach[i]
+                j_reaches_i = dj + 1.27 > dist
+                i_reaches_j = ui + 1.27 > dist
+                # do any of j's downward elements line up horizontally with i's upward ones?
+                xo = any(oj - lj <= oi + ewi and oi - li <= oj + ewj
+                         for (oj, _, dj_, lj, ewj, _z) in info[j][0] if dj_ > 0
+                         for (oi, ui_, _, li, ewi, _z2) in info[i][0] if ui_ > 0)
+                if j_reaches_i and i_reaches_j:
+                    # each reaches the other's row: sliding would chase forever, so spread
+                    if xo and min(dj, ui) <= 7.62:
+                        r = max(r, rel[j] + dj + ui + 1.27)          # a small one under a tall one: stack them
                     else:
-                        r = max(r, rel[j] + max(dj, ui) + 1.27)      # two tall ones: side by side, each clear of the other's row
+                        r = max(r, rel[j] + max(dj, ui) + 1.27)      # side by side, each clear of the other's row
+                        if xo:
+                            facing.add((j, i))
+                elif dj > 0 and ui > 0 and dj + ui + 1.27 > dist and xo:
+                    # neither reaches the other's row, but the elements would meet in between
+                    if min(dj, ui) <= 7.62:
+                        r = max(r, rel[j] + dj + ui + 1.27)
+                    else:
+                        r = max(r, rel[j] + max(dj, ui) + 1.27)
                         facing.add((j, i))
                 dist = r - rel[j]
                 if dj + 1.27 > dist and not finite[i]:              # a route cannot get out of the way: spread
@@ -501,7 +555,7 @@ def fan(s, hub, atts, reach=None, min_pitch=PITCH, group_gap=0, align="center", 
         for _ in range(n + 2):
             changed = False
             for i in range(n):
-                for (off, up, dn, lext, ew) in info[i][0]:
+                for (off, up, dn, lext, ew, zones) in info[i][0]:
                     for j in range(n):
                         if j == i or not finite[j]:
                             continue
@@ -509,17 +563,26 @@ def fan(s, hub, atts, reach=None, min_pitch=PITCH, group_gap=0, align="center", 
                         covers = (dist < 0 and up + 1.27 > -dist) or (dist > 0 and dn + 1.27 > dist)
                         if not covers:
                             continue
-                        req = shift[j] + info[j][2] + 1.27 + lext - off
-                        if req > shift[i] + 1e-6:
-                            shift[i] = snap(req + 1.26)
-                            changed = True
+                        xe = shift[i] + off
+                        d = abs(dist)
+                        if any(lo - 0.6 <= d <= hi + 0.6 for lo, hi in zones):
+                            # the row would run into the part or its symbol: it must end before
+                            spans = [(0.0, shift[j] + info[j][2])]
+                        else:
+                            spans = [(a + shift[j], b + shift[j]) for (a, b) in info[j][3]]
+                        for (a2, b2) in spans:
+                            if xe - lext < b2 + 1.27 and xe + ew > a2 - 1.27:
+                                req = b2 + 1.27 + lext - off
+                                if req > shift[i] + 1e-6:
+                                    shift[i] = snap(req + 1.26)
+                                    changed = True
             # facing elements share the band between the rows: one must start past the
             # other, text included. Slide whichever lane that costs less.
             for (j, i) in facing:
-                for (offj, upj, dnj, lextj, ewj) in info[j][0]:
+                for (offj, upj, dnj, lextj, ewj, _z) in info[j][0]:
                     if dnj <= 0:
                         continue
-                    for (offi, upi, dni, lexti, ewi) in info[i][0]:
+                    for (offi, upi, dni, lexti, ewi, _z2) in info[i][0]:
                         if upi <= 0:
                             continue
                         xj, xi = shift[j] + offj, shift[i] + offi
@@ -537,7 +600,7 @@ def fan(s, hub, atts, reach=None, min_pitch=PITCH, group_gap=0, align="center", 
         if os.environ.get("FAN_DEBUG") and hub.ref in os.environ["FAN_DEBUG"].split(","):
             print(f"[fan] {hub.ref} side {d}")
             for i, (pin, att) in enumerate(items):
-                el, fin, endw = info[i]
+                el, fin, endw = info[i][:3]
                 print(f"   {pin:>4} y={ys[i]:7.2f} rel={rel[i]:6.2f} shift={shift[i]:6.2f} end={endw:5.1f} finite={fin} elems={[(round(e[0],1), e[1], e[2]) for e in el]}")
         # 3) place the stack
         if al == "top":
@@ -557,10 +620,14 @@ def fan(s, hub, atts, reach=None, min_pitch=PITCH, group_gap=0, align="center", 
         ks = [0] * n
         down = [i for i in range(n) if travel[i] > 1e-6]
         up = [i for i in range(n) if travel[i] < -1e-6]
-        for j, i in enumerate(down):
-            ks[i] = len(down) - 1 - j
-        for j, i in enumerate(up):
-            ks[i] = j
+        # a lane going down turns outside every lane below it whose pin lies within its
+        # vertical run; assign columns from the bottom up so each one clears just those
+        for i in reversed(down):
+            below = [ks[j] for j in down if j > i and ys[j] <= lane_y[i] + 1e-6]
+            ks[i] = (max(below) + 1) if below else 0
+        for i in up:
+            above = [ks[j] for j in up if j < i and ys[j] >= lane_y[i] - 1e-6]
+            ks[i] = (max(above) + 1) if above else 0
         maxk = max(ks) if ks else 0
         need = snap(2.54 + maxk * 1.27 + 5.08) if (down or up) else 5.08
         reach = need if reach is None else max(reach, need)
@@ -569,12 +636,15 @@ def fan(s, hub, atts, reach=None, min_pitch=PITCH, group_gap=0, align="center", 
         base = snap(px0 + sx * (reach + max(shift[i] + max(chain_width(a), info[i][2]) for i, (_, a) in enumerate(items)) + 2.54))
         if ch_base is not None:
             base = snap(ch_base)
+        k = 0
         for i, (pin, att) in enumerate(items):
-            m = att
+            m, routed = att, False
             while m is not None:
                 if isinstance(m, (Conn, To)):
-                    m.channel_x = snap(base + sx * i * 1.27)
+                    m.channel_x = snap(base + sx * k * 1.27)
+                    routed = True
                 m = m.next
+            k += routed
         for i, (pin, att) in enumerate(items):
             px, py = hub.pin(pin)
             Y = lane_y[i]

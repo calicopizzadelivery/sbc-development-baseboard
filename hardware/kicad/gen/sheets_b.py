@@ -1,7 +1,7 @@
 """Ethernet, USB hub, FTDI and DAPLink sheets, component-centric."""
 from kit import Sheet, FP
 from sch import snap
-from fanout import fan, chain, L, P, Ser, Pull, PullLED, Tag, Flag, Conn, End, To, BusEnd, bus_join, rail_bus, decap_row, join_pins, top_caps, top_bus, Skip, jog, mark_end
+from fanout import fan, chain, L, P, Ser, Pull, PullLED, Tag, Flag, Conn, End, To, BusEnd, bus_join, rail_bus, decap_row, join_pins, top_caps, top_bus, Skip, jog, mark_end, Gap
 from sheets_a import flags, TVS
 
 AMBER, GREEN, RED = "LED AMBER", "LED GREEN", "LED RED"
@@ -15,7 +15,7 @@ def ethernet(project, num, page, sheet_path, plib):
             "PHY address 0 (pins 15/16 internal pull-downs; the MAC does not drive them). RXER needs the external pull-down.",
             "Transformer centre taps go to 0.1 uF each, not to a supply (datasheet 11.x). Bob Smith: 4x75R to 1 nF/2 kV."], (15, 15), 1.5)
     u = s.add("Interface_Ethernet", "KSZ8081RNA", "U301", "KSZ8081RNA", (160, 125), footprint="Package_DFN_QFN:QFN-24-1EP_4x4mm_P0.5mm_EP2.6x2.6mm")
-    yx = s.add("Device", "Crystal_GND24", "Y301", "25MHz", (85, 145), 90, footprint=FP["XTAL4"])
+    yx = s.add("Device", "Crystal_GND24", "Y301", "25MHz", (70, 165), 90, footprint=FP["XTAL4"])
     j10 = s.add("Connector", "RJ45_Kycon_G7LX-A88S7-BP-GY", "J10", "RJ45 magjack 10/100", (335, 125), footprint=FP["RJ45"])
     fan(s, j10, {1: End("td+"), 2: End("td-"), 3: End("rd+"), 6: End("rd-"), 13: End("ledg_k"),
                  14: chain(Ser("R", "330", None), P("+3V3")), 12: chain(Ser("R", "330", None), P("+3V3")), 11: P("GND"),
@@ -52,7 +52,7 @@ def hub(project, num, page, sheet_path, plib):
             "Port power is switched by TPS2553 under K64 GPIO (boot ON via pull-ups); PRTPWR outputs unused; /FAULT feeds OCSx_N."], (15, 15), 1.5)
     u = s.add("sbcbb", "USB2517", "U402", "USB2517", (165, 150), footprint="Package_DFN_QFN:QFN-64-1EP_9x9mm_P0.5mm_EP7.15x7.15mm")
     j1 = s.add("Connector", "USB_C_Receptacle_USB2.0_16P", "J1", "USB-C upstream", (35, 80), footprint=FP["USBC"])
-    esd0 = s.add("Power_Protection", "USBLC6-2SC6", "U401", "USBLC6-2SC6", (69.85, 80.01), footprint=FP["SOT236"])    # I/O rows = J1 B7 (D-) and A6 (D+)
+    esd0 = s.add("Power_Protection", "USBLC6-2SC6", "U401", "USBLC6-2SC6", (76.2, 80.01), footprint=FP["SOT236"])     # I/O rows = J1 B7 (D-) and A6 (D+); VBUS pin lands on the VBUS stretch before the divider
     yx = s.add("Device", "Crystal_GND24", "Y401", "24MHz", (80, 130), 90, footprint=FP["XTAL4"])
     # Port blocks, one per connector unit: the ESD sits on the D-/D+ rows, the switch
     # output runs along the VBUS row, so every wire into the connector is straight.
@@ -62,9 +62,9 @@ def hub(project, num, page, sheet_path, plib):
         ref, unit = [("J4", 1), ("J4", 2), ("J5", 1), ("J5", 2)][n - 1]
         j = s.add("sbcbb", "USB_A_Stacked2", ref, f"USB-A PORT{n}", (394.97, Y + 8.89), unit=unit, footprint=FP["USBA2"])
         esd = s.add("Power_Protection", "USBLC6-2SC6", f"U4{7+n:02d}", "USBLC6-2SC6", (372.11, Y), footprint=FP["SOT236"])
-        tps = s.add("sbcbb", "TPS2553DBV", f"U40{2+n}", "TPS2553DBV", (320.04, Y + 17.78), footprint=FP["SOT236"])
+        tps = s.add("sbcbb", "TPS2553DBV", f"U40{2+n}", "TPS2553DBV", (327.66, Y + 20.32), footprint=FP["SOT236"])   # OUT on the VBUS row
         ports.append((esd, tps, j, unit))
-    u407 = s.add("sbcbb", "TPS2553DBV", "U407", "TPS2553DBV", (250, 250), footprint=FP["SOT236"])
+    u407 = s.add("sbcbb", "TPS2553DBV", "U407", "TPS2553DBV", (235, 262), footprint=FP["SOT236"])
     for pin in ("A8", "B8"): s.pin_nc(j1, pin)
     for pin in (29, 26, 23, 20, 30, 39, 36, 28, 22, 32, 18, 16, 14): s.pin_nc(u, str(pin))
     pd10 = lambda: chain(Ser("R", "10k", None), P("GND"))
@@ -83,7 +83,7 @@ def hub(project, num, page, sheet_path, plib):
     for n, (esd, tps, j, unit) in enumerate(ports, start=1):
         dp, dm = {1: (9, 8), 2: (12, 11), 3: (54, 53), 4: (56, 55)}[n]
         atts[dp] = Conn(esd, 3); atts[dm] = Conn(esd, 1)                   # I/O2 is the D+ row, I/O1 the D- row
-    ends = fan(s, u, atts, align={"L": "top"}, channels={"R": 254})      # left rows stay on their pins for U401; routes clear the cap ladder
+    ends = fan(s, u, atts, align={"L": "top"}, channels={"R": 266.7})    # left rows stay on their pins for U401; routes clear the cap ladder and pull-ups
     bus_join(s, "strap_gnd", then=P("GND"), sx=1)
     top_bus(s, u, [46, 24, 64, 5, 10, 52, 57], "+3V3", caps_left=[("100n", None)] * 4, caps_right=[("100n", None)] * 3 + [("4u7", FP["C0805"])],
             rail_at="left", height=12.7)
@@ -91,9 +91,9 @@ def hub(project, num, page, sheet_path, plib):
     top_caps(s, u, 62, [("1u", None), ("100n", None)], height=12.7, sx=1)
     fan(s, yx, {2: P("GND")})
     fan(s, j1, {"A6": Skip(), "B6": Skip(), "A7": Skip(), "B7": Skip(),
-                "A4": chain(Flag(None), Ser("R", "10k", None), Tag("J1_VBUS_DET", None), Ser("R", "22k", None), P("GND")),
-                "A5": chain(Ser("R", "5.1k", None), BusEnd("cc_gnd")), "B5": chain(Ser("R", "5.1k", None), BusEnd("cc_gnd")), "A1": P("GND"), "SH": P("GND")}, align="top")
-    bus_join(s, "cc_gnd", then=P("GND"), sx=1)
+                "A4": chain(Flag(None), Gap(20.32), Ser("R", "10k", None), Tag("J1_VBUS_DET", None), Ser("R", "22k", None), P("GND")),
+                "A5": chain(Ser("R", "5.1k", None, step=12.7), P("GND")),       # the upper GND lands past the lower row's end
+                "B5": chain(Ser("R", "5.1k", None, step=7.62), P("GND")), "A1": P("GND"), "SH": P("GND")}, align="top")
     jx = snap(j1.pin("A6")[0] + 7.62)                                   # the joined pairs continue straight into the ESD array
     for pin, row in (("1", j1.pin("B7")[1]), ("3", j1.pin("A6")[1])):
         s.wire((jx, row), esd0.pin(pin)); s.junction((jx, row))
@@ -108,7 +108,7 @@ def hub(project, num, page, sheet_path, plib):
                      3: chain(Tag(f"PORT{n}_EN", None), Ser("R", "10k", None), P("+3V3")),
                      5: chain(Ser("R", "23.7k", None), P("GND")),
                      6: chain(Tag(f"PORT{n}_VBUS", None), Pull("GND", "C", "22u", None, fp=FP["C1206"]), PullLED(GREEN, "1k", None), Conn(j, vb)),
-                     4: chain(Tag(f"PORT{n}_FAULT_N", None), Ser("R", "10k", None), P("+3V3")), 2: P("GND")}, align="top")   # OUT stays on the VBUS row
+                     4: chain(Pull("+3V3", "R", "10k", None), L(f"PORT{n}_FAULT_N")), 2: P("GND")}, align="top")   # OUT stays on the VBUS row
         jatts = {gnd: P("GND")}
         if unit == 1:
             jatts["SH"] = P("GND")
@@ -143,7 +143,7 @@ def ftdi(project, num, page, sheet_path, plib):
     top_caps(s, u, 15, [("10u", FP["C0805"]), ("100n", None)], height=15.24, sx=-1, rail="FTDI_VBUS")
     fan(s, jp, {2: chain(Ser("R", "470", None), TVS(), Conn(j9, 6))})
     fan(s, jp2, {1: P("FTDI_3V3"), 2: Conn(j9, 3)})
-    fan(s, j9, {1: P("GND")})
+    fan(s, j9, {1: P("GND", hook=(-5.08, -7.62))})     # off the row below, which carries the RXD route
     return s
 
 
@@ -156,7 +156,7 @@ def daplink(project, num, page, sheet_path, plib):
             "J601 programs the K20 itself (bootloader + DAPLink). SW601 held at power-up enters DAPLink maintenance mode."], (15, 15), 1.5)
     u = s.add("MCU_NXP_Kinetis", "MK20DX128VFM5", "U601", "MK20DX128VFM5", (170, 115), footprint="Package_DFN_QFN:QFN-32-1EP_5x5mm_P0.5mm_EP3.45x3.45mm")
     j = s.add("Connector", "Conn_ARM_JTAG_SWD_10", "J601", "SWD (K20)", (40, 100), footprint=FP["SWD10"])
-    yx = s.add("Device", "Crystal_GND24", "Y601", "8MHz", (85, 140), 90, footprint=FP["XTAL4"])
+    yx = s.add("Device", "Crystal_GND24", "Y601", "8MHz", (45, 150), 90, footprint=FP["XTAL4"])   # below J601, clear of the reset network
     for pin in (9, 10, 13, 14, 20, 22, 23, 28, 30, 31, 32): s.pin_nc(u, str(pin))
     for pin in (6, 7, 8): s.pin_nc(j, str(pin))
     fan(s, u, {12: Conn(j, 4), 15: Conn(j, 2), 16: chain(Ser("R", "10k", None), P("K20_3V3")),

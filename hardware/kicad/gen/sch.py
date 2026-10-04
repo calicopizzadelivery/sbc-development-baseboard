@@ -71,6 +71,20 @@ class Instance:
         ys = [self.pin(n)[1] for n in self.pins]
         return min(xs), min(ys), max(xs), max(ys)
 
+    def body(self):
+        """The symbol outline on the sheet (library rectangles, else the pin extent)."""
+        pts = []
+        for sub in self.node[1:]:
+            if isinstance(sub, list) and sub and sub[0] == Sym("symbol"):
+                for g in sub[1:]:
+                    if isinstance(g, list) and g and g[0] == Sym("rectangle"):
+                        for key in ("start", "end"):
+                            c = [x for x in g[1:] if isinstance(x, list) and x and x[0] == Sym(key)][0]
+                            pts.append(transform(float(c[1]), float(c[2]), self.X, self.Y, self.rot, self.mirror))
+        if not pts:
+            return self.bbox()
+        return min(p[0] for p in pts), min(p[1] for p in pts), max(p[0] for p in pts), max(p[1] for p in pts)
+
 
 class Schematic:
     def __init__(self, project, title, paper="A3", page=1, sheet_path="/"):
@@ -266,10 +280,15 @@ class Schematic:
                     continue
                 at = [c for c in pr[3:] if isinstance(c, list) and c and c[0] == Sym("at")]
                 eff = [c for c in pr[3:] if isinstance(c, list) and c and c[0] == Sym("effects")]
-                if at:
+                if at and rot == 0:
                     pt = transform(float(at[0][1]), float(at[0][2]), X, Y, rot, inst.mirror)
                     if name == "Reference": ref_at = pt
                     else: val_at = pt
+                else:
+                    # a part turned round or on its side: both texts beside it, on the left, stacked
+                    bx0 = inst.body()[0]
+                    if name == "Reference": ref_at = (bx0 - 1.27, Y - 1.27)
+                    else: val_at = (bx0 - 1.27, Y + 1.27)
                 j = None
                 if eff:
                     jj = [c for c in eff[0][1:] if isinstance(c, list) and c and c[0] == Sym("justify")]
@@ -277,9 +296,9 @@ class Schematic:
                         j = " ".join(str(x) for x in jj[0][1:] if str(x) in ("left", "right"))
                         if (rot == 180) != (inst.mirror == "y") and j:
                             j = {"left": "right", "right": "left"}.get(j, j)
-                        if rot in (90, 270):
-                            j = None
                 lib_just[name] = j or None
+                if rot != 0:
+                    lib_just[name] = "right"    # ending at the anchor (J() mirrors it when drawn at 180)
             ref_hide = False
         if inst.ref_at: ref_at = inst.ref_at
         if inst.val_at: val_at = inst.val_at

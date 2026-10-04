@@ -141,7 +141,7 @@ def usb2517():
 
 
 def tps2553():
-    return box_symbol("TPS2553DBV", [("1", "IN", PI), ("3", "EN", I), ("5", "ILIM", P)],
+    return box_symbol("TPS2553DBV", [("1", "IN", PI), None, ("3", "EN", I), None, ("5", "ILIM", P)],
                       [("6", "OUT", PO), ("4", "~{FAULT}", OC)], bottom=[("2", "GND", PI)], ref="U", width=15.24,
                       footprint="Package_TO_SOT_SMD:SOT-23-6",
                       description="Current-limited USB power switch, EN active high, adjustable limit via ILIM resistor, SOT-23-6. Pinout from TI SLVS841.",

@@ -67,26 +67,14 @@ def relays(project, num, page, sheet_path, plib):
     for n, y in ((1, 75), (2, 150)):
         k = s.add("Relay", "G6K-2", f"K80{n}", "G6K-2F-Y DC5", (150, y), footprint="Relay_SMD:Relay_DPDT_Omron_G6K-2F-Y")
         jx = s.add("Connector_Generic", "Conn_01x03", f"J1{n}", "Relay COM/NO/NC", (230, y), footprint=FP["PH3"])
-        q = s.Q("Transistor_FET", "2N7002", "2N7002", (105, y + 32))
+        q = s.Q("Transistor_FET", "2N7002", "2N7002", (95, y + 42))
         for pin in (5, 6, 7): s.pin_nc(k, str(pin))
-        # coil: pin 1 (top-left) to +5V_PORTS, pin 8 (bottom-left) is the switched node
-        s.pin_power(k, "1", "+5V_PORTS")
-        x8, y8 = k.pin("8")
-        node = (x8, y8 + 5.08)
-        s.wire((x8, y8), node)
-        dx = q.pin("3")[0]
-        s.wire(node, (dx, node[1]), q.pin("3"))
-        s.junction(node)
-        # flyback diode and coil LED between the rail and the node
-        d = s.add("Diode", "1N4148W", s.ref("D"), "1N4148W", (x8 - 7.62, node[1] - 6.35), 270, footprint=FP["SOD123"])
-        s.pin_power(d, "1", "+5V_PORTS"); s.wire(d.pin("2"), (x8 - 7.62, node[1])); s.junction((x8 - 7.62, node[1]))
-        s.wire((x8 - 7.62, node[1]), node)
-        led = s.LED(RED, (x8 - 15.24, node[1] - 6.35), rot=90); r = s.R("2.2k", (x8 - 15.24, node[1] - 17.78))
-        s.pin_power(r, "1", "+5V_PORTS"); s.wire(r.pin("2"), led.pin("2")); s.wire(led.pin("1"), (x8 - 15.24, node[1]))
-        s.wire((x8 - 15.24, node[1]), (x8 - 7.62, node[1]))
-        s.junction((dx, node[1])) if dx != x8 - 15.24 else None
+        # coil: pin 1 (top-left) to +5V_PORTS; the switched end (pin 8, bottom-left) runs left with
+        # the flyback diode and the coil LED hanging up to the rail, then down to the FET drain
+        fan(s, k, {1: P("+5V_PORTS"),
+                   8: chain(Pull("+5V_PORTS", ("Diode", "1N4148W", "1"), "1N4148W", None, fp=FP["SOD123"]), PullLED(RED, "2.2k", None, rail="+5V_PORTS"), Conn(q, 3)),
+                   2: Conn(jx, 3), 4: Conn(jx, 2), 3: Conn(jx, 1)}, side_dir={8: -1})
         fan(s, q, {1: chain(Pull("GND", "R", "100k", None), Ser("R", "1k", None), L(f"RLY{n}_DRV")), 2: P("GND")})
-        fan(s, k, {2: Conn(jx, 3), 4: Conn(jx, 2), 3: Conn(jx, 1)})
     # passthrough
     k3 = s.add("sbcbb", "JW1FSN", "K803", "JW1FSN-DC5V", (150, 235), footprint="Relay_THT:Relay_SPDT_Panasonic_JW1_FormC")
     q3 = s.Q("Transistor_FET", "AO3400A", "AO3400A", (70, 262))
@@ -101,7 +89,7 @@ def relays(project, num, page, sheet_path, plib):
     fan(s, j18, {2: P("PSU_GND")}); fan(s, j19, {2: P("PSU_GND")})
     fan(s, opto, {1: chain(Pull("PSU_GND", ("Diode", "1N4148W", "1"), "1N4148W", None, fp=FP["SOD123"]), Ser("R", "1.8k", None, fp=FP["R1206"]), Ser("R", "1.8k", None, fp=FP["R1206"]), Conn(j18, 1)),
                   2: P("PSU_GND"), 4: chain(Pull("+3V3", "R", "10k", None), L("PSU_PRESENT_N")), 3: P("GND")})
-    flags(s, ["PSU_GND"], (25, 262))
+    flags(s, ["PSU_GND"], (25, 276))
     s.note(["Opto LED: 2x1.8k 1206 in series, 1 mA at 5 V, 8 mA / 0.12 W each at 30 V. The antiparallel 1N4148W protects a reversed PSU.",
             "PSU_PRESENT_N is active low at the K64."], (150, 280), 1.3)
     return s
