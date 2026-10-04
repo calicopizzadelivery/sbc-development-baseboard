@@ -1,7 +1,7 @@
 """Ethernet, USB hub, FTDI and DAPLink sheets, component-centric."""
 from kit import Sheet, FP
 from sch import snap
-from fanout import fan, chain, L, P, Ser, Pull, PullLED, Tag, Flag, Conn, End, To, BusEnd, bus_join, rail_bus, decap_row, join_pins, top_caps, top_bus, Skip
+from fanout import fan, chain, L, P, Ser, Pull, PullLED, Tag, Flag, Conn, End, To, BusEnd, bus_join, rail_bus, decap_row, join_pins, top_caps, top_bus, Skip, jog, mark_end
 from sheets_a import flags, TVS
 
 AMBER, GREEN, RED = "LED AMBER", "LED GREEN", "LED RED"
@@ -28,10 +28,12 @@ def ethernet(project, num, page, sheet_path, plib):
                18: chain(Pull("+3V3", "R", "1k", None), L("PHY_INT_N")), 19: L("RMII_TXEN"), 20: L("RMII_TXD0"), 21: L("RMII_TXD1"), 24: L("K64_RESET_N"),
                8: chain(Pull("GND", "C", "22p", None), Conn(yx, 1)), 7: chain(Pull("GND", "C", "22p", None), Conn(yx, 3)),
                3: To("rd-"), 4: To("rd+"), 5: To("td-"), 6: To("td+"), 9: chain(Ser("R", "6.49k 1%", None), P("GND")), 23: To("ledg_k"),
-               2: P("+3V3A_PHY"), 14: P("+3V3"), 22: P("GND"), 25: P("GND")})
-    top_caps(s, u, 1, [("2u2", None), ("100n", None)], height=12.7, sx=-1)
+               22: P("GND"), 25: P("GND")}, align={"L": "top"})
+    jog(s, u, 2, "+3V3A_PHY", up=5.08, over=10.16)
+    jog(s, u, 14, "+3V3", up=2.54, over=12.7)
+    top_caps(s, u, 1, [("2u2", None), ("100n", None)], height=15.24, sx=-1)
     fan(s, yx, {2: P("GND")})
-    s.two(s.FB("600R@100MHz", (40, 230)), "+3V3", "+3V3A_PHY")
+    s.two(s.FB("600R@100MHz", (40, 230), rot=90), "+3V3", "+3V3A_PHY")
     decap_row(s, "+3V3A_PHY", [("22u", FP["C0805"]), ("100n", None)], (55, 230))
     decap_row(s, "+3V3", [("100n", None)], (90, 230))
     flags(s, ["+3V3A_PHY"], (120, 230))
@@ -50,8 +52,8 @@ def hub(project, num, page, sheet_path, plib):
             "Port power is switched by TPS2553 under K64 GPIO (boot ON via pull-ups); PRTPWR outputs unused; /FAULT feeds OCSx_N."], (15, 15), 1.5)
     u = s.add("sbcbb", "USB2517", "U402", "USB2517", (165, 150), footprint="Package_DFN_QFN:QFN-64-1EP_9x9mm_P0.5mm_EP7.15x7.15mm")
     j1 = s.add("Connector", "USB_C_Receptacle_USB2.0_16P", "J1", "USB-C upstream", (35, 80), footprint=FP["USBC"])
-    esd0 = s.add("Power_Protection", "USBLC6-2SC6", "U401", "USBLC6-2SC6", (73.66, 80.01), footprint=FP["SOT236"])    # I/O rows = J1 B7 (D-) and A6 (D+)
-    yx = s.add("Device", "Crystal_GND24", "Y401", "24MHz", (80, 118), 90, footprint=FP["XTAL4"])
+    esd0 = s.add("Power_Protection", "USBLC6-2SC6", "U401", "USBLC6-2SC6", (69.85, 80.01), footprint=FP["SOT236"])    # I/O rows = J1 B7 (D-) and A6 (D+)
+    yx = s.add("Device", "Crystal_GND24", "Y401", "24MHz", (80, 130), 90, footprint=FP["XTAL4"])
     # Port blocks, one per connector unit: the ESD sits on the D-/D+ rows, the switch
     # output runs along the VBUS row, so every wire into the connector is straight.
     ports = []
@@ -81,22 +83,24 @@ def hub(project, num, page, sheet_path, plib):
     for n, (esd, tps, j, unit) in enumerate(ports, start=1):
         dp, dm = {1: (9, 8), 2: (12, 11), 3: (54, 53), 4: (56, 55)}[n]
         atts[dp] = Conn(esd, 3); atts[dm] = Conn(esd, 1)                   # I/O2 is the D+ row, I/O1 the D- row
-    ends = fan(s, u, atts, align={"L": "top"}, channels={"R": 259.08})   # left rows stay on their pins for U401; routes clear the cap row
+    ends = fan(s, u, atts, align={"L": "top"}, channels={"R": 254})      # left rows stay on their pins for U401; routes clear the cap ladder
     bus_join(s, "strap_gnd", then=P("GND"), sx=1)
-    top_bus(s, u, [46, 24, 64, 5, 10, 52, 57], "+3V3", caps=[("100n", None)] * 7 + [("4u7", FP["C0805"])], rail_at="left", height=7.62)
+    top_bus(s, u, [46, 24, 64, 5, 10, 52, 57], "+3V3", caps_left=[("100n", None)] * 4, caps_right=[("100n", None)] * 3 + [("4u7", FP["C0805"])],
+            rail_at="left", height=12.7)
     top_caps(s, u, 25, [("1u", None), ("100n", None)], height=7.62, sx=-1)
     top_caps(s, u, 62, [("1u", None), ("100n", None)], height=12.7, sx=1)
     fan(s, yx, {2: P("GND")})
     fan(s, j1, {"A6": Skip(), "B6": Skip(), "A7": Skip(), "B7": Skip(),
-                "A4": chain(Flag(None), Tag("J1_VBUS", None), Ser("R", "10k", None), Tag("J1_VBUS_DET", None), Ser("R", "22k", None), P("GND")),
-                "A5": chain(Ser("R", "5.1k", None), P("GND")), "B5": chain(Ser("R", "5.1k", None), P("GND")), "A1": P("GND"), "SH": P("GND")}, align="top")
+                "A4": chain(Flag(None), Ser("R", "10k", None), Tag("J1_VBUS_DET", None), Ser("R", "22k", None), P("GND")),
+                "A5": chain(Ser("R", "5.1k", None), BusEnd("cc_gnd")), "B5": chain(Ser("R", "5.1k", None), BusEnd("cc_gnd")), "A1": P("GND"), "SH": P("GND")}, align="top")
+    bus_join(s, "cc_gnd", then=P("GND"), sx=1)
     jx = snap(j1.pin("A6")[0] + 7.62)                                   # the joined pairs continue straight into the ESD array
     for pin, row in (("1", j1.pin("B7")[1]), ("3", j1.pin("A6")[1])):
         s.wire((jx, row), esd0.pin(pin)); s.junction((jx, row))
     fan(s, esd0, {6: To("usbup_dm"), 4: To("usbup_dp"), 2: P("GND")})     # I/O1 sits on the D- row, I/O2 on D+
-    vx, vy = esd0.pin("5")
-    s.wire((vx, vy), (vx, snap(vy - 3.81)), (snap(vx + 5.08), snap(vy - 3.81)))
-    s.label("J1_VBUS", (snap(vx + 5.08), snap(vy - 3.81)), 0, None)
+    vx, vy = esd0.pin("5")                                              # VBUS pin straight up onto J1's VBUS lane
+    vb = (vx, j1.pin("A4")[1])
+    s.wire((vx, vy), vb); s.junction(vb)
     for n, (esd, tps, j, unit) in enumerate(ports, start=1):
         vb, dmp, dpp, gnd = (1, 2, 3, 4) if unit == 1 else (5, 6, 7, 8)
         fan(s, esd, {6: Conn(j, dmp), 4: Conn(j, dpp), 5: L(f"PORT{n}_VBUS"), 2: P("GND")})
@@ -136,7 +140,7 @@ def ftdi(project, num, page, sheet_path, plib):
                2: Conn(jp, 3), 1: Conn(jp, 1), 10: led(), 17: led(),
                11: L("HUB_DN2_DP"), 12: L("HUB_DN2_DM"), 13: chain(Pull("GND", "C", "100n", None), P("FTDI_3V3")),
                14: chain(Ser("R", "10k", None), P("FTDI_3V3")), 3: P("FTDI_3V3"), 6: P("GND"), 16: P("GND")})
-    top_caps(s, u, 15, [("10u", FP["C0805"]), ("100n", None)], height=7.62, sx=-1, up=True, rail="FTDI_VBUS")
+    top_caps(s, u, 15, [("10u", FP["C0805"]), ("100n", None)], height=15.24, sx=-1, rail="FTDI_VBUS")
     fan(s, jp, {2: chain(Ser("R", "470", None), TVS(), Conn(j9, 6))})
     fan(s, jp2, {1: P("FTDI_3V3"), 2: Conn(j9, 3)})
     fan(s, j9, {1: P("GND")})
@@ -162,8 +166,8 @@ def daplink(project, num, page, sheet_path, plib):
                21: L("K64_RESET_N"), 24: L("K64_UART0_TX"), 25: L("K64_UART0_RX"), 26: L("SWCLK"), 27: L("SWDIO"),
                29: chain(Ser("D", "LED GREEN", None, lib="Device", name="LED", near="1", fp=FP["LED"]), Ser("R", "470", None), P("K20_3V3")),
                11: P("K20_3V3"), 2: P("GND"), 8: P("GND"), 33: P("GND")})
-    top_bus(s, u, [1, 7], "K20_3V3", caps=[("100n", None), ("100n", None)], rail_at="right", caps_at="right", height=7.62)
-    top_caps(s, u, 6, [("2u2", None)], height=12.7, sx=-1, up=True, rail="+5V_PORTS")
+    top_bus(s, u, [1, 7], "K20_3V3", caps_right=[("100n", None), ("100n", None)], rail_at="right", height=12.7)
+    top_caps(s, u, 6, [("2u2", None)], height=20.32, sx=-1, rail="+5V_PORTS")
     fan(s, yx, {2: P("GND")})
     fan(s, j, {1: P("K20_3V3"), 3: P("GND"), 9: P("GND")})
     return s

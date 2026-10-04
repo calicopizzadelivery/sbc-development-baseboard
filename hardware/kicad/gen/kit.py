@@ -89,16 +89,30 @@ class Sheet(Schematic):
         return self.add(lib, name, self.ref("Q"), value, at, rot, footprint=fp or FP["SOT23"])
 
     # ---- two-pin idioms (vertical: pin 1 up, pin 2 down)
-    def two(self, inst, top, bottom):
-        """Connect a vertical two-pin part: top/bottom are net names, or
-        ('P', rail) for a power symbol."""
-        for pin, side in (("1", top), ("2", bottom)):
+    def rail_end(self, inst, pin, rail):
+        """A power symbol on a pin, always the right way up: rails stand above
+        the wire end, GND hangs below it. Horizontal pins get a short jog."""
+        gnd = rail == "GND" or rail.endswith("GND")
+        end, d = self.stub(inst, pin, 2.54)
+        if d in ("L", "R"):
+            pt = (end[0], snap(end[1] + (2.54 if gnd else -2.54)))
+            self.wire(end, pt)
+            self.power(rail, pt, 0)
+        elif (d == "U") != gnd:
+            self.power(rail, end, 0)
+        else:                                   # a rail on a bottom pin or GND on a top pin: jog sideways
+            pt = (snap(end[0] + 2.54), end[1]); self.wire(end, pt)
+            pt2 = (pt[0], snap(pt[1] + (2.54 if gnd else -2.54))); self.wire(pt, pt2)
+            self.power(rail, pt2, 0)
+        return end
+
+    def two(self, inst, a, b):
+        """Connect a two-pin part: a = pin 1, b = pin 2; each a net name or ('P', rail)."""
+        for pin, side in (("1", a), ("2", b)):
             if isinstance(side, tuple):
-                self.pin_power(inst, pin, side[1])
-            elif side == "GND":
-                self.pin_power(inst, pin, "GND")
-            elif side.startswith("+") or side.startswith("VBUS_IN"):
-                self.pin_power(inst, pin, side)
+                self.rail_end(inst, pin, side[1])
+            elif side == "GND" or side.startswith("+") or side.startswith("VBUS_IN"):
+                self.rail_end(inst, pin, side)
             else:
                 self.pin_label(inst, pin, side)
         return inst
@@ -118,12 +132,7 @@ class Sheet(Schematic):
     def series(self, net_a, net_b, value, at, fp=None):
         """Horizontal resistor: pin 1 on the left = net_a, pin 2 right = net_b."""
         r = self.R(value, at, rot=90, fp=fp)
-        for pin, net in (("1", net_a), ("2", net_b)):
-            if net == "GND" or net.startswith("+") or net.startswith("VBUS_IN"):
-                self.pin_power(r, pin, net)
-            else:
-                self.pin_label(r, pin, net)
-        return r
+        return self.two(r, net_a, net_b)
 
     def led_chain(self, top, bottom, value_r, color, at):
         """Resistor over LED, vertical. top/bottom nets (rails allowed).
@@ -134,7 +143,7 @@ class Sheet(Schematic):
         self.wire(r.pin("2"), d.pin("2"))
         for inst, pin, net in ((r, "1", top), (d, "1", bottom)):
             if net == "GND" or net.startswith("+") or net.startswith("VBUS_IN"):
-                self.pin_power(inst, pin, net)
+                self.rail_end(inst, pin, net)
             else:
                 self.pin_label(inst, pin, net)
         return r, d
@@ -155,8 +164,8 @@ class Sheet(Schematic):
     def flag_rail(self, rail, at):
         x, y = sp(at)
         self.power(rail, (x, y))
-        self.flag((x + 5.08, y))
-        self.wire((x, y), (x + 5.08, y))
+        self.flag((x + 10.16, y))
+        self.wire((x, y), (x + 10.16, y))
 
     def flag_net(self, net, at):
         x, y = sp(at)

@@ -15,6 +15,12 @@ from kisym import transform
 PITCH = 2.54
 
 
+def snap_up(v):
+    """Round up to the connection grid."""
+    import math
+    return round(math.ceil(v / G - 1e-6) * G, 4)
+
+
 # ----------------------------------------------------------------------------- attachments
 def text_w(txt, glob=False):
     """Rendered width of 1.27 mm text (plus the global-label box)."""
@@ -104,11 +110,14 @@ class Ser(Att):
     """Two-pin part in line with the wire; `near` says which pin touches the lane end.
     kind: 'R','C','L','FB','D' (Device:D_* via name), with lib/name overridable."""
     width = 7.62
-    step = 7.62
+    lext = 1.5            # the reference, right-justified, reaches back a little past the lane end
+    h_up = 1.7            # the texts sit above the part, so the row above must be clear there
 
     def __init__(self, kind, value, next, fp=None, lib=None, name=None, near="1", flip=False):
         super().__init__(next)
         self.kind, self.value, self.fp, self.lib, self.name, self.near, self.flip = kind, value, fp, lib, name, near, flip
+        self.ew = 4.2 + text_w(value)
+        self.step = max(7.62, snap(self.ew + 1.0 + 1.26))
 
     def render(self, s, E, sx, lane):
         far = (snap(E[0] + sx * 7.62), E[1])
@@ -129,9 +138,15 @@ class Ser(Att):
         s.wire(E, inst.pin(self.near))
         other = "2" if self.near == "1" else "1"
         s.wire(inst.pin(other), far)
-        # both texts above the part, inside the row pitch: ref ends left of centre, value starts right of it
-        inst.ref_at = (inst.X - 0.4, E[1] - 1.4); inst.ref_just = "right"
-        inst.val_at = (inst.X + 0.4, E[1] - 1.4); inst.val_just = "left"
+        # both texts above the part, small, inside the row pitch: the reference on the side the
+        # lane came from, the (longer) value on the side it continues to
+        inst.field_size = 1.0
+        if sx > 0:
+            inst.ref_at = (inst.X - 0.4, E[1] - 1.1); inst.ref_just = "right"
+            inst.val_at = (inst.X + 0.4, E[1] - 1.1); inst.val_just = "left"
+        else:
+            inst.ref_at = (inst.X + 0.4, E[1] - 1.1); inst.ref_just = "left"
+            inst.val_at = (inst.X - 0.4, E[1] - 1.1); inst.val_just = "right"
         return self.next.render(s, far, sx, lane) if self.next else far
 
 
@@ -147,7 +162,8 @@ class Pull(Att):
             self.h_down = 16.51
         else:
             self.h_up = 17.78
-        self.end_w = 2.54 + text_w(value)
+        self.end_w = 2.54 + max(text_w(value), 5.0)
+        self.text_step = max(5.08, snap(self.end_w + 1.5 + 1.26))   # used when the next part hangs the same way
 
     def render(self, s, E, sx, lane):
         y = snap(E[1] + (6.35 if self.down else -6.35))
@@ -169,11 +185,13 @@ class Pull(Att):
             s.wire(E, inst.pin(top)); s.pin_power(inst, bot, self.rail)
         else:
             s.wire(E, inst.pin(bot)); s.pin_power(inst, top, self.rail)
-        inst.ref_at = (E[0] + 2.54, y - 1.27); inst.val_at = (E[0] + 2.54, y + 1.27)
+        # text beside the part, on the side away from the pin
+        inst.ref_at = (E[0] + sx * 2.54, y - 1.27); inst.val_at = (E[0] + sx * 2.54, y + 1.27)
+        inst.ref_just = inst.val_just = "left" if sx > 0 else "right"
         if self.next is not None:
             s.junction(E)
             # continue the lane past the junction
-            far = (snap(E[0] + sx * 5.08), E[1])
+            far = (snap(E[0] + sx * self.step), E[1])
             s.wire(E, far)
             return self.next.render(s, far, sx, lane)
         return E
@@ -189,7 +207,8 @@ class PullLED(Att):
             self.h_down = 22.86
         else:
             self.h_up = 22.86
-        self.end_w = 2.54 + text_w(r_value)
+        self.end_w = 2.54 + max(text_w(r_value), text_w(color))
+        self.text_step = max(5.08, snap(self.end_w + 1.5 + 1.26))
 
     def render(self, s, E, sx, lane):
         if self.down:
@@ -200,10 +219,12 @@ class PullLED(Att):
             d = s.LED(self.color, (E[0], snap(E[1] - 5.08)), rot=90, fp=self.fp_led)      # cathode down, on the lane
             r = s.R(self.r_value, (E[0], snap(E[1] - 13.97)), rot=0)
             s.wire(E, d.pin("1")); s.wire(d.pin("2"), r.pin("2")); s.pin_power(r, "1", self.rail)
-        r.ref_at = (E[0] + 2.54, r.Y - 1.27); r.val_at = (E[0] + 2.54, r.Y + 1.27)
+        for inst in (r, d):
+            inst.ref_at = (E[0] + sx * 2.54, inst.Y - 1.27); inst.val_at = (E[0] + sx * 2.54, inst.Y + 1.27)
+            inst.ref_just = inst.val_just = "left" if sx > 0 else "right"
         if self.next is not None:
             s.junction(E)
-            far = (snap(E[0] + sx * 5.08), E[1]); s.wire(E, far)
+            far = (snap(E[0] + sx * self.step), E[1]); s.wire(E, far)
             return self.next.render(s, far, sx, lane)
         return E
 
@@ -315,13 +336,52 @@ def chain_width(att):
 
 
 def chain(*atts):
-    """Link attachments: chain(Ser(...), Pull(...), L('X')) -> Ser.next = Pull, Pull.next = L."""
+    """Link attachments: chain(Ser(...), Pull(...), L('X')) -> Ser.next = Pull, Pull.next = L.
+    Two parts hanging the same way in a row are spaced so the first one's text
+    clears the second."""
     for a, b in zip(atts, atts[1:]):
         n = a
         while n.next is not None:
             n = n.next
         n.next = b
+    n = atts[0]
+    while n is not None and n.next is not None:
+        m = n.next
+        if isinstance(n, (Pull, PullLED)) and isinstance(m, (Pull, PullLED, Ladder)) and (isinstance(m, Ladder) or n.down == m.down):
+            n.step = max(n.step, n.text_step)
+        n = m
     return atts[0]
+
+
+def cap_pitch(caps):
+    """Capacitor spacing in a ladder: wide enough for the longer of reference and value."""
+    return [max(7.62, snap(2.54 + max(text_w(c[1] if c[0] == "CP" else c[0]), 5.0) + 1.5)) for c in caps]
+
+
+class Ladder(Att):
+    """A row of capacitors hanging from the lane into a GND rail below, with one
+    GND symbol at the end; the lane carries on past them. caps: (value, fp) or
+    ("CP", value, fp) for a polarised one."""
+    def __init__(self, caps, next=None):
+        super().__init__(next)
+        self.caps = caps
+        self.pitches = cap_pitch(caps)
+        self.h_down = 7.62 + 6.35
+        self.lext = 1.3
+        self.width = sum(self.pitches) + 5.08
+        self.step = snap(self.width + 2.54)
+        self.end_w = self.width
+        self.ew = self.width
+
+    def render(self, s, E, sx, lane):
+        x_end, _ = ladder(s, E[0], E[1], sx, self.caps, pitches=self.pitches)
+        s.wire(E, (x_end, E[1]))
+        if self.next is not None:
+            far = (snap(E[0] + sx * self.step), E[1])
+            if abs(far[0] - x_end) > 1e-6:
+                s.wire((x_end, E[1]), far)
+            return self.next.render(s, far, sx, lane)
+        return (x_end, E[1])
 
 
 # ----------------------------------------------------------------------------- fans
@@ -339,16 +399,20 @@ class End(Att):
 
 
 class To(Att):
-    """Route from this lane end to an End(key) recorded by another fan on the sheet."""
+    """Route from this lane end to an End(key) recorded by another fan on the sheet.
+    `direct`: turn at the target's own x (an L, arriving into the end from above
+    or below) instead of in this fan's channel."""
     route = True
 
-    def __init__(self, key):
-        super().__init__(None); self.key = key; self.channel_x = None
+    def __init__(self, key, direct=False):
+        super().__init__(None); self.key = key; self.channel_x = None; self.direct = direct
 
     def render(self, s, E, sx, lane, vertical=None):
         T, tsx = End.registry[(id(s), self.key)]
         if abs(T[1] - E[1]) < 1e-6:
             s.wire(E, T)
+        elif self.direct:
+            s.wire(E, (T[0], E[1]), T)
         elif vertical is not None:
             chy = snap(E[1] + vertical * (2.54 + lane * 1.27))
             s.wire(E, (E[0], chy), (T[0], chy), T)
@@ -431,7 +495,7 @@ def fan(s, hub, atts, reach=None, min_pitch=PITCH, group_gap=0, align="center", 
                     r = max(r, rel[j] + dj + 1.27)
                 if ui + 1.27 > dist and not finite[j]:
                     r = max(r, rel[j] + ui + 1.27)
-            rel[i] = snap(r)
+            rel[i] = snap_up(r)
         # 2) slide: an element that reaches a finite row starts beyond that row's content
         shift = [0.0] * n
         for _ in range(n + 2):
@@ -449,8 +513,8 @@ def fan(s, hub, atts, reach=None, min_pitch=PITCH, group_gap=0, align="center", 
                         if req > shift[i] + 1e-6:
                             shift[i] = snap(req + 1.26)
                             changed = True
-            # facing elements share the band between the rows: the lower lane's element
-            # starts past the upper lane's element
+            # facing elements share the band between the rows: one must start past the
+            # other, text included. Slide whichever lane that costs less.
             for (j, i) in facing:
                 for (offj, upj, dnj, lextj, ewj) in info[j][0]:
                     if dnj <= 0:
@@ -458,10 +522,16 @@ def fan(s, hub, atts, reach=None, min_pitch=PITCH, group_gap=0, align="center", 
                     for (offi, upi, dni, lexti, ewi) in info[i][0]:
                         if upi <= 0:
                             continue
-                        req = shift[j] + offj + ewj + 1.27 + lexti - offi
-                        if req > shift[i] + 1e-6:
-                            shift[i] = snap(req + 1.26)
-                            changed = True
+                        xj, xi = shift[j] + offj, shift[i] + offi
+                        if xi - lexti >= xj + ewj + 1.27 - 1e-6 or xj - lextj >= xi + ewi + 1.27 - 1e-6:
+                            continue
+                        req_i = xj + ewj + 1.27 + lexti - offi          # slide i past j's element
+                        req_j = xi + ewi + 1.27 + lextj - offj          # or j past i's
+                        if req_i - shift[i] <= req_j - shift[j]:
+                            shift[i] = snap(req_i + 1.26)
+                        else:
+                            shift[j] = snap(req_j + 1.26)
+                        changed = True
             if not changed:
                 break
         if os.environ.get("FAN_DEBUG") and hub.ref in os.environ["FAN_DEBUG"].split(","):
@@ -496,7 +566,7 @@ def fan(s, hub, atts, reach=None, min_pitch=PITCH, group_gap=0, align="center", 
         reach = need if reach is None else max(reach, need)
         # route channels start beyond the widest attachment chain of this fan
         px0 = hub.pin(items[0][0])[0]
-        base = snap(px0 + sx * (reach + max(shift[i] + chain_width(a) for i, (_, a) in enumerate(items)) + 2.54))
+        base = snap(px0 + sx * (reach + max(shift[i] + max(chain_width(a), info[i][2]) for i, (_, a) in enumerate(items)) + 2.54))
         if ch_base is not None:
             base = snap(ch_base)
         for i, (pin, att) in enumerate(items):
@@ -560,7 +630,10 @@ def rail_bus(s, hub, pins, rail, caps=None, cap_fp=None, reach=3.81):
 def decap_row(s, rail, caps, at, gnd="GND"):
     """A row of decoupling caps under a shared rail wire; rail symbol at the left end."""
     x0, y = sp(at)
-    xs = [snap(x0 + 10.16 * i) for i in range(len(caps))]
+    xs, x = [], x0
+    for entry in caps:
+        xs.append(snap(x))
+        x += max(10.16, snap(2.54 + text_w(entry[-2]) + 1.5))
     s.wire((xs[0], y), (xs[-1], y))
     s.power(rail, (xs[0], y), 0)
     for i, entry in enumerate(caps):
@@ -634,76 +707,120 @@ def xtal_cluster(s, hub, pin_a, pin_b, value, cap, fp_xtal, fp_cap=None, gnd24=F
     return y
 
 
-def top_caps(s, hub, pin, caps, height=7.62, sx=1, up=False, rail=None):
-    """A vertical supply pin with capacitors to GND on a short rail above (or
-    below) it. Caps hang toward the symbol by default, away from it with `up`.
-    `rail` names a power symbol to put at the far end of the rail."""
+def ladder(s, x_first, y_top, sx, caps, gnd_sym=True, pitches=None):
+    """A row of decoupling capacitors between a supply rail at y_top and a GND
+    rail 7.62 below it, extending in direction sx from x_first (the first
+    capacitor's x). The GND rail ends in one GND symbol pointing down. Returns
+    the x where both rails end and the last capacitor's x."""
+    if not caps:
+        return x_first, x_first
+    pitches = pitches or cap_pitch(caps)
+    xs, x = [], x_first
+    for i in range(len(caps)):
+        xs.append(snap(x))
+        x += sx * pitches[i]
+    x_end = snap(xs[-1] + sx * 5.08)
+    y_bot = snap(y_top + 7.62)
+    s.wire((xs[0], y_bot), (x_end, y_bot))
+    for i, cap in enumerate(caps):
+        if cap[0] == "CP":
+            c = s.CP(cap[1], (xs[i], snap(y_top + 3.81)), rot=0, fp=cap[2])
+        else:
+            val, fp = cap[-2], cap[-1]
+            c = s.C(val, (xs[i], snap(y_top + 3.81)), rot=0, fp=fp)
+        c.ref_at = (xs[i] + sx * 1.5 if sx > 0 else xs[i] - 1.5, snap(y_top + 3.81) - 1.27)
+        c.val_at = (xs[i] + sx * 1.5 if sx > 0 else xs[i] - 1.5, snap(y_top + 3.81) + 1.27)
+        c.ref_just = c.val_just = "left" if sx > 0 else "right"
+        s.junction((xs[i], y_top))
+        if i > 0:
+            s.junction((xs[i], y_bot))
+    if gnd_sym:
+        s.power("GND", (x_end, y_bot), 0)
+    return x_end, xs[-1]
+
+
+def jog(s, hub, pin, rail, up=2.54, over=7.62):
+    """A rail symbol on a vertical pin, moved sideways: stub `up`, run `over`
+    (signed), then the symbol standing up (or GND hanging down). For supply
+    pins so close together that their names would print over each other."""
     p = str(pin)
     px, py = hub.pin(p)
     d = hub.pin_dir(p)
+    gnd = rail == "GND" or rail.endswith("GND")
+    T = (px, snap(py + (-up if d == "U" else up)))
+    J = (snap(px + over), T[1])
+    s.wire((px, py), T, J)
+    s.power(rail, J, 0 if (d == "U") != gnd else 180)
+    return J
+
+
+def mark_end(s, key, pt, sx=1):
+    """Register a point as a route target (as End would) for To() routes."""
+    End.registry[(id(s), key)] = (pt, sx)
+
+
+def top_caps(s, hub, pin, caps, height=12.7, sx=1, up=False, rail=None):
+    """A vertical supply pin with its decoupling on a short rail beside it: the
+    capacitors hang from the rail into a GND rail below, one GND symbol at the
+    end pointing down, and the supply symbol (if `rail`) above it. For a pin on
+    the top edge the rail needs height >= 12.7 so the GND rail clears the pins."""
+    p = str(pin)
+    px, py = hub.pin(p)
+    d = hub.pin_dir(p)
+    if d == "U" and caps:
+        height = max(height, 12.7)
     T = (px, snap(py + (-height if d == "U" else height)))
     s.wire((px, py), T)
-    xs = [snap(px + sx * 7.62 * (i + 1)) for i in range(len(caps))]
-    end = (snap(xs[-1] + sx * 5.08), T[1]) if rail else (xs[-1], T[1])
-    s.wire(T, end)
-    s.junction(T) if len(caps) > 0 else None
-    away = (d == "U") == (not up)        # +1: caps extend toward larger y
-    for i, (val, fp) in enumerate(caps):
-        cy = snap(T[1] + (6.35 if away else -6.35))
-        c = s.C(val, (xs[i], cy), rot=0, fp=fp)
-        if away:
-            s.wire((xs[i], T[1]), c.pin("1")); s.pin_power(c, "2", "GND")
-        else:
-            s.wire((xs[i], T[1]), c.pin("2")); s.pin_power(c, "1", "GND")
-        if i < len(caps) - 1 or rail:
-            s.junction((xs[i], T[1]))
+    x_end, x_last = ladder(s, snap(px + sx * 7.62), T[1], sx, caps)
+    s.wire(T, (x_end if rail else x_last, T[1]))
     if rail:
         gnd = rail == "GND" or rail.endswith("GND")
-        s.power(rail, end, 0 if (d == "U") != gnd else 180)
+        s.power(rail, (x_end, T[1]), 180 if gnd else 0)
     return T
 
 
-def top_bus(s, hub, pins, rail, caps=None, rail_at="left", height=7.62, extra=None, caps_at=None, margin=5.08):
+def top_bus(s, hub, pins, rail, caps=None, rail_at="left", height=7.62, extra=None, caps_at=None, margin=5.08,
+            caps_left=None, caps_right=None):
     """Join vertical power pins with a horizontal bus above (or below, for GND)
-    the symbol: rail symbol at one end, decoupling capacitors hanging away from
-    the symbol at `caps_at` ("left"/"right", default: the end opposite the rail).
-    `extra` is an attachment rendered from the end opposite the rail (e.g. a
-    ferrite bead to another rail). Returns the bus y."""
+    the symbol. Decoupling capacitors hang from the bus beyond the pins, on
+    either side, into a GND rail below them (`ladder`). The rail symbol stands
+    at the `rail_at` end, past that side's ladder; `extra` is an attachment
+    rendered from the other end (e.g. a ferrite bead to another rail)."""
     pins = [str(p) for p in pins]
     pts = sorted((hub.pin(p) for p in pins), key=lambda q: q[0])
     d = hub.pin_dir(pins[0])
     sy = -1 if d == "U" else 1
+    if caps and caps_left is None and caps_right is None:
+        if (caps_at or ("right" if rail_at == "left" else "left")) == "left":
+            caps_left = caps
+        else:
+            caps_right = caps
+    caps_left, caps_right = caps_left or [], caps_right or []
+    if d == "U" and (caps_left or caps_right):
+        height = max(height, 12.7)
     by = snap(pts[0][1] + sy * height)
     for (px, py) in pts:
         s.wire((px, py), (px, by))
     x0, x1 = pts[0][0], pts[-1][0]
     gnd = rail == "GND" or rail.endswith("GND")
-    caps = caps or []
-    ncap = len(caps)
-    caps_at = caps_at or ("right" if rail_at == "left" else "left")
-    cap_room = 7.62 * ncap
-    ext_room = 7.62 if extra else 0.0
-    left_room = (cap_room if caps_at == "left" else 0.0) + (margin if rail_at == "left" else 0.0) + (ext_room if rail_at == "right" else 0.0)
-    right_room = (cap_room if caps_at == "right" else 0.0) + (margin if rail_at == "right" else 0.0) + (ext_room if rail_at == "left" else 0.0)
-    bus_l, bus_r = snap(x0 - left_room), snap(x1 + right_room)
-    rail_pt = (bus_l, by) if rail_at == "left" else (bus_r, by)
+    if caps_left:
+        end_l, last_l = ladder(s, snap(x0 - 7.62), by, -1, caps_left)
+        bus_l = end_l if (rail_at == "left" or extra is not None and rail_at == "right") else last_l
+    else:
+        bus_l = snap(x0 - (margin if rail_at == "left" else 0))
+    if caps_right:
+        end_r, last_r = ladder(s, snap(x1 + 7.62), by, 1, caps_right)
+        bus_r = end_r if (rail_at == "right" or extra is not None and rail_at == "left") else last_r
+    else:
+        bus_r = snap(x1 + (margin if rail_at == "right" else 0))
     s.wire((bus_l, by), (bus_r, by))
+    rail_pt = (bus_l, by) if rail_at == "left" else (bus_r, by)
     s.power(rail, rail_pt, 0 if (d == "U") != gnd else 180)
     for (px, py) in pts:
         if abs(px - bus_l) > 1e-6 and abs(px - bus_r) > 1e-6:
             s.junction((px, by))
-    cx = snap(x1 + 7.62) if caps_at == "right" else snap(x0 - 7.62)
-    step = 7.62 if caps_at == "right" else -7.62
-    far = (bus_r, by) if rail_at == "left" else (bus_l, by)
-    for i, (val, fp) in enumerate(caps):
-        x = snap(cx + step * i)
-        c = s.C(val, (x, snap(by + sy * 6.35)), rot=0, fp=fp)
-        if sy < 0:
-            s.wire((x, by), c.pin("2")); s.pin_power(c, "1", "GND")
-        else:
-            s.wire((x, by), c.pin("1")); s.pin_power(c, "2", "GND")
-        if abs(x - bus_l) > 1e-6 and abs(x - bus_r) > 1e-6:
-            s.junction((x, by))
     if extra is not None:
+        far = (bus_r, by) if rail_at == "left" else (bus_l, by)
+        s.junction(far) if (caps_right if rail_at == "left" else caps_left) else None
         extra.render(s, far, 1 if rail_at == "left" else -1, 0)
     return by

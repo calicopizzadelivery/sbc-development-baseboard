@@ -25,10 +25,11 @@ def load(path):
             lib_id = find(el, "lib_id")[1]; at = find(el, "at"); ref = find(el, "property")  # first property is Reference
             refname = next(p[2] for p in find_all(el, "property") if p[1] == "Reference")
             X, Y, rot = float(at[1]), float(at[2]), int(float(at[3])) if len(at) > 3 else 0
+            m = find(el, "mirror"); mirror = str(m[1]) if m else None
             unit = int(find(el, "unit")[1])
             for p in pins_of(libs[lib_id]):
                 if p.unit in (0, unit):
-                    pins.append((transform(p.x, p.y, X, Y, rot), f"{refname}.{p.number}"))
+                    pins.append((transform(p.x, p.y, X, Y, rot, mirror), f"{refname}.{p.number}"))
         elif k in ("label", "global_label", "hierarchical_label"):
             at = find(el, "at"); points.append(((float(at[1]), float(at[2])), f"label {el[1]}"))
         elif k == "no_connect":

@@ -34,9 +34,11 @@ def effects(size=1.27, justify=None, hide=False):
 
 
 class Instance:
-    def __init__(self, sch, libname, name, ref, value, X, Y, rot, node, unit):
+    def __init__(self, sch, libname, name, ref, value, X, Y, rot, node, unit, mirror=None):
         self.sch, self.libname, self.name = sch, libname, name
         self.ref, self.value, self.X, self.Y, self.rot, self.unit = ref, value, X, Y, rot, unit
+        self.mirror = mirror
+        self.field_size = 1.27
         self.node = node
         self.pins = {p.number: p for p in pins_of(node) if p.unit in (0, unit)}
         self.fields = {}
@@ -52,11 +54,11 @@ class Instance:
 
     def pin(self, number):
         p = self.pins[str(number)]
-        return transform(p.x, p.y, self.X, self.Y, self.rot)
+        return transform(p.x, p.y, self.X, self.Y, self.rot, self.mirror)
 
     def pin_dir(self, number):
         p = self.pins[str(number)]
-        return pin_direction(p.angle, self.rot)
+        return pin_direction(p.angle, self.rot, self.mirror)
 
     def pin_by_name(self, name):
         for p in self.pins.values():
@@ -88,7 +90,7 @@ class Schematic:
 
     # --- symbols ----------------------------------------------------------
     def add(self, libname, name, ref, value, at, rot=0, footprint="", fields=None,
-            unit=1, dnp=False, datasheet="~", hide_value=False, project_lib=None):
+            unit=1, dnp=False, datasheet="~", hide_value=False, project_lib=None, mirror=None):
         key = f"{libname}:{name}"
         plib = project_lib if project_lib is not None else self.project_lib
         if key not in self.lib_symbols:
@@ -98,7 +100,7 @@ class Schematic:
             raise ValueError(f"duplicate reference {ref} unit {unit}")
         self.refs.add((ref, unit))
         at = sp(at)
-        inst = Instance(self, libname, name, ref, value, at[0], at[1], rot, node, unit)
+        inst = Instance(self, libname, name, ref, value, at[0], at[1], rot, node, unit, mirror)
         inst.footprint = footprint
         inst.fields = fields or {}
         inst.dnp = dnp
@@ -239,34 +241,70 @@ class Schematic:
         X, Y, rot = inst.X, inst.Y, inst.rot
         x0, y0, x1, y1 = inst.bbox()
         two_pin = len(inst.pins) <= 2 and not inst.ref.startswith("#")
+        vertical = False
+        # a field's drawn angle is the symbol's rotation plus its own: give fields on a
+        # rotated symbol an angle of 90 so they still read horizontally
+        fangle = 90 if rot in (90, 270) else 0
+        lib_just = {}
         if inst.ref.startswith("#PWR"):
             ref_at, val_at = (X, Y), (X, Y + (2.54 if inst.value == "GND" or inst.value.endswith("GND") else -3.81) if rot in (0, 180) else Y)
             ref_hide = True
         elif two_pin:
-            if rot in (90, 270):
+            pp = [inst.pin(n) for n in inst.pins]
+            vertical = len(pp) == 2 and abs(pp[0][0] - pp[1][0]) < 1e-6    # pins stacked: text beside the part
+            if not vertical:
                 ref_at, val_at = (X, Y - 2.0), (X, Y + 2.0)
             else:
                 ref_at, val_at = (X + 2.2, Y - 1.4), (X + 2.2, Y + 1.4)
             ref_hide = False
         else:
+            # multi-pin parts: where the library put the fields, rotated with the symbol
             ref_at, val_at = (X, y0 - 2.54), (X, y1 + 2.54)
+            for name in ("Reference", "Value"):
+                pr = prop(inst.node, name)
+                if pr is None:
+                    continue
+                at = [c for c in pr[3:] if isinstance(c, list) and c and c[0] == Sym("at")]
+                eff = [c for c in pr[3:] if isinstance(c, list) and c and c[0] == Sym("effects")]
+                if at:
+                    pt = transform(float(at[0][1]), float(at[0][2]), X, Y, rot, inst.mirror)
+                    if name == "Reference": ref_at = pt
+                    else: val_at = pt
+                j = None
+                if eff:
+                    jj = [c for c in eff[0][1:] if isinstance(c, list) and c and c[0] == Sym("justify")]
+                    if jj:
+                        j = " ".join(str(x) for x in jj[0][1:] if str(x) in ("left", "right"))
+                        if (rot == 180) != (inst.mirror == "y") and j:
+                            j = {"left": "right", "right": "left"}.get(j, j)
+                        if rot in (90, 270):
+                            j = None
+                lib_just[name] = j or None
             ref_hide = False
         if inst.ref_at: ref_at = inst.ref_at
         if inst.val_at: val_at = inst.val_at
-        just = "left" if two_pin and rot in (0, 180) else None
+        just = "left" if two_pin and vertical else None
+        # text drawn at 180 degrees is shown upright by KiCad with its justification mirrored
+        flip = (fangle + rot) % 360 == 180
+        def J(j):
+            return {"left": "right", "right": "left"}.get(j, j) if (flip and j) else j
 
         def P(name, val, at, hide=False, j=just):
-            p = [Sym("property"), name, val, [Sym("at"), at[0], at[1], 0]]
+            p = [Sym("property"), name, val, [Sym("at"), at[0], at[1], fangle if name in ("Reference", "Value") else 0]]
             if hide: p.append([Sym("hide"), Sym("yes")])
-            p += [[Sym("show_name"), Sym("no")], [Sym("do_not_autoplace"), Sym("no")], effects(1.27, j)]
+            p += [[Sym("show_name"), Sym("no")], [Sym("do_not_autoplace"), Sym("no")],
+                  effects(inst.field_size if name in ("Reference", "Value") else 1.27, j)]
             return p
-        node = [Sym("symbol"), [Sym("lib_id"), f"{inst.libname}:{inst.name}"], [Sym("at"), X, Y, rot],
+        node = [Sym("symbol"), [Sym("lib_id"), f"{inst.libname}:{inst.name}"], [Sym("at"), X, Y, rot]]
+        if inst.mirror:
+            node.append([Sym("mirror"), Sym(inst.mirror)])
+        node += [
                 [Sym("unit"), inst.unit], [Sym("body_style"), 1], [Sym("exclude_from_sim"), Sym("no")],
                 [Sym("in_bom"), Sym("no" if inst.ref.startswith("#") else "yes")], [Sym("on_board"), Sym("no" if inst.ref.startswith("#") else "yes")],
                 [Sym("in_pos_files"), Sym("yes")], [Sym("dnp"), Sym("yes" if inst.dnp else "no")],
                 [Sym("fields_autoplaced"), Sym("no")], [Sym("uuid"), inst.uuid],
-                P("Reference", inst.ref, ref_at, hide=ref_hide, j=inst.ref_just or just),
-                P("Value", inst.value, val_at, hide=inst.hide_value, j=inst.val_just or just),
+                P("Reference", inst.ref, ref_at, hide=ref_hide, j=J(inst.ref_just or lib_just.get("Reference") or just)),
+                P("Value", inst.value, val_at, hide=inst.hide_value, j=J(inst.val_just or lib_just.get("Value") or just)),
                 P("Footprint", inst.footprint, (X, Y), hide=True),
                 P("Datasheet", inst.datasheet, (X, Y), hide=True)]
         desc = prop(inst.node, "Description")

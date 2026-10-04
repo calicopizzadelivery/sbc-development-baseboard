@@ -10,12 +10,14 @@ from kisym import Sym, dump
 LIB = "sbcbb"
 
 
-def _prop(name, value, at, hide=False, size=1.27):
+def _prop(name, value, at, hide=False, size=1.27, justify=None):
     p = [Sym("property"), name, value, [Sym("at"), at[0], at[1], 0]]
     if hide:
         p.append([Sym("hide"), Sym("yes")])
-    p += [[Sym("show_name"), Sym("no")], [Sym("do_not_autoplace"), Sym("no")],
-          [Sym("effects"), [Sym("font"), [Sym("size"), size, size]]]]
+    eff = [Sym("effects"), [Sym("font"), [Sym("size"), size, size]]]
+    if justify:
+        eff.append([Sym("justify"), Sym(justify)])
+    p += [[Sym("show_name"), Sym("no")], [Sym("do_not_autoplace"), Sym("no")], eff]
     return p
 
 
@@ -64,8 +66,14 @@ def box_symbol(name, left, right, top=(), bottom=(), ref="U", footprint="", desc
     unit = [Sym("symbol"), f"{name}_1_1"] + pins
     node = [Sym("symbol"), name, [Sym("pin_names"), [Sym("offset"), 1.016]], [Sym("exclude_from_sim"), Sym("no")],
             [Sym("in_bom"), Sym("yes")], [Sym("on_board"), Sym("yes")],
-            _prop("Reference", ref, (round(x0, 4), round(y0 + 1.27, 4))),
-            _prop("Value", name, (round(x0, 4), round(-y0 - 1.27, 4))),
+            # reference above the top-left corner, value below it (reading leftward): clear of
+            # the top and bottom pins, which start further in
+            _prop("Reference", ref, (round(x0, 4), round(y0 + 1.27, 4)), justify="left"),
+            # value: above the top-right corner when the top edge is free; else below the body,
+            # at the left when the bottom edge is busy, at the right otherwise
+            (_prop("Value", name, (round(-x0, 4), round(y0 + 1.27, 4)), justify="right") if not top
+             else _prop("Value", name, (round(x0, 4), round(-y0 - 1.27, 4)), justify="right") if nb >= 4
+             else _prop("Value", name, (round(-x0, 4), round(-y0 - 1.27, 4)), justify="right")),
             _prop("Footprint", footprint, (0, 0), hide=True),
             _prop("Datasheet", datasheet, (0, 0), hide=True),
             _prop("Description", description, (0, 0), hide=True),
@@ -141,8 +149,8 @@ def tps2553():
 
 
 def pca9517a():
-    return box_symbol("PCA9517A", [("2", "SCLA", B), ("3", "SDAA", B), None, ("5", "EN", I)],
-                      [("7", "SCLB", B), ("6", "SDAB", B)], top=[("1", "VCC(A)", PI), ("8", "VCC(B)", PI)],
+    return box_symbol("PCA9517A", [("3", "SDAA", B), ("2", "SCLA", B), None, ("5", "EN", I)],
+                      [("6", "SDAB", B), ("7", "SCLB", B)], top=[("1", "VCC(A)", PI), ("8", "VCC(B)", PI)],
                       bottom=[("4", "GND", PI)], ref="U", width=17.78,
                       footprint="Package_SO:TSSOP-8_4.4x3mm_P0.65mm",
                       description="Level-translating I2C bus repeater. Port A 0.9-5.5 V, port B 2.7-5.5 V (0.5 V offset side). EN active high, internal pull-up to VCC(B). Pinout from NXP PCA9517A Table 3.",
@@ -177,8 +185,8 @@ def usb_a_stacked():
         return node
     node = [Sym("symbol"), name, [Sym("pin_names"), [Sym("offset"), 1.016]], [Sym("exclude_from_sim"), Sym("no")],
             [Sym("in_bom"), Sym("yes")], [Sym("on_board"), Sym("yes")],
-            _prop("Reference", "J", (round(x0, 4), round(y0 + 1.27, 4))),
-            _prop("Value", name, (round(x0, 4), round(-y0 - 1.27, 4))),
+            _prop("Reference", "J", (round(x0, 4), round(y0 + 1.27, 4)), justify="left"),
+            _prop("Value", name, (round(-x0, 4), round(y0 + 1.27, 4)), justify="right"),
             _prop("Footprint", "", (0, 0), hide=True),
             _prop("Datasheet", "", (0, 0), hide=True),      # KiCad folds "~" to "" in libraries, so "~" here reads as a mismatch
             _prop("Description", "USB-A receptacle, double stacked, one unit per port", (0, 0), hide=True),
@@ -188,8 +196,19 @@ def usb_a_stacked():
     return node
 
 
+def tps54560():
+    """TPS54560B buck, drawn for the sheet: VIN at the top-left with room below it for
+    its input capacitors, the control pins lower, BOOT/SW/FB on the right."""
+    return box_symbol("TPS54560BDDA", [("2", "VIN", PI), None, None, None, None, None, ("3", "EN", I), ("4", "RT/CLK", I), None, ("6", "COMP", O)],
+                      [("1", "BOOT", P), ("8", "SW", PO), None, None, None, None, None, None, None, ("5", "FB", I)],
+                      bottom=[("7", "GND", PI), ("9", "PAD", PI)], ref="U", width=22.86,
+                      footprint="Package_SO:HSOP-8-1EP_3.9x4.9mm_P1.27mm_EP2.41x3.1mm",
+                      description="4.5-60 V, 5 A step-down converter, HSOP-8. Pinout from TI TPS54560B datasheet pin table.",
+                      datasheet="https://www.ti.com/lit/ds/symlink/tps54560b.pdf")
+
+
 def project_lib():
-    return {LIB: {n[1]: n for n in (k64(), usb2517(), tps2553(), pca9517a(), jw1fsn(), usb_a_stacked())}}
+    return {LIB: {n[1]: n for n in (k64(), usb2517(), tps2553(), pca9517a(), jw1fsn(), usb_a_stacked(), tps54560())}}
 
 
 def write_lib(path):

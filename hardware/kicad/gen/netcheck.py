@@ -85,6 +85,7 @@ def main(path, show_all=False, trace=False):
             lib_id = child(node, "lib_id")[1]
             at = child(node, "at")
             X, Y, rot = float(at[1]), float(at[2]), int(float(at[3])) if len(at) > 3 else 0
+            m = child(node, "mirror"); mirror = str(m[1]) if m else None
             ref, val = prop(node, "Reference"), prop(node, "Value")
             if lib_id.startswith("power:"):
                 kind = "flag" if val == "PWR_FLAG" else "rail"
@@ -94,7 +95,7 @@ def main(path, show_all=False, trace=False):
             if lib is None:
                 continue
             for p in pins_of(lib):
-                px, py = transform(p.x, p.y, X, Y, rot)
+                px, py = transform(p.x, p.y, X, Y, rot, mirror)
                 points.append(((px, py), "pin", f"{ref}.{p.number}"))
     uf = UF()
     ends = []

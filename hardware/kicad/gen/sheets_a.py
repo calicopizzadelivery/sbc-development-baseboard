@@ -2,7 +2,7 @@
 net fans out of its hub to whatever it connects to."""
 from kit import Sheet, FP
 from sch import snap
-from fanout import fan, chain, L, P, Ser, Pull, PullLED, Tag, Flag, Conn, End, To, BusEnd, bus_join, rail_bus, decap_row, join_pins, top_caps, top_bus, Skip
+from fanout import fan, chain, L, P, Ser, Pull, PullLED, Tag, Flag, Conn, End, To, BusEnd, bus_join, rail_bus, decap_row, join_pins, top_caps, top_bus, Skip, Ladder, jog, mark_end
 
 AMBER, GREEN, RED = "LED AMBER", "LED GREEN", "LED RED"
 def TVS(v="PESD5V0S1UL"):
@@ -16,7 +16,7 @@ def TVS(v="PESD5V0S1UL"):
 def flags(s, rails, at):
     x, y = at
     for i, r in enumerate(rails):
-        s.flag_rail(r, (x + 20.32 * (i % 5), y + 12.7 * (i // 5)))
+        s.flag_rail(r, (x + 25.4 * (i % 5), y + 12.7 * (i // 5)))
 
 
 def power(project, num, page, sheet_path, plib):
@@ -30,11 +30,11 @@ def power(project, num, page, sheet_path, plib):
     # ---- parts
     j2 = s.add("Connector", "USB_C_Receptacle_USB2.0_16P", "J2", "USB-C PD in", (40, 85), footprint=FP["USBC"])
     u1 = s.add("Interface_USB", "STUSB4500QTR", "U101", "STUSB4500QTR", (160, 85), footprint="Package_DFN_QFN:QFN-24-1EP_4x4mm_P0.5mm_EP2.7x2.7mm")
-    q1 = s.Q("Transistor_FET", "2N7002", "2N7002", (238, 72))
-    u2 = s.add("sbcbb", "PCA9517A", "U102", "PCA9517A", (160, 205), footprint="Package_SO:TSSOP-8_4.4x3mm_P0.65mm")
-    j17 = s.add("Connector_Generic", "Conn_01x04", "J17", "Qwiic PD programming", (40, 205), 180, footprint=FP["QWIIC"])
-    q2 = s.Q("Transistor_FET", "2N7002", "2N7002", (110, 240))
-    d8 = s.D("Diode", "BAT54C", "BAT54C", (70, 268), fp=FP["SOT23"])
+    q1 = s.Q("Transistor_FET", "2N7002", "2N7002", (250, 45))       # right of the STUSB4500 routes, above buck 1
+    u2 = s.add("sbcbb", "PCA9517A", "U102", "PCA9517A", (150, 185), footprint="Package_SO:TSSOP-8_4.4x3mm_P0.65mm")   # below the STUSB4500's I2C lanes
+    j17 = s.add("Connector_Generic", "Conn_01x04", "J17", "Qwiic PD programming", (40, 165), 180, footprint=FP["QWIIC"])
+    q2 = s.Q("Transistor_FET", "2N7002", "2N7002", (150, 215))
+    d8 = s.D("Diode", "BAT54C", "BAT54C", (70, 268), rot=180, fp=FP["SOT23"])   # common cathode on top
     for pin in ("A6", "B6", "A7", "B7", "A8", "B8"): s.pin_nc(j2, pin)
     for pin in (3, 14, 15, 17, 20): s.pin_nc(u1, str(pin))
     # ---- inlet
@@ -43,28 +43,30 @@ def power(project, num, page, sheet_path, plib):
     fan(s, j2, {"A4": P("VBUS_IN"), "A1": P("GND"), "SH": P("GND"),
                 "A5": chain(TVS("ESDA25W"), Conn(u1, 2, stub=22.86)), "B5": chain(TVS("ESDA25W"), Conn(u1, 4, stub=22.86))})
     decap_row(s, "VBUS_IN", [("D", "SMAJ24A", FP["SMA"]), ("10u/50V", FP["C1210"]), ("10u/50V", FP["C1210"]), ("100n/50V", None), ("1u/50V", FP["C0805"])], (25, 140))
-    s.led_chain("VBUS_IN", "GND", "10k", AMBER, (85, 140))
-    fan(s, u2, {2: End("u2scl"), 3: End("u2sda"), 5: chain(Pull("+3V3", "R", "10k", None), Conn(q2, 3)), 7: L("I2C0_SCL"), 6: L("I2C0_SDA"),
-                1: P("+3V3_PD"), 8: P("+3V3"), 4: P("GND")})
+    s.led_chain("VBUS_IN", "GND", "10k", AMBER, (60, 185))
     fan(s, u1, {6: chain(Ser("R", "10k", None), P("GND")), 2: Skip(), 1: Skip(), 4: Skip(), 5: Skip(),
                 18: chain(Ser("R", "1k", None), P("VBUS_IN")),
-                7: chain(Pull("+3V3_PD", "R", "4.7k", None), TVS(), To("u2scl")),
-                8: chain(Pull("+3V3_PD", "R", "4.7k", None), TVS(), To("u2sda")),
+                7: chain(Pull("+3V3_PD", "R", "4.7k", None), TVS(), Tag("PD_SCL", None), End("pd_scl")),
+                8: chain(Pull("+3V3_PD", "R", "4.7k", None), TVS(), Tag("PD_SDA", None), End("pd_sda")),
                 # (left stack anchored on RESET: the CC rows are drawn by join_pins and must stay put)
                 19: chain(Pull("+3V3_PD", "R", "10k", None), L("PD_ALERT_N")),
                 12: P("GND"), 13: P("GND"),
                 16: chain(Pull("VBUS_IN", "R", "100k", None), Pull("GND", ("Device", "D_Zener", "1"), "BZT52C5V1", None, fp=FP["SOD123"]), Conn(q1, 1)),
                 9: chain(Ser("R", "470", None, fp=FP["R1206"]), P("VBUS_IN")),
                 11: chain(Pull("+3V3_PD", "R", "10k", None), L("PD_ATTACH_N")),
-                24: P("VBUS_IN"), 22: P("+3V3_PRG"), 10: P("GND"), 25: P("GND")})
-    top_caps(s, u1, 21, [("1u", None)], height=12.7)
-    top_caps(s, u1, 23, [("1u", None)], height=7.62)
+                10: P("GND"), 25: P("GND")}, align={"L": "top"})
+    jog(s, u1, 24, "VBUS_IN", up=2.54, over=-7.62)
+    jog(s, u1, 22, "+3V3_PRG", up=7.62, over=-12.7)
+    top_caps(s, u1, 21, [("1u", None)], height=20.32, sx=-1)
+    top_caps(s, u1, 23, [("1u", None)], height=12.7, sx=1)
     fan(s, q1, {2: P("GND"), 3: L("BUCK_EN")})
     s.note(["BUCK_EN: VBUS_EN_SNK released (no contract) -> Q101 on -> EN low -> bucks off.",
             "Contract valid -> VBUS_EN_SNK low -> Q101 off -> EN floats high (internal pull-up) -> bucks on.",
-            "The zener keeps the gate under 5.1 V at 20 V VBUS."], (200, 36), 1.3)
+            "The zener keeps the gate under 5.1 V at 20 V VBUS."], (205, 118), 1.3)
     # ---- programming header, bus buffer, +3V3_PD
-    fan(s, j17, {1: P("GND"), 2: P("+3V3_PRG"), 3: To("u2sda"), 4: To("u2scl")})
+    fan(s, u2, {2: To("pd_scl", direct=True), 3: To("pd_sda", direct=True), 5: chain(Pull("+3V3", "R", "10k", None), Conn(q2, 3)), 7: L("I2C0_SCL"), 6: L("I2C0_SDA"),
+                1: P("+3V3_PD"), 8: P("+3V3"), 4: P("GND")})
+    fan(s, j17, {1: P("GND"), 2: P("+3V3_PRG"), 3: L("PD_SDA"), 4: L("PD_SCL")})
     fan(s, q2, {1: chain(Pull("GND", "R", "100k", None), Ser("R", "100k", None), P("+3V3_PRG")), 2: P("GND")})
     fan(s, d8, {1: P("+3V3"), 2: P("+3V3_PRG"), 3: P("+3V3_PD")})
     decap_row(s, "+3V3_PRG", [("1u", None), ("R", "100k", None)], (100, 262))
@@ -74,9 +76,9 @@ def power(project, num, page, sheet_path, plib):
     s.series("+3V3_PRG", "PD_PROG_DET", "100k", (225, 262))
     # ---- bucks 1 and 2
     for ref, y, rail in (("U103", 75, "+5V_PORTS"), ("U104", 150, "+5V_TGT")):
-        u = s.add("Regulator_Switching", "TPS54560BDDA", ref, "TPS54560BDDA", (305, y), footprint="Package_SO:HSOP-8-1EP_3.9x4.9mm_P1.27mm_EP2.41x3.1mm")
-        lind = s.add("Device", "L", s.ref("L"), "10u/6A", (360, y - 7.62), 90, footprint=FP["L_PWR"])
-        fan(s, u, {2: chain(Pull("GND", "C", "100n/50V", None), Pull("GND", "C", "10u/50V", None, fp=FP["C1210"]), Pull("GND", "C", "10u/50V", None, fp=FP["C1210"]), P("VBUS_IN")),
+        u = s.add("sbcbb", "TPS54560BDDA", ref, "TPS54560BDDA", (290, y), footprint="Package_SO:HSOP-8-1EP_3.9x4.9mm_P1.27mm_EP2.41x3.1mm")
+        lind = s.add("Device", "L", s.ref("L"), "10u/6A", (350, y - 12.7), 90, footprint=FP["L_PWR"])
+        fan(s, u, {2: chain(Ladder([("100n/50V", None), ("10u/50V", FP["C1210"]), ("10u/50V", FP["C1210"])]), P("VBUS_IN")),
                    3: L("BUCK_EN"),
                    4: chain(Ser("R", "243k", None), P("GND")),
                    6: chain(Pull("GND", "C", "47p", None), Ser("R", "19.1k", None), Ser("C", "3n3", None), P("GND")),
@@ -84,8 +86,7 @@ def power(project, num, page, sheet_path, plib):
                    8: chain(Pull("GND", ("Device", "D_Schottky", "1"), "B560C", None, fp=FP["SMA"]), Conn(lind, 1)),
                    5: chain(Pull("GND", "R", "9.76k", None), Ser("R", "51.1k", None), P(rail)),
                    7: P("GND"), 9: P("GND")})
-        fan(s, lind, {2: chain(Pull("GND", "C", "47u/10V", None, fp=FP["C1210"]), Pull("GND", "C", "47u/10V", None, fp=FP["C1210"]),
-                                Pull("GND", ("Device", "C_Polarized", "1", "v"), "100u/10V", None, fp=FP["CP"]), PullLED(AMBER, "1k", None), P(rail))})
+        fan(s, lind, {2: chain(Ladder([("47u/10V", FP["C1210"]), ("47u/10V", FP["C1210"]), ("CP", "100u/10V", FP["CP"])]), PullLED(AMBER, "1k", None), P(rail))})
     s.note(["TPS54560B: non-synchronous, 4.5-60 V in, 5 A. fsw 400 kHz (RT 243k). FB 51.1k/9.76k -> 5.0 V.",
             "COMP values are placeholders (19.1k / 3.3n / 47p): run TI WEBENCH or the datasheet procedure before fab."], (240, 210), 1.3)
     # ---- buck 3
@@ -95,7 +96,7 @@ def power(project, num, page, sheet_path, plib):
                 6: chain(Ser("L", "470n/4A", None), Pull("GND", "C", "22u", None, fp=FP["C0805"]), Pull("GND", "C", "22u", None, fp=FP["C0805"]), PullLED(AMBER, "470", None), P("+3V3")),
                 2: chain(Pull("GND", "R", "22.1k", None), Ser("R", "100k", None), P("+3V3")),
                 3: P("GND"), 5: P("GND")})
-    flags(s, ["VBUS_IN", "GND", "+3V3_PRG", "+3V3_PD", "+5V_PORTS", "+5V_TGT", "+3V3"], (25, 232))
+    flags(s, ["VBUS_IN", "GND", "+3V3_PRG", "+3V3_PD", "+5V_PORTS", "+5V_TGT", "+3V3"], (25, 246))
     return s
 
 
@@ -108,17 +109,31 @@ def mcu(project, num, page, sheet_path, plib):
             "Spare pins (PTA1, PTA2, PTB23, PTD7, PTE0-6, PTE26, ADC, DAC) are left no-connect."], (15, 15), 1.5)
     u = s.add("sbcbb", "MK64FN1M0VLL12", "U201", "MK64FN1M0VLL12", (190, 150), footprint="Package_QFP:LQFP-100_14x14mm_P0.5mm")
     j3 = s.add("Connector", "USB_C_Receptacle_USB2.0_16P", "J3", "USB-C HID to target", (40, 118), footprint=FP["USBC"])
-    esd = s.add("Power_Protection", "USBLC6-2SC6", "U202", "USBLC6-2SC6", (73.66, 118.11), footprint=FP["SOT236"])  # I/O rows = J3 B7 (D-) and A6 (D+)
-    j16 = s.add("Connector", "Conn_ARM_JTAG_SWD_10", "J16", "SWD", (335, 60), 180, footprint=FP["SWD10"])
+    esd = s.add("Power_Protection", "USBLC6-2SC6", "U202", "USBLC6-2SC6", (74.93, 118.11), footprint=FP["SOT236"])  # I/O rows = J3 B7 (D-) and A6 (D+)
+    j16 = s.add("Connector", "Conn_ARM_JTAG_SWD_10", "J16", "SWD", (335, 60), 0, mirror="y", footprint=FP["SWD10"])   # signals face the K64, VTref up, GND down
     rgb = s.add("Device", "LED_RGBA", "D202", "RGB heartbeat", (335, 225), footprint=FP["RGB"])
     yx = s.add("Device", "Crystal", "Y201", "32.768kHz", (95, 182), 90, footprint=FP["XTAL2"])
     for pin in (51, 14, 15, 16, 17, 18, 19, 20, 21, 26, 27, 35, 36, 69, 100, 1, 2, 3, 4, 5, 6, 7, 33): s.pin_nc(u, str(pin))
     for pin in ("A8", "B8"): s.pin_nc(j3, pin)
     for pin in (6, 7, 8): s.pin_nc(j16, str(pin))
+    join_pins(s, j3, ["A6", "B6"], length=7.62); join_pins(s, j3, ["A7", "B7"], length=7.62)
+    fan(s, j3, {"A6": Skip(), "B6": Skip(), "A7": Skip(), "B7": Skip(),
+                "A4": chain(Flag(None), Ser("R", "100k", None), Pull("GND", "R", "47k", None), L("VBUS_SENSE")),
+                "A5": chain(Ser("R", "5.1k", None), BusEnd("cc_gnd")), "B5": chain(Ser("R", "5.1k", None), BusEnd("cc_gnd")),
+                "A1": P("GND"), "SH": P("GND")}, align="top")
+    bus_join(s, "cc_gnd", then=P("GND"), sx=1)
+    jx = snap(j3.pin("A6")[0] + 7.62)                                   # the joined pairs continue straight into the ESD array
+    for pin, row in (("1", j3.pin("B7")[1]), ("3", j3.pin("A6")[1])):
+        s.wire((jx, row), esd.pin(pin)); s.junction((jx, row))
+    fan(s, esd, {2: P("GND")})
+    vx, vy = esd.pin("5")                                               # VBUS pin straight up onto J3's VBUS lane
+    vb = (vx, j3.pin("A4")[1])
+    s.wire((vx, vy), vb); s.junction(vb)
+    mark_end(s, "j3vbus", vb, -1)                                       # ...where the K64's VREGIN diode lands too
     led = lambda: Ser("R", "330", None)
     ends = fan(s, u, {
         # left: USB regulator, USB, clock, reset
-        13: chain(Flag(None), Pull("GND", "C", "2u2", None), Ser("D", "BAT54", None, lib="Device", name="D_Schottky", near="1", fp=FP["SOD123"]), L("J3_VBUS")),
+        13: chain(Flag(None), Pull("GND", "C", "2u2", None), Ser("D", "BAT54", None, lib="Device", name="D_Schottky", near="1", fp=FP["SOD123"]), To("j3vbus", direct=True)),
         12: Pull("GND", "C", "2u2", None),
         10: Conn(esd, 4), 11: Conn(esd, 6),                   # I/O2 carries D+, I/O1 D-
         50: L("RMII_CLK_50M"),
@@ -140,23 +155,11 @@ def mcu(project, num, page, sheet_path, plib):
         93: L("GPIO1"), 94: L("GPIO2"), 95: L("GPIO3"), 96: L("GPIO4"), 97: L("GPIO5"), 98: L("GPIO6"), 99: L("VBUS_SENSE"),
         31: chain(Pull("+3V3", "R", "4.7k", None), L("I2C0_SCL")), 32: chain(Pull("+3V3", "R", "4.7k", None), L("I2C0_SDA")),
     }, align={"L": "top"})
-    top_bus(s, u, [8, 40, 48, 61, 75, 89, 30], "+3V3", caps=[("100n", None)] * 6 + [("10u", FP["C0805"])], rail_at="left", caps_at="left", height=7.62)
-    top_bus(s, u, [22, 23], "+3V3A", caps=[("100n", None), ("10u", FP["C0805"])], rail_at="left", height=15.24, margin=2.54,
+    top_bus(s, u, [8, 40, 48, 61, 75, 89, 30], "+3V3", caps_left=[("100n", None)] * 6 + [("10u", FP["C0805"])], rail_at="left", height=12.7)
+    top_bus(s, u, [22, 23], "+3V3A", caps_right=[("100n", None), ("10u", FP["C0805"])], rail_at="left", height=22.86, margin=2.54,
             extra=chain(Ser("FB", "600R@100MHz", None), P("+3V3")))
     top_bus(s, u, [9, 41, 49, 60, 74, 88, 25, 24], "GND", rail_at="right", height=7.62)
     # J3 and its ESD array
-    join_pins(s, j3, ["A6", "B6"], length=7.62); join_pins(s, j3, ["A7", "B7"], length=7.62)
-    fan(s, j3, {"A6": Skip(), "B6": Skip(), "A7": Skip(), "B7": Skip(),
-                "A4": chain(Flag(None), Tag("J3_VBUS", None), Ser("R", "100k", None), Tag("VBUS_SENSE", None), Ser("R", "47k", None), P("GND")),
-                "A5": chain(Ser("R", "5.1k", None), P("GND")), "B5": chain(Ser("R", "5.1k", None), P("GND")),
-                "A1": P("GND"), "SH": P("GND")}, align="top")
-    jx = snap(j3.pin("A6")[0] + 7.62)                                   # the joined pairs continue straight into the ESD array
-    for pin, row in (("1", j3.pin("B7")[1]), ("3", j3.pin("A6")[1])):
-        s.wire((jx, row), esd.pin(pin)); s.junction((jx, row))
-    fan(s, esd, {2: P("GND")})
-    vx, vy = esd.pin("5")
-    s.wire((vx, vy), (vx, snap(vy - 3.81)), (snap(vx + 5.08), snap(vy - 3.81)))      # VBUS pin: lifted stub, label between the CC rows
-    s.label("J3_VBUS", (snap(vx + 5.08), snap(vy - 3.81)), 0, None)
     s.note(["J3: UFP, Rd 5.1k on both CC. VBUS is sense-only: D201 to VREGIN plus the 100k/47k divider. No board rail reaches J3."], (20, 175), 1.3)
     fan(s, j16, {1: P("+3V3"), 3: P("GND"), 9: P("GND"), 10: L("K64_RESET_N")})
     fan(s, rgb, {4: P("+3V3")})
