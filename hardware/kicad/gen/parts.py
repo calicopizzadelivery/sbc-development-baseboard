@@ -5,6 +5,7 @@ from the datasheets (see docs/hardware-spec.md for the sources). They are
 embedded into the schematics and also written out as sbc-baseboard.kicad_sym
 with a sym-lib-table so KiCad can resolve the "sbcbb:" nickname when editing.
 """
+import math
 from kisym import Sym, dump
 
 LIB = "sbcbb"
@@ -34,14 +35,40 @@ def box_symbol(name, left, right, top=(), bottom=(), ref="U", footprint="", desc
     nl, nr = len(left), len(right)
     nt, nb = len(top), len(bottom)
     h_pins = max(nl, nr)
-    H = (h_pins + 1) * pitch
+    H0 = (h_pins + 1) * pitch
     if width is None:
         longest = max([len(p[1]) for p in list(left) + list(right) if p] + [4])
         width = max(20.32, round((longest * 1.3 + 4) / 2.54) * 2.54 * 2 if (nl and nr) else 0, (max(nt, nb) + 1) * pitch)
     W = width
-    x0, y0 = -W / 2, H / 2          # top-left in library coords (Y up)
+    # a top or bottom pin prints its name vertically into the body (1.27 mm text, about
+    # 1.1 mm per character after the 1.016 mm offset). Wherever that column meets a side
+    # pin's name, the body is extended past the side-pin rows by whole rows until the
+    # vertical name clears the side name's box (half height 0.635 mm plus a 0.4 mm gap);
+    # the side rows themselves do not move
+    CH, OFF, HALF, GAP = 1.1, 1.016, 0.635, 0.4
+    def name_x(ps, n):                               # x of the n-th top/bottom pin
+        return round(round(-W / 2 + (n + 1) * (W / (len(ps) + 1)), 4) / 1.27) * 1.27
+    def side_span(side, p):                          # x extent of a side pin's name
+        w = OFF + CH * len(p[1]) + 0.5
+        return (-W / 2, -W / 2 + w) if side == "L" else (W / 2 - w, W / 2)
+    def clear(ps, from_top):
+        need = 0.0
+        for n, tp in enumerate(ps):
+            if tp is None: continue
+            x = name_x(ps, n)
+            reach = OFF + CH * len(tp[1]) + GAP + HALF
+            for side, col in (("L", left), ("R", right)):
+                for k, sp in enumerate(col):
+                    if sp is None: continue
+                    a, b = side_span(side, sp)
+                    if b < x - HALF or a > x + HALF: continue
+                    dist = (k + 1) * pitch if from_top else (h_pins - k) * pitch   # row from that edge
+                    need = max(need, reach - dist)
+        return math.ceil(need / pitch) * pitch if need > 0 else 0.0
+    top_clear, bottom_clear = clear(top, True), clear(bottom, False)
+    x0, y0 = -W / 2, H0 / 2                       # side-pin rows hang from y0 (library coords, Y up)
+    yt, yb = round(y0 + top_clear, 4), round(-y0 - bottom_clear, 4)   # body top / bottom
     pins = []
-    # left column, top to bottom
     for i, p in enumerate(left):
         if p is None: continue
         y = round(y0 - (i + 1) * pitch, 4)
@@ -54,26 +81,26 @@ def box_symbol(name, left, right, top=(), bottom=(), ref="U", footprint="", desc
         if p is None: continue
         x = round(x0 + (i + 1) * (W / (nt + 1)), 4)
         x = round(x / 1.27) * 1.27
-        pins.append(_pin(p[2], p[0], p[1], x, round(y0 + 2.54, 4), 270))
+        pins.append(_pin(p[2], p[0], p[1], x, round(yt + 2.54, 4), 270))
     for i, p in enumerate(bottom):
         if p is None: continue
         x = round(x0 + (i + 1) * (W / (nb + 1)), 4)
         x = round(x / 1.27) * 1.27
-        pins.append(_pin(p[2], p[0], p[1], x, round(-y0 - 2.54, 4), 90))
+        pins.append(_pin(p[2], p[0], p[1], x, round(yb - 2.54, 4), 90))
     body = [Sym("symbol"), f"{name}_0_1",
-            [Sym("rectangle"), [Sym("start"), round(x0, 4), round(y0, 4)], [Sym("end"), round(-x0, 4), round(-y0, 4)],
+            [Sym("rectangle"), [Sym("start"), round(x0, 4), yt], [Sym("end"), round(-x0, 4), yb],
              [Sym("stroke"), [Sym("width"), 0.254], [Sym("type"), Sym("default")]], [Sym("fill"), [Sym("type"), Sym("background")]]]]
     unit = [Sym("symbol"), f"{name}_1_1"] + pins
     node = [Sym("symbol"), name, [Sym("pin_names"), [Sym("offset"), 1.016]], [Sym("exclude_from_sim"), Sym("no")],
             [Sym("in_bom"), Sym("yes")], [Sym("on_board"), Sym("yes")],
             # reference above the top-left corner, value below it (reading leftward): clear of
             # the top and bottom pins, which start further in
-            _prop("Reference", ref, (round(x0, 4), round(y0 + 1.27, 4)), justify="left"),
+            _prop("Reference", ref, (round(x0, 4), round(yt + 1.27, 4)), justify="left"),
             # value: above the top-right corner when the top edge is free; else below the body,
             # at the left when the bottom edge is busy, at the right otherwise
-            (_prop("Value", name, (round(-x0, 4), round(y0 + 1.27, 4)), justify="right") if not top
-             else _prop("Value", name, (round(x0, 4), round(-y0 - 1.27, 4)), justify="right") if nb >= 4
-             else _prop("Value", name, (round(-x0, 4), round(-y0 - 1.27, 4)), justify="right")),
+            (_prop("Value", name, (round(-x0, 4), round(yt + 1.27, 4)), justify="right") if not top
+             else _prop("Value", name, (round(x0, 4), round(yb - 1.27, 4)), justify="right") if nb >= 4
+             else _prop("Value", name, (round(-x0, 4), round(yb - 1.27, 4)), justify="right")),
             _prop("Footprint", footprint, (0, 0), hide=True),
             _prop("Datasheet", datasheet, (0, 0), hide=True),
             _prop("Description", description, (0, 0), hide=True),

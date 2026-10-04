@@ -403,7 +403,8 @@ class Ladder(Att):
         self.pitches = cap_pitch(caps)
         self.h_down = 7.62 + 6.35
         self.lext = 1.3
-        self.width = sum(self.pitches) + 5.08
+        last = caps[-1][1] if caps[-1][0] == "CP" else caps[-1][0]
+        self.width = sum(self.pitches[:-1]) + max(5.08 + 2.5, 2.54 + text_w(last) + 1.0)   # up to the GND symbol or the last cap's text
         self.step = snap(self.width + 2.54)
         self.end_w = self.width
         self.ew = self.width
@@ -457,7 +458,7 @@ class To(Att):
         return T
 
 
-def fan(s, hub, atts, reach=None, min_pitch=PITCH, group_gap=0, align="center", channels=None, side_dir=None):
+def fan(s, hub, atts, reach=None, min_pitch=PITCH, group_gap=0, align="center", channels=None, side_dir=None, turn_at=None):
     """Fan every pin in `atts` {pin: Att} out of the hub.
 
     Lanes on a side keep pin pitch wherever they can. A hanging element (pull,
@@ -468,7 +469,9 @@ def fan(s, hub, atts, reach=None, min_pitch=PITCH, group_gap=0, align="center", 
     vertically. Lanes that had to move turn in staggered columns so nothing
     crosses. `align` places a spread stack: "center" on the pin group, "top" or
     "bottom" flush with its first or last pin. `channels` fixes the x where routes
-    turn (a value, or {side: value}) when the default would land on something
+    turn (a value, or {side: value}) when the default would land on something;
+    `turn_at` likewise fixes the x of the innermost turn column (default 2.54 mm
+    from the pin end) when a column would run through something placed beside the hub
     else. `side_dir` {pin: -1|1} says which way a chain on a top or bottom pin
     runs (default: to the right). Returns {pin: lane-end point}."""
     ends = {}
@@ -486,6 +489,8 @@ def fan(s, hub, atts, reach=None, min_pitch=PITCH, group_gap=0, align="center", 
         reach = reach_arg
         al = align.get(d, "center") if isinstance(align, dict) else align
         ch_base = channels.get(d) if isinstance(channels, dict) else channels
+        t_base = turn_at.get(d) if isinstance(turn_at, dict) else turn_at      # innermost turn column, when given
+        side = d                                                               # d is reused as a distance below
         if d in ("U", "D"):
             # vertical pins: short stubs only (power symbols / labels), no spreading
             items.sort(key=lambda it: hub.pin(it[0])[0])
@@ -534,7 +539,7 @@ def fan(s, hub, atts, reach=None, min_pitch=PITCH, group_gap=0, align="center", 
                     if xo and min(dj, ui) <= 7.62:
                         r = max(r, rel[j] + dj + ui + 1.27)          # a small one under a tall one: stack them
                     else:
-                        r = max(r, rel[j] + max(dj, ui) + 1.27)      # side by side, each clear of the other's row
+                        r = max(r, rel[j] + max(dj, ui) + 2.54)      # side by side, each clear of the other's row and its label
                         if xo:
                             facing.add((j, i))
                 elif dj > 0 and ui > 0 and dj + ui + 1.27 > dist and xo:
@@ -542,7 +547,7 @@ def fan(s, hub, atts, reach=None, min_pitch=PITCH, group_gap=0, align="center", 
                     if min(dj, ui) <= 7.62:
                         r = max(r, rel[j] + dj + ui + 1.27)
                     else:
-                        r = max(r, rel[j] + max(dj, ui) + 1.27)
+                        r = max(r, rel[j] + max(dj, ui) + 2.54)
                         facing.add((j, i))
                 dist = r - rel[j]
                 if dj + 1.27 > dist and not finite[i]:              # a route cannot get out of the way: spread
@@ -598,7 +603,7 @@ def fan(s, hub, atts, reach=None, min_pitch=PITCH, group_gap=0, align="center", 
             if not changed:
                 break
         if os.environ.get("FAN_DEBUG") and hub.ref in os.environ["FAN_DEBUG"].split(","):
-            print(f"[fan] {hub.ref} side {d}")
+            print(f"[fan] {hub.ref} side {side}")
             for i, (pin, att) in enumerate(items):
                 el, fin, endw = info[i][:3]
                 print(f"   {pin:>4} y={ys[i]:7.2f} rel={rel[i]:6.2f} shift={shift[i]:6.2f} end={endw:5.1f} finite={fin} elems={[(round(e[0],1), e[1], e[2]) for e in el]}")
@@ -629,13 +634,17 @@ def fan(s, hub, atts, reach=None, min_pitch=PITCH, group_gap=0, align="center", 
             above = [ks[j] for j in up if j < i and ys[j] >= lane_y[i] - 1e-6]
             ks[i] = (max(above) + 1) if above else 0
         maxk = max(ks) if ks else 0
-        need = snap(2.54 + maxk * 1.27 + 5.08) if (down or up) else 5.08
+        px0 = hub.pin(items[0][0])[0]
+        t0 = t_base
+        d0 = 2.54 if t0 is None else snap(abs(t0 - px0))
+        need = snap(d0 + maxk * 1.27 + 5.08) if (down or up) else 5.08
         reach = need if reach is None else max(reach, need)
         # route channels start beyond the widest attachment chain of this fan
-        px0 = hub.pin(items[0][0])[0]
         base = snap(px0 + sx * (reach + max(shift[i] + max(chain_width(a), info[i][2]) for i, (_, a) in enumerate(items)) + 2.54))
         if ch_base is not None:
             base = snap(ch_base)
+        if os.environ.get("FAN_DEBUG") and hub.ref in os.environ["FAN_DEBUG"].split(","):
+            print(f"[fan] {hub.ref} side {side}: reach={reach} turn d0={d0} maxk={maxk} channel base={base}")
         k = 0
         for i, (pin, att) in enumerate(items):
             m, routed = att, False
@@ -648,7 +657,7 @@ def fan(s, hub, atts, reach=None, min_pitch=PITCH, group_gap=0, align="center", 
         for i, (pin, att) in enumerate(items):
             px, py = hub.pin(pin)
             Y = lane_y[i]
-            xt = snap(px + sx * (2.54 + ks[i] * 1.27))
+            xt = snap(px + sx * (d0 + ks[i] * 1.27))
             E = (snap(px + sx * (reach + shift[i])), Y)
             if isinstance(att, Skip):
                 ends[pin] = (px, py)

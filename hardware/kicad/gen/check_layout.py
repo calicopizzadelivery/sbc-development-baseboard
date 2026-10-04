@@ -162,7 +162,37 @@ def main(path, verbose=False):
                 if eff_ang == 180 and just:
                     just = {"left": "right", "right": "left"}.get(just, just)
                 texts.append((f"{ref}:{t}", text_box(t, x, y, eff_ang, just, size), ref, (X, Y)))
-    issues = {"text-body": [], "text-wire": [], "text-text": [], "text-stub": [], "wire-body": [], "power-dir": []}
+    # the sheet: A3 landscape, inner frame line 12 mm in, title block in the lower right
+    # (measured from KiCad's default drawing sheet); keep 3 mm inside the frame and off the block
+    FRAME = (15.0, 15.0, 405.0, 282.0)
+    TITLE = (297.0, 250.0, 420.0, 297.0)
+    for node in root[1:]:
+        if isinstance(node, list) and node and node[0] == Sym("text"):
+            at = child(node, "at"); eff = child(node, "effects")
+            size = SIZE
+            if eff:
+                f = child(eff, "font")
+                if f and child(f, "size"): size = float(child(f, "size")[1])
+            lines = str(node[1]).split("\n")
+            wdt = max(len(l) for l in lines) * size * 0.8
+            x, y = float(at[1]), float(at[2])
+            texts.append((f"note '{lines[0][:24]}'", (x, y - size * 0.6, x + wdt, y + size * 0.7), None, None))
+    issues = {"text-body": [], "text-wire": [], "text-text": [], "text-stub": [], "wire-body": [], "power-dir": [], "frame": []}
+    def outside(box):
+        if box[0] < FRAME[0] or box[1] < FRAME[1] or box[2] > FRAME[2] or box[3] > FRAME[3]:
+            return "past the frame"
+        if overlap(box, TITLE):
+            return "on the title block"
+        return None
+    for ref, body, is_power in bodies:
+        why = outside(body)
+        if why: issues["frame"].append((ref, why))
+    for name, box, owner, anchor in texts:
+        why = outside(box)
+        if why: issues["frame"].append((name, why))
+    for a, b in wires:
+        why = outside(seg_box(a, b))
+        if why: issues["frame"].append((f"wire {a}->{b}", why))
     for name, box, owner, anchor in texts:
         for ref, body, is_power in bodies:
             if ref == owner or is_power:
@@ -183,6 +213,8 @@ def main(path, verbose=False):
                 break
     for i in range(len(texts)):
         for j in range(i + 1, len(texts)):
+            if texts[i][0].startswith("note") and texts[j][0].startswith("note"):
+                continue                                     # note lines are stacked on purpose
             if overlap(texts[i][1], texts[j][1], tol=0.2):
                 issues["text-text"].append((texts[i][0], texts[j][0]))
     for a, b in wires:

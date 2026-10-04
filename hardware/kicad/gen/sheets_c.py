@@ -13,8 +13,8 @@ def target(project, num, page, sheet_path, plib):
             "VREF_TGT comes from the target on J13.1 / J15.1 and sets the level of every translator (TXB0104/TXB0108/TXS0102).",
             "OE pins follow VREF_TGT: with the target off the translators are high-impedance. J15 GPIO are push-pull (TXB).",
             "TXS0102 instead of PCA9306: works with VREF_TGT equal to 3.3 V (PCA9306 needs VREF2 > VREF1). Range 1.65-3.6 V.",
-            "TPS26630: ILIM 3.65k -> ~5 A, UVLO 196k/75k -> 4.3 V, OVP/MODE/PGTH to GND (latch-off). IMON 20k -> 2.8 V at 5 A into PTB2."], (15, 15), 1.5)
-    j13 = s.add("Connector_Generic", "Conn_01x04", "J13", "Console VREF/TXD/RXD/GND", (40, 68), 180, footprint=FP["PH4"])
+            "TPS26630: ILIM 3.65k -> ~5 A, UVLO 196k/75k -> 4.3 V, OVP/MODE/PGTH to GND (latch-off). IMON 20k -> 2.8 V at 5 A into PTB2."], (16, 17), 1.5)
+    j13 = s.add("Connector_Generic", "Conn_01x04", "J13", "Console", (40, 68), 180, footprint=FP["PH4"])
     u1 = s.add("Logic_LevelTranslator", "TXB0104PW", "U701", "TXB0104PW", (150, 72), footprint="Package_SO:TSSOP-14_4.4x5mm_P0.65mm")
     j15 = s.add("Connector_Generic", "Conn_02x06_Odd_Even", "J15", "GPIO + I2C breakout", (40, 170), footprint=FP["HDR2x6"])
     u2 = s.add("Logic_LevelTranslator", "TXB0108PW", "U702", "TXB0108PW", (160, 165), footprint="Package_SO:TSSOP-20_4.4x6.5mm_P0.65mm")
@@ -44,13 +44,13 @@ def target(project, num, page, sheet_path, plib):
     top_caps(s, u3, 7, [("100n", None)], height=7.62, sx=1, up=True, rail="+3V3")
     # +5V_TGT eFuse
     fan(s, u4, {1: chain(Pull("GND", "C", "100n", None), Pull("GND", "C", "10u", None, fp=FP["C0805"]), P("+5V_TGT")),
-                6: chain(Pull("GND", "R", "75k", None), Ser("R", "196k", None), P("+5V_TGT")),
+                6: chain(Pull("GND", "R", "75k", None), Pull("+5V_TGT", "R", "196k", None)),
                 7: P("GND"), 11: P("GND"), 12: chain(Pull("+3V3", "R", "10k", None), L("TGT_EN")),
                 5: P("+5V_TGT"), 8: P("GND"), 25: P("GND"),
                 17: chain(Pull("GND", "C", "22u", None, fp=FP["C1206"]), PullLED(GREEN, "1k", None), Conn(j14, 1)),
                 15: P("GND"), 13: chain(Pull("GND", "C", "1n", None), Pull("GND", "R", "20k", None), L("TGT_IMON")),
                 14: chain(Pull("+3V3", "R", "10k", None), L("TGT_FAULT_N")),
-                9: chain(Ser("C", "10n", None), P("GND")), 10: chain(Ser("R", "3.65k 1%", None), P("GND"))})
+                9: Pull("GND", "C", "10n", None), 10: Pull("GND", "R", "3.65k 1%", None)})
     fan(s, j14, {2: P("GND")})
     return s
 
@@ -63,7 +63,7 @@ def relays(project, num, page, sheet_path, plib):
             "Red LEDs sit across each coil and show the energized state. Flyback 1N4148W on every coil.",
             "Passthrough J18 -> K803 (NO contact) -> J19 on nets PSU_VP / PSU_VOUT / PSU_GND that touch no board net: PSU_GND is its own ground.",
             "Only the optocoupler's emitter sits across the passthrough, sized for 5-30 V. No indicator LED there.",
-            "K803 JW1FSN pad map COM=6 NO=4 NC=2: VERIFY against the Panasonic terminal drawing before fab."], (15, 15), 1.5)
+            "K803 JW1FSN pad map COM=6 NO=4 NC=2: VERIFY against the Panasonic terminal drawing before fab."], (16, 17), 1.5)
     for n, y in ((1, 75), (2, 150)):
         k = s.add("Relay", "G6K-2", f"K80{n}", "G6K-2F-Y DC5", (150, y), footprint="Relay_SMD:Relay_DPDT_Omron_G6K-2F-Y")
         jx = s.add("Connector_Generic", "Conn_01x03", f"J1{n}", "Relay COM/NO/NC", (230, y), footprint=FP["PH3"])
@@ -76,11 +76,11 @@ def relays(project, num, page, sheet_path, plib):
                    2: Conn(jx, 3), 4: Conn(jx, 2), 3: Conn(jx, 1)}, side_dir={8: -1})
         fan(s, q, {1: chain(Pull("GND", "R", "100k", None), Ser("R", "1k", None), L(f"RLY{n}_DRV")), 2: P("GND")})
     # passthrough
-    k3 = s.add("sbcbb", "JW1FSN", "K803", "JW1FSN-DC5V", (150, 235), footprint="Relay_THT:Relay_SPDT_Panasonic_JW1_FormC")
-    q3 = s.Q("Transistor_FET", "AO3400A", "AO3400A", (70, 262))
-    j18 = s.add("Connector_Generic", "Conn_01x02", "J18", "PSU in (isolated)", (300, 225), footprint=FP["PH2"])
-    j19 = s.add("Connector_Generic", "Conn_01x02", "J19", "PSU out (isolated)", (300, 250), footprint=FP["PH2"])
-    opto = s.add("Isolator", "LTV-817", "U801", "LTV-817", (230, 270), 180, footprint=FP["DIP4"])
+    k3 = s.add("sbcbb", "JW1FSN", "K803", "JW1FSN-DC5V", (150, 225), footprint="Relay_THT:Relay_SPDT_Panasonic_JW1_FormC")
+    q3 = s.Q("Transistor_FET", "AO3400A", "AO3400A", (70, 252))
+    j18 = s.add("Connector_Generic", "Conn_01x02", "J18", "PSU in (isolated)", (300, 212), footprint=FP["PH2"])
+    j19 = s.add("Connector_Generic", "Conn_01x02", "J19", "PSU out (isolated)", (300, 237), footprint=FP["PH2"])
+    opto = s.add("Isolator", "LTV-817", "U801", "LTV-817", (230, 250), 180, footprint=FP["DIP4"])   # all above the frame margin and left of the title block
     s.pin_nc(k3, "2")
     fan(s, k3, {1: P("+5V_PORTS"),
                 8: chain(Pull("+5V_PORTS", ("Diode", "1N4148W", "1"), "1N4148W", None, fp=FP["SOD123"]), PullLED(RED, "2.2k", None, rail="+5V_PORTS"), Conn(q3, 3)),
@@ -89,7 +89,7 @@ def relays(project, num, page, sheet_path, plib):
     fan(s, j18, {2: P("PSU_GND")}); fan(s, j19, {2: P("PSU_GND")})
     fan(s, opto, {1: chain(Pull("PSU_GND", ("Diode", "1N4148W", "1"), "1N4148W", None, fp=FP["SOD123"]), Ser("R", "1.8k", None, fp=FP["R1206"]), Ser("R", "1.8k", None, fp=FP["R1206"]), Conn(j18, 1)),
                   2: P("PSU_GND"), 4: chain(Pull("+3V3", "R", "10k", None), L("PSU_PRESENT_N")), 3: P("GND")})
-    flags(s, ["PSU_GND"], (25, 276))
+    flags(s, ["PSU_GND"], (25, 272))
     s.note(["Opto LED: 2x1.8k 1206 in series, 1 mA at 5 V, 8 mA / 0.12 W each at 30 V. The antiparallel 1N4148W protects a reversed PSU.",
-            "PSU_PRESENT_N is active low at the K64."], (150, 280), 1.3)
+            "PSU_PRESENT_N is active low at the K64."], (95, 272), 1.3)
     return s
