@@ -43,7 +43,7 @@ flowchart LR
     FTDI["FT231X<br/>USB-UART, 3.3 V"]
     TSW["eFuse<br/>+5V_TGT"]
     RLY["2x SPDT<br/>signal relay"]
-    PT["passthrough<br/>SPDT power relay, 5 A NC"]
+    PT["passthrough<br/>SPDT power relay, 5 A NO"]
     LT["TXB0104 / TXB0108<br/>PCA9306"]
   end
 
@@ -108,7 +108,7 @@ host is attached and whether or not the host agrees.
 | J16 | 10-pin Cortex debug | you | Direct SWD to the K64, bypassing DAPLink. |
 | J17 | 4-pin JST SH, 1.0 mm | you | STUSB4500 NVM programming. Qwiic / STEMMA QT pinout: GND, 3.3 V, SDA, SCL. |
 | J18 | 2-pos pluggable 5.08 mm | PSU | Target passthrough in: V+, GND. 0–30 VDC, 5 A. Isolated from every board net. |
-| J19 | 2-pos pluggable 5.08 mm | target | Target passthrough out: V+ through the relay's NC contact, GND on the copper bus. |
+| J19 | 2-pos pluggable 5.08 mm | target | Target passthrough out: V+ through the relay's **NO** contact, GND on the copper bus. Unpowered until commanded. |
 
 Pluggable terminal blocks rather than fixed: a relay's wiring can be unplugged
 as a unit and reinstalled the same way, which fixed screw terminals do not give
@@ -212,7 +212,7 @@ activity at the header. TVS on all four signals; the header will be hot-plugged.
 | PD programming header | **JST SM04B-SRSS-TB** | The Qwiic / STEMMA QT connector, side entry; `BM04B-SRSS-TB` if placement wants top entry. Stock cables fit either. |
 | PD bus buffer | **PCA9517A** | Isolates the K64 from the PD sink's I2C whenever the board is unpowered or a programmer is on J17. See §4. |
 | Relays, 2× | **Omron G6K-1F-Y**, 5 V coil | 1 Form C (SPDT), gold-clad contacts, 1 A / 30 VDC, ~30 mA coil. |
-| Power relay | **Panasonic JW1FSN-DC5V** | 1 Form C, 10 A at 30 VDC resistive on the form C with no NC derate, AgSnO2, sealed. 530 mW coil, 106 mA at 5 V. Also pass: Omron G2R-1 DC5, G5LE-1 DC5. **Not** G5Q-1 — 3 A on NC. Verified in §4. |
+| Power relay | **Panasonic JW1FSN-DC5V** | 1 Form C, load on the **NO** contact: 10 A at 30 VDC resistive, AgSnO2, sealed. 530 mW coil, 106 mA at 5 V. Alternates: Omron G2R-1 DC5, G5LE-1 DC5. Ratings in §4. |
 | Relay drivers, 3× | AO3400 + 1N4148 flyback | One FET for all three coils. Gate pulldown to ground — see §5. |
 | PSU presence detect | LTV-817-class optocoupler | Optional. The only component that touches the passthrough, across an isolation barrier — see §4. |
 | UART translation | **TXB0104** | Auto-direction, push-pull. `VCCA` from J13's VREF pin. |
@@ -352,7 +352,7 @@ the wrong tool for it. So J18 and J19 pass an external PSU straight through,
 the board's only involvement being one relay contact in the high side.
 
 ```
-J18 (PSU in)   V+  ──> relay COM ── NC ──> V+   J19 (target out)
+J18 (PSU in)   V+  ──> relay COM ── NO ──> V+   J19 (target out)
                GND ──> copper bus, ≥5 mm, both outer layers ──> GND
 ```
 
@@ -370,19 +370,30 @@ Three reasons, all of which matter at 19 V / 3 A:
 The target's ground still meets the board's through J3 and J13, as it would on
 any bench. The point is that the *power* current does not.
 
-**NC, not NO.** The relay is de-energized in the passing state. This is the §5
-rule — a rail boots to the state that does no harm, set by hardware — taken one
-step further: a baseboard that has lost its own power, or has been unplugged
-entirely, still passes the PSU through. The only way to cut the target is to
-energize the coil, and a coil cannot energize by accident.
+**NO, not NC.** The relay is de-energized with the target *off*. Nothing on J19
+powers until the baseboard is up and has been told to, and a baseboard that has
+lost its own power, or been unplugged, leaves the target off. A target cannot
+come up unexpectedly, and a coil cannot energize by accident. Rev 0.1 had this
+the other way — NC, the §5 rule taken one step further, so a dead baseboard
+still passed power — and it was switched on 2026-10-03 for the workflow: on this
+bench, power is something the baseboard *grants*.
 
-The cost is the mirror image: with the baseboard unpowered, the target *cannot*
-be cut. That is the right way round for a development bench.
+The cost is the mirror image, and it is a real one: **a baseboard reset is a
+target power cycle.** The gate pulldown drops the coil the instant the K64
+enters reset, and firmware cannot pick it up until it is running — a few hundred
+milliseconds at best, which is longer than an SBC's input capacitance will hold
+it up. Firmware persists the commanded state and restores it first thing at
+boot, so the target comes back without anyone asking; but it does come *back*.
+The §5 line "resetting the baseboard must not reset the target" holds for
++5V_TGT and the ports, and not for this rail. If that ever matters, the hardware
+answer is a latching relay — Omron's G2RK-1 is the double-winding version of the
+G2R-1, in the same datasheet, 5 A at 30 VDC, and it holds its state with no coil
+power through any reset and through power loss. It is not fitted.
 
-**The NC rating is the selection criterion, and it is easy to get wrong.** SPDT
-power relays are commonly rated on the NO contact — the "10 A" on the front of
-the datasheet — with the NC contact derated in a table further in. Read off the
-datasheets, 2026-10-03:
+**The load sits on the NO contact, so the headline rating is the one that
+applies.** It was going to sit on NC, where SPDT power relays are commonly
+derated in a table further into the datasheet, which is why these were read off
+the datasheets on 2026-10-03; the table stays as the record:
 
 | Relay | Form C at 30 VDC, resistive | NC derated? | Contacts | 5 V coil |
 |---|---|---|---|---|
@@ -394,13 +405,13 @@ datasheets, 2026-10-03:
 | Omron G5LE-1-E | 16 A NO at 250 VAC | **12 A NC** | — | — |
 
 The G5Q-1 is the trap in one line: a "10 A" relay whose NC contact carries 3 A.
-The JW1FSN is the pick — the only passing part with AgSnO2, which matters
-because an SBC's input is a bank of bulk capacitance, so the contact closes into
-an inrush of tens of amps for microseconds, which AgSnO2 tolerates and AgNi pits
-under. At an AGX's 3 A its contact runs at 30 % of rating; at the design figure
-of 5 A, 50 %. Both are the margins a relay should run at, so the 5 A design
-rating stays, and the copper with it. Resistive and capacitive loads are assumed
-and no snubber is fitted, so an inductive load on J19 needs its own.
+On NO, every part in the top half is simply its headline figure. The JW1FSN
+stays the pick for its AgSnO2 contacts: an SBC's input is a bank of bulk
+capacitance, so every `TGT PSU ON` closes into an inrush of tens of amps for
+microseconds, which AgSnO2 tolerates and AgNi pits under. At an AGX's 3 A the
+contact runs at 30 % of rating; at the design figure of 5 A, 50 %. The 5 A
+design rating stays, and the copper with it. Resistive and capacitive loads are
+assumed and no snubber is fitted, so an inductive load on J19 needs its own.
 
 **Copper.** 5 A continuous at a 10 °C rise wants about 2.7 mm of 1 oz outer
 copper by IPC-2221. Use ≥5 mm on both outer layers, via-stitched, for GND and
@@ -438,7 +449,7 @@ runs. Choose each switch's enable polarity so the passive state is the safe one.
 | J4, J5 USB-A ports, FT231X | **ON** | pull-up on active-high `EN` | Never silently drop power. A watchdog reset must not disconnect the console adapter you are reading the target's boot log on — which on this board may be the FT231X itself. |
 | +5V_TGT | **ON** | pull-up on `EN` | Same. Resetting the baseboard must not reset the target. |
 | Relay 1, 2 | **DE-ENERGIZED** | 100 kΩ gate pulldown | A relay that energizes at boot asserts FORCE_RECOVERY on every reset of the controller. Which way that fails is the installer's choice — SPDT gives both NO and NC on the terminal block. |
-| Passthrough relay | **PASSING** (de-energized, NC closed) | 100 kΩ gate pulldown, and the relay itself | A baseboard that has lost its own power still passes the PSU through. Cutting the target takes an energized coil, which cannot happen by accident. |
+| Passthrough relay | **OFF** (de-energized, NO open) | 100 kΩ gate pulldown, and the relay itself | Nothing on J19 powers until firmware is up and has been told to. The cost — a baseboard reset drops the target — is accepted; see §4. |
 
 This is carried straight from the relay controller, where the two firmware
 profiles boot opposite ways for exactly these reasons, and where a unit test
@@ -451,6 +462,9 @@ Two matching firmware rules:
    takes to reach the next instruction, which is enough to click a relay.
 2. **The relay pins are never configured as anything but GPIO outputs.** No
    alternate-function pin shared with a peripheral that might drive it.
+3. **Restore the passthrough's persisted state immediately after rule 1**,
+   before the network, before USB, before anything that can block. Every
+   millisecond here is target downtime.
 
 ### Back-feed
 
@@ -545,8 +559,9 @@ firmware is running and its loop is not wedged.
 | 8 | Authentication on the TCP transport. Today anything that can reach the port can cut the target's power and assert its recovery pins. A trusted segment is the assumption; decide whether that is good enough. | Remote management outside the lab |
 | 9 | Should the K64 be able to rewrite the STUSB4500 NVM itself, over the buffered bus? Then J17 is bring-up and recovery only, and PDO changes become a console command. | Firmware scope |
 | 10 | Verify at bring-up, against the datasheets: the STUSB4500 runs and answers I2C from `VSYS` alone with no VBUS; what it asks of an unused `VSYS`; and the PCA9517A's B side with `VCCA` at 0 V. The J17 circuit assumes all three. | J17 circuit |
-| 11 | ~~Power relay NC rating~~ **Resolved** against the datasheets: Panasonic JW1FSN-DC5V, 10 A at 30 VDC on the form C with no NC derate, AgSnO2. G2R-1 and G5LE-1 also pass; G5Q-1, at 3 A NC, does not. Table in §4. | — |
+| 11 | ~~Power relay NC rating~~ **Resolved** against the datasheets: Panasonic JW1FSN-DC5V, 10 A at 30 VDC on the form C with no NC derate, AgSnO2. G2R-1 and G5LE-1 also pass; G5Q-1, at 3 A NC, does not. The load has since moved to the NO contact, where the headline figure applies. Table in §4. | — |
 | 12 | J9 pin 3: a third jumper position that makes it a VREF *input* feeding the FT231X's `VCCIO`, so the header follows a 1.8 V target. Needs the FT231X's behaviour with `VCCIO` at 0 V (target off) verified first; J13 already covers 1.8 V, so this is convenience, not capability. | J9 |
+| 13 | Passthrough at boot: restore the last commanded state (the default — a watchdog reset must not strand a remote target), or stay off until commanded again? And is the reset gap worth fitting the G2RK-1 latching relay instead? | Firmware policy, §4 |
 
 Item 4 is deferred on purpose. It only becomes expensive if a board leaves the
 lab, and a VID has lead time of its own, so that is the moment to start it.

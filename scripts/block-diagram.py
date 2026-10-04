@@ -139,11 +139,11 @@ box(1090, 565, 220, 55, "eFuse", "+5V_TGT · 5 A · /FAULT")
 tag(1095, 635, "+5V_TGT")
 # power relay straddling the barrier
 e(f'<rect x="1090" y="880" width="220" height="120" rx="6" fill="{C["dev"]}" stroke="{C["dev_edge"]}" stroke-width="1.6"/>')
-e(f'<text x="1200" y="903" text-anchor="middle" font-size="14" font-weight="600" fill="{C["ink"]}">JW1FSN-DC5V · SPDT power relay</text>')
+e(f'<text x="1200" y="903" text-anchor="middle" font-size="14" font-weight="600" fill="{C["ink"]}">JW1FSN · SPDT power relay</text>')
 e(f'<text x="1200" y="922" text-anchor="middle" font-size="12.5" fill="{C["mute"]}">coil: +5V_PORTS · FET + flyback</text>')
 e(f'<line x1="1092" y1="935" x2="1308" y2="935" stroke="{C["iso_edge"]}" stroke-width="1.4" stroke-dasharray="7 5"/>')
-e(f'<text x="1200" y="962" text-anchor="middle" font-size="12.5" fill="{C["mute"]}">NC passes · 10 A at 30 VDC · AgSnO2</text>')
-e(f'<text x="1200" y="980" text-anchor="middle" font-size="12.5" fill="{C["mute"]}">COM → NC when de-energized</text>')
+e(f'<text x="1200" y="962" text-anchor="middle" font-size="12.5" fill="{C["mute"]}">NO · 10 A at 30 VDC · AgSnO2</text>')
+e(f'<text x="1200" y="980" text-anchor="middle" font-size="12.5" fill="{C["mute"]}">COM → NO when energized</text>')
 
 # ---------- right column
 box(1470, 85, 240, 50, "J9  FTDI header · 6-pin 0.1″", "GND CTS VCC TXD RXD DTR · 3.3 V", "conn")
@@ -153,7 +153,7 @@ box(1470, 345, 240, 55, "J13  Phoenix 3.5", "console: VREF · TXD · RXD · GND"
 box(1470, 415, 240, 55, "J15  2×6 header", "6× GPIO · I2C · VREF · GND", "conn")
 box(1470, 490, 240, 55, "J11, J12  Phoenix 3.5", "COM · NO · NC, per relay", "conn")
 box(1470, 565, 240, 55, "J14  Phoenix 5.08", "+5V_TGT out · 5 A", "conn")
-box(1470, 950, 240, 70, "J19  Phoenix 5.08", ["PSU out", "V+ via NC · GND via bus"], "conn")
+box(1470, 950, 240, 70, "J19  Phoenix 5.08", ["PSU out", "V+ via NO · GND via bus"], "conn")
 
 # ---------- edges: USB / debug / ethernet
 path([(250, 120), (330, 120)])
@@ -185,7 +185,7 @@ path([(980, 700), (1200, 700), (1200, 880)], "coil drive · FET + flyback", (121
 
 # passthrough
 path([(250, 975), (1090, 975)], "V+  →  COM", (960, 991), width=2.6, color=C["iso"])
-path([(1310, 975), (1470, 975)], "NC", (1390, 969), width=2.6, color=C["iso"])
+path([(1310, 975), (1470, 975)], "NO", (1390, 969), width=2.6, color=C["iso"])
 path([(250, 1010), (1470, 1010)], "GND · copper bus ≥ 5 mm, both outer layers", (900, 1028), width=5, color=C["iso"], arrow="none")
 # opto stubs + sense line
 e(f'<line x1="740" y1="970" x2="740" y2="975" stroke="{C["iso"]}" stroke-width="1.6"/>')

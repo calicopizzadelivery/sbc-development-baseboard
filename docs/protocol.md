@@ -53,11 +53,12 @@ powered, the target is powered, a relay is energized. Which way a relay's
 contacts run at that point is a wiring choice — SPDT gives you NO and NC on the
 terminal block — so the protocol does not need to know.
 
-The passthrough is the one place that inverts underneath: `TGT PSU ON` means
-the relay is *passing*, which is its de-energized state, and also what an
-unpowered baseboard does. The protocol still says `ON`, because the thing the
-channel exists to do is happening. The polarity lives in one place in the
-firmware, as it does on the relay controller.
+`TGT PSU ON` energizes the passthrough relay and the target powers; de-energized
+is off, which is also what an unpowered baseboard does. Firmware restores the
+last commanded state at boot ([spec, open question 13](hardware-spec.md#8-open-questions)),
+so a baseboard reset is a brief power cut to the target rather than a change of
+state. A `PULSE` in flight across a reset is lost; the channel comes back to its
+pre-pulse state.
 
 `FTDI` is deliberately not `PORT 6`, though that is the hub port it sits on.
 `PORT ALL OFF` does not touch it: the bridge you are reading the boot log on

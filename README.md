@@ -40,7 +40,7 @@ workstation ──USB-C──> hub ──> 4x USB-A (switched)     ──> whate
                            ──> UART + VREF             ──> target's console
                            ──> 2x SPDT dry contacts    ──> target's recovery/reset pins
                            ──> switched +5V, 5 A       ──> target's supply
- target PSU ──Phoenix──> isolated relay, NC, 5 A       ──> target's supply, any voltage
+ target PSU ──Phoenix──> isolated relay, NO, 5 A       ──> target's supply, any voltage
  PD charger ──USB-C──> PD sink ──> 5 V rails
 ```
 
@@ -73,8 +73,8 @@ preferences. They are written up in full in
   exactly like a target that is not booting.
 - **The target's PSU passes through on its own nets.** A 19 V / 3 A return
   current has no business on the board's ground plane or its USB shields. It
-  crosses one relay contact — normally closed — so a dead baseboard still
-  passes power.
+  crosses one relay contact — normally open — so nothing powers until the
+  baseboard says so, and a dead baseboard leaves the target off.
 
 ## Status
 
