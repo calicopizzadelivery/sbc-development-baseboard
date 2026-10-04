@@ -177,7 +177,7 @@ def main(path, verbose=False):
             wdt = max(len(l) for l in lines) * size * 0.8
             x, y = float(at[1]), float(at[2])
             texts.append((f"note '{lines[0][:24]}'", (x, y - size * 0.6, x + wdt, y + size * 0.7), None, None))
-    issues = {"text-body": [], "text-wire": [], "text-text": [], "text-stub": [], "wire-body": [], "power-dir": [], "frame": []}
+    issues = {"text-body": [], "text-wire": [], "text-text": [], "text-stub": [], "wire-body": [], "power-dir": [], "frame": [], "pin-name": []}
     def outside(box):
         if box[0] < FRAME[0] or box[1] < FRAME[1] or box[2] > FRAME[2] or box[3] > FRAME[3]:
             return "past the frame"
@@ -231,6 +231,8 @@ def main(path, verbose=False):
             continue
         if (gnd and rot != 0) or (not gnd and rot != 0):
             issues["power-dir"].append((f"{val} rot {rot}", f"@({X:.2f}, {Y:.2f})"))
+    import check_pins
+    issues["pin-name"] = [(line.strip(), "") for line in check_pins.check(path)]   # names inside a symbol that print over each other
     total = sum(len(v) for v in issues.values())
     print(f"{path}: {total} layout issue(s)  " + "  ".join(f"{k}={len(v)}" for k, v in issues.items()))
     if verbose:

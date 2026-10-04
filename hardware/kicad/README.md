@@ -47,7 +47,10 @@ land on a foreign wire (the shorts a netlist shows only as a merged net);
 `gen/netcheck.py`, which traces wire-level connectivity in each sheet and
 reports any net carrying two rails; and `gen/check_layout.py`, which reports
 text over outlines, wires or other text, wires through a part body, and power
-symbols pointing the wrong way (GND always hangs down, rails always stand up). The netlist was also diffed against the
+symbols pointing the wrong way (GND always hangs down, rails always stand up),
+anything on the sheet frame or the title block, and pin names inside a symbol
+that print over each other (`gen/check_pins.py`, run on library symbols too;
+its `--gaps` option lists the closest name pairs). The netlist was also diffed against the
 first label-style pass with passive renumbering factored out, so the re-layout
 changed drawing, not connectivity (the JP501 default and the J1 VBUS divider
 tap, which became a local label, are the two intended exceptions).

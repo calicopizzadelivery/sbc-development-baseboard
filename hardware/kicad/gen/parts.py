@@ -6,6 +6,7 @@ embedded into the schematics and also written out as sbc-baseboard.kicad_sym
 with a sym-lib-table so KiCad can resolve the "sbcbb:" nickname when editing.
 """
 import math
+from check_pins import text_w as glyph_w       # the same stroke-font estimate the pin-name gate uses
 from kisym import Sym, dump
 
 LIB = "sbcbb"
@@ -40,23 +41,23 @@ def box_symbol(name, left, right, top=(), bottom=(), ref="U", footprint="", desc
         longest = max([len(p[1]) for p in list(left) + list(right) if p] + [4])
         width = max(20.32, round((longest * 1.3 + 4) / 2.54) * 2.54 * 2 if (nl and nr) else 0, (max(nt, nb) + 1) * pitch)
     W = width
-    # a top or bottom pin prints its name vertically into the body (1.27 mm text, about
-    # 1.1 mm per character after the 1.016 mm offset). Wherever that column meets a side
+    # a top or bottom pin prints its name vertically into the body (1.27 mm text after the
+    # 1.016 mm offset; glyph widths from check_pins). Wherever that column meets a side
     # pin's name, the body is extended past the side-pin rows by whole rows until the
-    # vertical name clears the side name's box (half height 0.635 mm plus a 0.4 mm gap);
+    # vertical name clears the side name's box (half height 0.635 mm plus a 0.8 mm gap);
     # the side rows themselves do not move
-    CH, OFF, HALF, GAP = 1.1, 1.016, 0.635, 0.4
+    OFF, HALF, GAP, SIZE = 1.016, 0.635, 0.8, 1.27
     def name_x(ps, n):                               # x of the n-th top/bottom pin
         return round(round(-W / 2 + (n + 1) * (W / (len(ps) + 1)), 4) / 1.27) * 1.27
-    def side_span(side, p):                          # x extent of a side pin's name
-        w = OFF + CH * len(p[1]) + 0.5
+    def side_span(side, p):                          # x extent of a side pin's name, with margin
+        w = OFF + glyph_w(p[1], SIZE) + 0.5
         return (-W / 2, -W / 2 + w) if side == "L" else (W / 2 - w, W / 2)
     def clear(ps, from_top):
         need = 0.0
         for n, tp in enumerate(ps):
             if tp is None: continue
             x = name_x(ps, n)
-            reach = OFF + CH * len(tp[1]) + GAP + HALF
+            reach = OFF + glyph_w(tp[1], SIZE) + GAP + HALF
             for side, col in (("L", left), ("R", right)):
                 for k, sp in enumerate(col):
                     if sp is None: continue
