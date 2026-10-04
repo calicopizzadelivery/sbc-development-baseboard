@@ -25,7 +25,7 @@ def main():
     defs = [("Power", "power.kicad_sch", sheets_a.power, 1), ("MCU", "mcu.kicad_sch", sheets_a.mcu, 2),
             ("Ethernet", "ethernet.kicad_sch", sheets_b.ethernet, 3), ("USB hub", "hub.kicad_sch", sheets_b.hub, 4),
             ("FTDI", "ftdi.kicad_sch", sheets_b.ftdi, 5), ("DAPLink", "daplink.kicad_sch", sheets_b.daplink, 6),
-            ("Target I/O", "target.kicad_sch", sheets_c.target, 7)]
+            ("Target I/O", "target.kicad_sch", sheets_c.target, 7), ("Relays", "relays.kicad_sch", sheets_c.relays, 8)]
     x, y = 30, 40
     for i, (name, file, fn, num) in enumerate(defs):
         suuid = uid()
@@ -42,13 +42,13 @@ def main():
              "switched +5V_TGT eFuse, and an isolated PSU passthrough on a 5 A relay. 140 x 80 mm, four M3 at 10 mm from each corner.",
              "",
              "VERIFY BEFORE FAB (also in docs/hardware-spec.md section 8):",
-             "  - K703 JW1FSN contact pad mapping (COM 6 / NO 4 / NC 2) against the Panasonic drawing",
+             "  - K803 JW1FSN contact pad mapping (COM 6 / NO 4 / NC 2) against the Panasonic drawing",
              "  - DAPLink k20dx HIC pin assignments (SWCLK PTC5, SWDIO PTC6, nRESET PTB1, LED PTD4, UART1 PTC3/4)",
              "  - TPS54560B compensation values; TPS2553 ILIM at bring-up; TPS26630 UVLO/ILIM",
              "  - STUSB4500 operation from VSYS alone (J17 programmer, no VBUS); PCA9517A isolation with VCC(B) = 0",
              "  - USB2517 VBUS_DET divider (10k/22k) vs the EVB; LED_A/B strap pull-downs",
              "  - KSZ8081 crystal load (22 pF) and 50 MHz REF_CLK series resistor",
-             "Reference designators: 1xx power, 2xx MCU, 3xx Ethernet, 4xx hub, 5xx FTDI, 6xx DAPLink, 7xx target I/O."]
+             "Reference designators: 1xx power, 2xx MCU, 3xx Ethernet, 4xx hub, 5xx FTDI, 6xx DAPLink, 7xx target I/O, 8xx relays and passthrough."]
     for i, ln in enumerate(notes):
         root.text(ln, (30, 175 + i * 3.2), size=1.6, bold=(i == 0))
     root.emit(os.path.join(OUT, f"{PROJECT}.kicad_sch"), root.uuid)

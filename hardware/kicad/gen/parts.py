@@ -26,7 +26,7 @@ def _pin(etype, number, name, x, y, angle, length=2.54):
 
 
 def box_symbol(name, left, right, top=(), bottom=(), ref="U", footprint="", description="",
-               width=None, pitch=2.54, datasheet="~"):
+               width=None, pitch=2.54, datasheet=""):
     """left/right/top/bottom: lists of (number, name, etype) in order; None = gap.
     Pins are placed on a 2.54 grid. Returns the symbol node."""
     nl, nr = len(left), len(right)
@@ -77,16 +77,17 @@ PI, PO, I, O, B, P, OC, NC = "power_in", "power_out", "input", "output", "bidire
 
 
 def k64():
-    left = [("8", "VDD", PI), ("40", "VDD", PI), ("48", "VDD", PI), ("61", "VDD", PI), ("75", "VDD", PI), ("89", "VDD", PI),
-            ("22", "VDDA", PI), ("23", "VREFH", PI), ("30", "VBAT", PI), ("13", "VREGIN", PI), ("12", "VOUT33", PO), None,
+    left = [("13", "VREGIN", PI), ("12", "VOUT33", PO), None,
             ("10", "USB0_DP", B), ("11", "USB0_DM", B), None,
             ("50", "EXTAL0/PTA18", I), ("51", "XTAL0/PTA19", P), ("29", "EXTAL32", P), ("28", "XTAL32", P), None,
             ("52", "RESET_b", I), ("38", "NMI_b/PTA4", I), None,
             ("14", "ADC0_DP1", I), ("15", "ADC0_DM1", I), ("16", "ADC1_DP1", I), ("17", "ADC1_DM1", I),
             ("18", "ADC0_DP0", I), ("19", "ADC0_DM0", I), ("20", "ADC1_DP0", I), ("21", "ADC1_DM0", I),
-            ("26", "VREF_OUT", P), ("27", "DAC0_OUT", P), None,
-            ("24", "VREFL", PI), ("25", "VSSA", PI),
-            ("9", "VSS", PI), ("41", "VSS", PI), ("49", "VSS", PI), ("60", "VSS", PI), ("74", "VSS", PI), ("88", "VSS", PI)]
+            ("26", "VREF_OUT", P), ("27", "DAC0_OUT", P)]
+    top = [("8", "VDD", PI), ("40", "VDD", PI), ("48", "VDD", PI), ("61", "VDD", PI), ("75", "VDD", PI), ("89", "VDD", PI),
+           ("30", "VBAT", PI), ("22", "VDDA", PI), ("23", "VREFH", PI)]
+    bottom = [("9", "VSS", PI), ("41", "VSS", PI), ("49", "VSS", PI), ("60", "VSS", PI), ("74", "VSS", PI), ("88", "VSS", PI),
+              ("25", "VSSA", PI), ("24", "VREFL", PI)]
     right = [("34", "PTA0/SWD_CLK", B), ("35", "PTA1", B), ("36", "PTA2", B), ("37", "PTA3/SWD_DIO", B),
              ("39", "PTA5/RMII0_RXER", B), ("42", "PTA12/RMII0_RXD1", B), ("43", "PTA13/RMII0_RXD0", B),
              ("44", "PTA14/RMII0_CRS_DV", B), ("45", "PTA15/RMII0_TXEN", B), ("46", "PTA16/RMII0_TXD0", B), ("47", "PTA17/RMII0_TXD1", B), None,
@@ -101,7 +102,7 @@ def k64():
              ("99", "PTD6", B), ("100", "PTD7", B), None,
              ("1", "PTE0", B), ("2", "PTE1", B), ("3", "PTE2", B), ("4", "PTE3", B), ("5", "PTE4", B), ("6", "PTE5", B), ("7", "PTE6", B),
              ("31", "PTE24/I2C0_SCL", B), ("32", "PTE25/I2C0_SDA", B), ("33", "PTE26", B)]
-    return box_symbol("MK64FN1M0VLL12", left, right, ref="U", width=55.88,
+    return box_symbol("MK64FN1M0VLL12", left, right, top=top, bottom=bottom, ref="U", width=60.96,
                       footprint="Package_QFP:LQFP-100_14x14mm_P0.5mm",
                       description="Kinetis K64, Cortex-M4F 120 MHz, 1 MB flash, 256 KB SRAM, USB FS OTG, 10/100 ENET, LQFP-100. Pinout from K64P144M120SF5 rev 7 table 5.1 (100 LQFP column).",
                       datasheet="https://www.nxp.com/docs/en/data-sheet/K64P144M120SF5.pdf")
@@ -111,10 +112,10 @@ def usb2517():
     left = [("59", "USBUP_DP", B), ("58", "USBUP_DM", B), ("44", "VBUS_DET", I), None,
             ("61", "XTAL1/CLKIN", I), ("60", "XTAL2", O), ("43", "RESET_N", I), ("63", "RBIAS", P), ("19", "TEST", I), None,
             ("13", "CFG_SEL2", I), ("42", "HS_IND/CFG_SEL1", B), ("41", "SCL/SMBCLK/CFG_SEL0", B), ("40", "SDA/SMBDATA/NON_REM1", B),
-            ("45", "SUSP_IND/LOCAL_PWR/NON_REM0", B), None,
-            ("46", "VDD33", PI), ("24", "VDD33CR", PI), ("64", "VDD33PLL", PI),
-            ("5", "VDDA33", PI), ("10", "VDDA33", PI), ("52", "VDDA33", PI), ("57", "VDDA33", PI),
-            ("25", "VDD18", PO), ("62", "VDD18PLL", PO), ("65", "VSS/EP", PI)]
+            ("45", "SUSP_IND/LOCAL_PWR/NON_REM0", B)]
+    top = [("46", "VDD33", PI), ("24", "VDD33CR", PI), ("64", "VDD33PLL", PI),
+           ("5", "VDDA33", PI), ("10", "VDDA33", PI), ("52", "VDDA33", PI), ("57", "VDDA33", PI)]
+    bottom = [("25", "VDD18", PO), ("62", "VDD18PLL", PO), ("65", "VSS/EP", PI)]
     right = [("2", "USBDN1_DP", B), ("1", "USBDN1_DM", B), ("4", "USBDN2_DP", B), ("3", "USBDN2_DM", B),
              ("7", "USBDN3_DP/PRT_DIS_P3", B), ("6", "USBDN3_DM/PRT_DIS_M3", B), ("9", "USBDN4_DP", B), ("8", "USBDN4_DM", B),
              ("12", "USBDN5_DP", B), ("11", "USBDN5_DM", B), ("54", "USBDN6_DP", B), ("53", "USBDN6_DM", B),
@@ -125,7 +126,7 @@ def usb2517():
              ("31", "LED_A5_N/PRT_SWP5", B), ("17", "LED_A6_N/PRT_SWP6", B), ("15", "LED_A7_N/PRT_SWP7", B), None,
              ("50", "LED_B1_N/BOOST0", B), ("48", "LED_B2_N/BOOST1", B), ("34", "LED_B3_N/GANG_EN", B), ("32", "LED_B4_N", B),
              ("18", "LED_B5_N", B), ("16", "LED_B6_N", B), ("14", "LED_B7_N", B)]
-    return box_symbol("USB2517", left, right, ref="U", width=58.42,
+    return box_symbol("USB2517", left, right, top=top, bottom=bottom, ref="U", width=68.58,
                       footprint="Package_DFN_QFN:QFN-64-1EP_9x9mm_P0.5mm_EP7.15x7.15mm",
                       description="USB 2.0 Hi-Speed 7-port hub controller, QFN-64. Pinout from DS00001598C Table 5-1.",
                       datasheet="https://ww1.microchip.com/downloads/en/DeviceDoc/USB2517-USB2517i-Data-Sheet-00001598C.pdf")
@@ -156,8 +157,39 @@ def jw1fsn():
                       datasheet="https://industrial.panasonic.com/cdbs/www-data/pdf/ADS0000/ADS0000C300.pdf")
 
 
+def usb_a_stacked():
+    """Double-stacked USB-A receptacle as two units, one per port, each drawn as
+    its own connector: D-, D+ at the top, VBUS and GND at the bottom, pins on the
+    left so the connector faces the sheet edge. Pin numbers follow
+    Connector:USB_A_Stacked (1-4 upper port, 5-8 lower port, SH shield)."""
+    name = "USB_A_Stacked2"
+    W, H = 15.24, 22.86
+    x0, y0 = -W / 2, H / 2
+    rows = {0: 8.89, 1: 6.35, 6: -6.35, 7: -8.89}
+    def unit(u, pins, shield):
+        node = [Sym("symbol"), f"{name}_{u}_1",
+                [Sym("rectangle"), [Sym("start"), round(x0, 4), round(y0, 4)], [Sym("end"), round(-x0, 4), round(-y0, 4)],
+                 [Sym("stroke"), [Sym("width"), 0.254], [Sym("type"), Sym("default")]], [Sym("fill"), [Sym("type"), Sym("background")]]]]
+        for num, pname, row, etype in pins:
+            node.append(_pin(etype, num, pname, round(x0 - 2.54, 4), rows[row], 0))
+        if shield:
+            node.append(_pin(P, "SH", "SHIELD", 0, round(-y0 - 2.54, 4), 90))
+        return node
+    node = [Sym("symbol"), name, [Sym("pin_names"), [Sym("offset"), 1.016]], [Sym("exclude_from_sim"), Sym("no")],
+            [Sym("in_bom"), Sym("yes")], [Sym("on_board"), Sym("yes")],
+            _prop("Reference", "J", (round(x0, 4), round(y0 + 1.27, 4))),
+            _prop("Value", name, (round(x0, 4), round(-y0 - 1.27, 4))),
+            _prop("Footprint", "", (0, 0), hide=True),
+            _prop("Datasheet", "", (0, 0), hide=True),      # KiCad folds "~" to "" in libraries, so "~" here reads as a mismatch
+            _prop("Description", "USB-A receptacle, double stacked, one unit per port", (0, 0), hide=True),
+            unit(1, [("2", "D-", 0, B), ("3", "D+", 1, B), ("1", "VBUS", 6, PI), ("4", "GND", 7, PI)], True),
+            unit(2, [("6", "D-", 0, B), ("7", "D+", 1, B), ("5", "VBUS", 6, PI), ("8", "GND", 7, PI)], False),
+            [Sym("embedded_fonts"), Sym("no")]]
+    return node
+
+
 def project_lib():
-    return {LIB: {n[1]: n for n in (k64(), usb2517(), tps2553(), pca9517a(), jw1fsn())}}
+    return {LIB: {n[1]: n for n in (k64(), usb2517(), tps2553(), pca9517a(), jw1fsn(), usb_a_stacked())}}
 
 
 def write_lib(path):

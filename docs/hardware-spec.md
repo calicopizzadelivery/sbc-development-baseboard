@@ -666,12 +666,29 @@ lab, and a VID has lead time of its own, so that is the moment to start it.
 
 ## 9. Schematic
 
-First pass captured 2026-10-04 in KiCad 10, under
+Captured 2026-10-04 in KiCad 10, under
 [`hardware/kicad/sbc-baseboard/`](../hardware/kicad/sbc-baseboard/): a root
-sheet and seven sub-sheets (power, MCU, Ethernet, hub, FTDI, DAPLink, target
-I/O), 331 parts, 354 nets, **ERC clean at every severity**, with
+sheet and eight sub-sheets (power, MCU, Ethernet, hub, FTDI, DAPLink, target
+I/O, relays and passthrough), 331 parts, 354 nets, **ERC clean at every
+severity**, with
 [`sbc-baseboard.pdf`](../hardware/kicad/sbc-baseboard/sbc-baseboard.pdf) for
 review and a BOM. Reference designators are numbered by sheet (1xx power …
-7xx target). How it was generated, and the rule that the KiCad files become
-the source of truth the moment they are hand-edited, is in
-[`hardware/kicad/README.md`](../hardware/kicad/README.md).
+7xx target I/O, 8xx relays).
+
+Every sheet is drawn around its main component: nets leave the IC as wires,
+fanning out in pin order, and whatever a net connects to sits at the end of
+its wire — the connector at the page edge, the series part in line, the
+pull-up hanging from its rail. Labels are kept for nets that leave the page
+(and three local taps: the two VBUS dividers and the J15 breakout). The rules
+are written down in the
+[ecad-standards](https://github.com/calicopizzadelivery/ecad-standards)
+repository so later boards read the same way. How this one was generated,
+and the rule that the KiCad files become the source of truth the moment they
+are hand-edited, is in [`hardware/kicad/README.md`](../hardware/kicad/README.md).
+
+Two part-level details settled during capture, worth knowing when reading
+the sheets: the single-line ESD diodes on the console, FTDI and PD I2C lines
+are PESD5V0S1UL in SOD-882, drawn with KiCad's own symbol so the cathode is
+on the line and the anode on GND; and the stacked USB-A receptacles J4/J5 use
+a two-unit project symbol, one unit per port, so each port block (switch,
+ESD array, receptacle) is drawn as its own straight-through cluster.

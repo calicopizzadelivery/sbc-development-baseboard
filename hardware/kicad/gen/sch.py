@@ -46,6 +46,8 @@ class Instance:
         self.uuid = uid()
         self.ref_at = None
         self.val_at = None
+        self.ref_just = None
+        self.val_just = None
         self.hide_value = False
 
     def pin(self, number):
@@ -82,6 +84,7 @@ class Schematic:
         self.project_lib = {}
         self.refs = set()
         self.comments = []
+        self.wire_log = []
 
     # --- symbols ----------------------------------------------------------
     def add(self, libname, name, ref, value, at, rot=0, footprint="", fields=None,
@@ -91,9 +94,9 @@ class Schematic:
         if key not in self.lib_symbols:
             self.lib_symbols[key] = get_symbol(libname, name, plib)
         node = self.lib_symbols[key]
-        if ref in self.refs and not ref.startswith("#"):
-            raise ValueError(f"duplicate reference {ref}")
-        self.refs.add(ref)
+        if (ref, unit) in self.refs and not ref.startswith("#"):
+            raise ValueError(f"duplicate reference {ref} unit {unit}")
+        self.refs.add((ref, unit))
         at = sp(at)
         inst = Instance(self, libname, name, ref, value, at[0], at[1], rot, node, unit)
         inst.footprint = footprint
@@ -120,10 +123,13 @@ class Schematic:
 
     # --- connectivity -----------------------------------------------------
     def wire(self, *pts):
+        import inspect
         pts = [sp(p) for p in pts]
+        who = "/".join(f.function for f in inspect.stack()[1:5] if f.function not in ("<module>", "main"))
         for a, b in zip(pts, pts[1:]):
             if a != b:
                 self.items.append(("wire", (a, b)))
+                self.wire_log.append((a, b, who))
 
     def junction(self, at):
         self.items.append(("junction", sp(at)))
@@ -226,6 +232,8 @@ class Schematic:
             out.append([Sym("sheet_instances"), [Sym("path"), "/", [Sym("page"), "1"]]])
         out.append([Sym("embedded_fonts"), Sym("no")])
         open(path, "w", encoding="utf-8").write(dump(out) + "\n")
+        import json
+        json.dump(self.wire_log, open(path + ".wires.json", "w"))
 
     def _symbol(self, inst, root_uuid):
         X, Y, rot = inst.X, inst.Y, inst.rot
@@ -257,8 +265,8 @@ class Schematic:
                 [Sym("in_bom"), Sym("no" if inst.ref.startswith("#") else "yes")], [Sym("on_board"), Sym("no" if inst.ref.startswith("#") else "yes")],
                 [Sym("in_pos_files"), Sym("yes")], [Sym("dnp"), Sym("yes" if inst.dnp else "no")],
                 [Sym("fields_autoplaced"), Sym("no")], [Sym("uuid"), inst.uuid],
-                P("Reference", inst.ref, ref_at, hide=ref_hide),
-                P("Value", inst.value, val_at, hide=inst.hide_value),
+                P("Reference", inst.ref, ref_at, hide=ref_hide, j=inst.ref_just or just),
+                P("Value", inst.value, val_at, hide=inst.hide_value, j=inst.val_just or just),
                 P("Footprint", inst.footprint, (X, Y), hide=True),
                 P("Datasheet", inst.datasheet, (X, Y), hide=True)]
         desc = prop(inst.node, "Description")
