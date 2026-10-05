@@ -30,7 +30,7 @@ def _pin(etype, number, name, x, y, angle, length=2.54):
 
 
 def box_symbol(name, left, right, top=(), bottom=(), ref="U", footprint="", description="",
-               width=None, pitch=2.54, datasheet=""):
+               width=None, pitch=2.54, datasheet="", value_hint=None):
     """left/right/top/bottom: lists of (number, name, etype) in order; None = gap.
     Pins are placed on a 2.54 grid. Returns the symbol node."""
     nl, nr = len(left), len(right)
@@ -88,6 +88,7 @@ def box_symbol(name, left, right, top=(), bottom=(), ref="U", footprint="", desc
         x = round(x0 + (i + 1) * (W / (nb + 1)), 4)
         x = round(x / 1.27) * 1.27
         pins.append(_pin(p[2], p[0], p[1], x, round(yb - 2.54, 4), 90))
+    stacked = not top and glyph_w(ref + "000", 1.27) + glyph_w(value_hint or name, 1.27) + 2.0 > W   # value_hint: the longest value an instance carries
     body = [Sym("symbol"), f"{name}_0_1",
             [Sym("rectangle"), [Sym("start"), round(x0, 4), yt], [Sym("end"), round(-x0, 4), yb],
              [Sym("stroke"), [Sym("width"), 0.254], [Sym("type"), Sym("default")]], [Sym("fill"), [Sym("type"), Sym("background")]]]]
@@ -96,10 +97,13 @@ def box_symbol(name, left, right, top=(), bottom=(), ref="U", footprint="", desc
             [Sym("in_bom"), Sym("yes")], [Sym("on_board"), Sym("yes")],
             # reference above the top-left corner, value below it (reading leftward): clear of
             # the top and bottom pins, which start further in
-            _prop("Reference", ref, (round(x0, 4), round(yt + 1.27, 4)), justify="left"),
-            # value: above the top-right corner when the top edge is free; else below the body,
-            # at the left when the bottom edge is busy, at the right otherwise
-            (_prop("Value", name, (round(-x0, 4), round(yt + 1.27, 4)), justify="right") if not top
+            # reference above the top-left corner. Value: above the top-right corner when the top
+            # edge is free and both fit on that line; stacked under the reference when the body
+            # is too narrow for the two side by side; else below the body, at the left when the
+            # bottom edge is busy, at the right otherwise
+            _prop("Reference", ref, (round(x0, 4), round(yt + (3.3 if stacked else 1.27), 4)), justify="left"),
+            (_prop("Value", name, (round(x0, 4), round(yt + 1.27, 4)), justify="left") if stacked
+             else _prop("Value", name, (round(-x0, 4), round(yt + 1.27, 4)), justify="right") if not top
              else _prop("Value", name, (round(x0, 4), round(yb - 1.27, 4)), justify="right") if nb >= 4
              else _prop("Value", name, (round(-x0, 4), round(yb - 1.27, 4)), justify="right")),
             _prop("Footprint", footprint, (0, 0), hide=True),
@@ -169,8 +173,10 @@ def usb2517():
 
 
 def tps2553():
+    # FAULT above OUT on the right: the switched rail's parts hang down from the OUT row, the
+    # FAULT label runs above them
     return box_symbol("TPS2553DBV", [("1", "IN", PI), None, ("3", "EN", I), None, ("5", "ILIM", P)],
-                      [("6", "OUT", PO), ("4", "~{FAULT}", OC)], bottom=[("2", "GND", PI)], ref="U", width=15.24,
+                      [("4", "~{FAULT}", OC), ("6", "OUT", PO)], bottom=[("2", "GND", PI)], ref="U", width=15.24,
                       footprint="Package_TO_SOT_SMD:SOT-23-6",
                       description="Current-limited USB power switch, EN active high, adjustable limit via ILIM resistor, SOT-23-6. Pinout from TI SLVS841.",
                       datasheet="https://www.ti.com/lit/ds/symlink/tps2553.pdf")
@@ -179,7 +185,7 @@ def tps2553():
 def pca9517a():
     return box_symbol("PCA9517A", [("3", "SDAA", B), ("2", "SCLA", B), None, ("5", "EN", I)],
                       [("6", "SDAB", B), ("7", "SCLB", B)], top=[("1", "VCC(A)", PI), ("8", "VCC(B)", PI)],
-                      bottom=[("4", "GND", PI)], ref="U", width=17.78,
+                      bottom=[("4", "GND", PI)], ref="U", width=20.32,
                       footprint="Package_SO:TSSOP-8_4.4x3mm_P0.65mm",
                       description="Level-translating I2C bus repeater. Port A 0.9-5.5 V, port B 2.7-5.5 V (0.5 V offset side). EN active high, internal pull-up to VCC(B). Pinout from NXP PCA9517A Table 3.",
                       datasheet="https://www.nxp.com/docs/en/data-sheet/PCA9517A.pdf")
@@ -187,7 +193,7 @@ def pca9517a():
 
 def jw1fsn():
     return box_symbol("JW1FSN", [("1", "COIL+", P), ("8", "COIL-", P)],
-                      [("6", "COM", P), ("4", "NO", P), ("2", "NC", P)], ref="K", width=17.78,
+                      [("6", "COM", P), ("4", "NO", P), ("2", "NC", P)], ref="K", width=17.78, value_hint="JW1FSN-DC5V",
                       footprint="Relay_THT:Relay_SPDT_Panasonic_JW1_FormC",
                       description="Panasonic JW1FSN 1 Form C power relay, 10 A / 30 VDC, AgSnO2, 5 V 530 mW coil. Pad mapping COM=6 NO=4 NC=2 inferred from the JW datasheet PC-board pattern (pair in one row = NO/NC, single = COM): VERIFY against the Panasonic terminal drawing before fab.",
                       datasheet="https://industrial.panasonic.com/cdbs/www-data/pdf/ADS0000/ADS0000C300.pdf")
@@ -213,8 +219,10 @@ def usb_a_stacked():
         return node
     node = [Sym("symbol"), name, [Sym("pin_names"), [Sym("offset"), 1.016]], [Sym("exclude_from_sim"), Sym("no")],
             [Sym("in_bom"), Sym("yes")], [Sym("on_board"), Sym("yes")],
-            _prop("Reference", "J", (round(x0, 4), round(y0 + 1.27, 4)), justify="left"),
-            _prop("Value", name, (round(-x0, 4), round(y0 + 1.27, 4)), justify="right"),
+            # the port name ("USB-A PORT1") and "J4" do not fit side by side on a 15 mm body:
+            # reference on the upper line, value on the line just above the body
+            _prop("Reference", "J", (round(x0, 4), round(y0 + 3.3, 4)), justify="left"),
+            _prop("Value", name, (round(x0, 4), round(y0 + 1.27, 4)), justify="left"),
             _prop("Footprint", "", (0, 0), hide=True),
             _prop("Datasheet", "", (0, 0), hide=True),      # KiCad folds "~" to "" in libraries, so "~" here reads as a mismatch
             _prop("Description", "USB-A receptacle, double stacked, one unit per port", (0, 0), hide=True),

@@ -22,9 +22,12 @@ def snap_up(v):
 
 
 # ----------------------------------------------------------------------------- attachments
+from check_pins import text_w as glyph_w          # per-glyph stroke-font widths, calibrated against KiCad's PDF
+
+
 def text_w(txt, glob=False):
-    """Rendered width of 1.27 mm text (plus the global-label box)."""
-    return 1.05 * len(txt) + (2.5 if glob else 1.0)
+    """Rendered width of 1.27 mm text (plus the label box)."""
+    return glyph_w(txt, 1.27) + (2.5 if glob else 1.0)
 
 
 class Att:
@@ -105,10 +108,9 @@ class P(Att):
         super().__init__(None); self.rail = rail; self.hook = hook
         if rail == "GND" or rail.endswith("GND"):
             self.h_down = 3.81
-            self.lext = 2.0
         else:
             self.h_up = 5.08
-            self.lext = max(1.5, 0.55 * len(rail) + 0.5)
+        self.lext = max(1.5, text_w(rail) / 2 + 0.5)                 # the symbol's name, centred on the lane end
         self.end_w = self.lext
 
     def render(self, s, E, sx, lane):
@@ -182,7 +184,9 @@ class Pull(Att):
         else:
             self.h_up = 19.05
         self.zones = [(3.0, 12.2), (13.5, 19.5)]                     # body with its pins; rail symbol and its name
-        self.end_w = 2.54 + max(text_w(value), 5.0)
+        half = text_w(rail) / 2 + 0.5                                 # the rail symbol's name, centred on the part
+        self.lext = max(1.27, half)
+        self.end_w = max(2.54 + max(text_w(value), 5.0), half)
         self.text_step = max(5.08, snap(self.end_w + 1.5 + 1.26))   # used when the next part hangs the same way
 
     def render(self, s, E, sx, lane):
@@ -269,9 +273,9 @@ class Flag(Att):
 
 class Tag(Att):
     """A net label dropped on the lane; the lane carries on."""
-    def __init__(self, net, next, glob=None):
+    def __init__(self, net, next, glob=None, step=None):
         super().__init__(next); self.net, self.glob = net, glob
-        self.step = max(5.08, snap(text_w(net, True) + 3.81))
+        self.step = step if step else max(5.08, snap(text_w(net, True) + 3.81))   # a fixed step lines up lanes that share a bus
         self.end_w = text_w(net, True)
 
     def render(self, s, E, sx, lane):
@@ -295,20 +299,22 @@ class BusEnd(Att):
         return E
 
 
-def bus_join(s, key, then=None, sx=1, then_down=False):
+def bus_join(s, key, then=None, sx=1, then_down=False, at_top=False):
     """Vertical wire through every BusEnd(key) point; `then` renders from the
-    bottom end, sideways by default or straight down with `then_down`."""
+    bottom end (the top end with `at_top`, for a bus to a rail), sideways by
+    default or straight on with `then_down`."""
     pts = sorted(BusEnd.registry.pop((id(s), key)), key=lambda p: p[1])
     x = pts[0][0]
     s.wire((x, pts[0][1]), (x, pts[-1][1]))
     for p in pts[1:-1]:
         s.junction(p)
     if then is not None:
+        end = pts[0] if at_top else pts[-1]
         if then_down:
-            far = (x, snap(pts[-1][1] + 2.54)); s.wire(pts[-1], far)
+            far = (x, snap(end[1] + (-2.54 if at_top else 2.54))); s.wire(end, far)
         else:
-            s.junction(pts[-1])
-            far = (snap(x + sx * 5.08), pts[-1][1]); s.wire(pts[-1], far)
+            s.junction(end)
+            far = (snap(x + sx * 5.08), end[1]); s.wire(end, far)
         then.render(s, far, sx, 0)
 
 
@@ -614,6 +620,7 @@ def fan(s, hub, atts, reach=None, min_pitch=PITCH, group_gap=0, align="center", 
             off = ys[-1] - rel[-1]
         else:
             off = (ys[0] + ys[-1]) / 2 - (rel[0] + rel[-1]) / 2
+        off = snap(off)                 # on the grid, so the spreads between rows survive the snap below
         lane_y = [snap(y + off) for y in rel]
         for i in range(1, n):
             if lane_y[i] < lane_y[i - 1] + min_pitch:
@@ -851,10 +858,11 @@ def top_caps(s, hub, pin, caps, height=12.7, sx=1, up=False, rail=None):
     T = (px, snap(py + (-height if d == "U" else height)))
     s.wire((px, py), T)
     x_end, x_last = ladder(s, snap(px + sx * 7.62), T[1], sx, caps)
-    s.wire(T, (x_end if rail else x_last, T[1]))
+    x_rail = snap(x_end + sx * 3.81) if up else x_end     # caps hanging up: one more step so the rail's name clears their GND rail
+    s.wire(T, (x_rail if rail else x_last, T[1]))
     if rail:
         gnd = rail == "GND" or rail.endswith("GND")
-        s.power(rail, (x_end, T[1]), 180 if gnd else 0)
+        s.power(rail, (x_rail, T[1]), 180 if gnd else 0)
     return T
 
 

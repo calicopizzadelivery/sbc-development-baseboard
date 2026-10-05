@@ -285,10 +285,17 @@ class Schematic:
                     if name == "Reference": ref_at = pt
                     else: val_at = pt
                 else:
-                    # a part turned round or on its side: both texts beside it, on the left, stacked
-                    bx0 = inst.body()[0]
-                    if name == "Reference": ref_at = (bx0 - 1.27, Y - 1.27)
-                    else: val_at = (bx0 - 1.27, Y + 1.27)
+                    # a part turned round or on its side: both texts beside it, stacked, on the
+                    # side that has no pins (the left unless only the left carries pins)
+                    bx0, _, bx1, _ = inst.body()
+                    xs = [inst.pin(n)[0] for n in inst.pins]
+                    side_right = min(xs) < bx0 - 0.1 and max(xs) <= bx1 + 0.1
+                    if side_right:
+                        if name == "Reference": ref_at = (bx1 + 1.27, Y - 1.27)
+                        else: val_at = (bx1 + 1.27, Y + 1.27)
+                    else:
+                        if name == "Reference": ref_at = (bx0 - 1.27, Y - 1.27)
+                        else: val_at = (bx0 - 1.27, Y + 1.27)
                 j = None
                 if eff:
                     jj = [c for c in eff[0][1:] if isinstance(c, list) and c and c[0] == Sym("justify")]
@@ -298,7 +305,7 @@ class Schematic:
                             j = {"left": "right", "right": "left"}.get(j, j)
                 lib_just[name] = j or None
                 if rot != 0:
-                    lib_just[name] = "right"    # ending at the anchor (J() mirrors it when drawn at 180)
+                    lib_just[name] = "left" if side_right else "right"    # against the body (J() mirrors it when drawn at 180)
             ref_hide = False
         if inst.ref_at: ref_at = inst.ref_at
         if inst.val_at: val_at = inst.val_at

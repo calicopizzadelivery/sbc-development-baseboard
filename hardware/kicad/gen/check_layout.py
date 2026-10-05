@@ -9,6 +9,7 @@ labels get a 2.5 mm box). A field's angle is the symbol's rotation plus its
 own, which is how KiCad draws it."""
 import sys, math
 from kisym import parse, Sym, pins_of, transform
+from check_pins import text_w as glyph_w         # stroke-font glyph widths, shared with the pin-name check
 
 SIZE = 1.27
 
@@ -42,7 +43,7 @@ def props(node):
 
 
 def text_box(text, x, y, angle, just, size=SIZE, pad=0.0):
-    w = max(1.0, len(text) * size * 0.8) + pad
+    w = max(1.0, glyph_w(text, size)) + pad
     h = size * 1.2 + pad
     angle = angle % 180
     if angle == 0:
@@ -93,7 +94,7 @@ def main(path, verbose=False):
             at = child(node, "at")
             x, y, rot = float(at[1]), float(at[2]), float(at[3]) if len(at) > 3 else 0.0
             glob = tag == Sym("global_label")
-            w = len(node[1]) * SIZE * 0.8 + (3.0 if glob else 0.5)
+            w = glyph_w(node[1], SIZE) + (3.0 if glob else 0.5)
             h = 2.0 if glob else 1.5
             if rot % 180 == 0:
                 box = (x, y - h / 2, x + w, y + h / 2) if rot == 0 else (x - w, y - h / 2, x, y + h / 2)
@@ -123,7 +124,13 @@ def main(path, verbose=False):
                             rects.append(seg_box(p, q))
             pins = pins_of(lib)
             pin_pts = []
+            pn = child(lib, "pin_numbers")
+            nums_hidden = bool(pn) and any(str(x) == "hide" or (isinstance(x, list) and x and str(x[0]) == "hide" and str(x[1]) == "yes") for x in pn[1:])
+            seen = set()
+            unit_node = child(node, "unit"); unit = int(unit_node[1]) if unit_node else 1
             for p in pins:
+                if p.unit not in (0, unit):
+                    continue
                 px, py = transform(p.x, p.y, X, Y, rot, mirror)
                 # stub toward the body
                 ang = ((180 - p.angle) if mirror == "y" else p.angle)
@@ -133,6 +140,19 @@ def main(path, verbose=False):
                 pin_pts.append((px, py))
                 if not is_power:
                     stubs.append((ref, (px, py), (qx, qy)))
+                # the pin number: 1.27 mm text along the pin, just above it (left of a vertical pin);
+                # stacked same-position pins print one number over another, counted once
+                if not is_power and not nums_hidden and p.number not in ("", "~") and (px, py) not in seen:
+                    seen.add((px, py))
+                    w, h = glyph_w(p.number, SIZE), SIZE
+                    mx, my = (px + qx) / 2, (py + qy) / 2
+                    if dy == 0:
+                        box = (mx - w / 2, my - 0.15 - h, mx + w / 2, my - 0.15)
+                    elif mirror == "y":
+                        box = (mx + 0.15, my - w / 2, mx + 0.15 + h, my + w / 2)
+                    else:
+                        box = (mx - 0.15 - h, my - w / 2, mx - 0.15, my + w / 2)
+                    texts.append((f"{ref}:#{p.number}", box, ref, (px, py)))
             if rects:
                 body = rects[0]
                 for r in rects[1:]:
