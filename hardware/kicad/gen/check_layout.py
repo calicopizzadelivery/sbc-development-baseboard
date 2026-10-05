@@ -95,11 +95,21 @@ def main(path, verbose=False):
             x, y, rot = float(at[1]), float(at[2]), float(at[3]) if len(at) > 3 else 0.0
             glob = tag == Sym("global_label")
             w = glyph_w(node[1], SIZE) + (3.0 if glob else 0.5)
-            h = 2.0 if glob else 1.5
-            if rot % 180 == 0:
-                box = (x, y - h / 2, x + w, y + h / 2) if rot == 0 else (x - w, y - h / 2, x, y + h / 2)
+            if glob:
+                # a global label's flag is centred on the anchor line
+                h = 2.0
+                if rot % 180 == 0:
+                    box = (x, y - h / 2, x + w, y + h / 2) if rot == 0 else (x - w, y - h / 2, x, y + h / 2)
+                else:
+                    box = (x - h / 2, y - w, x + h / 2, y) if rot == 90 else (x - h / 2, y, x + h / 2, y + w)
             else:
-                box = (x - h / 2, y - w, x + h / 2, y) if rot == 90 else (x - h / 2, y, x + h / 2, y + w)
+                # a local label's text sits above its wire whichever way it reads: 0.38 to 1.90 mm
+                # above the anchor, measured on KiCad's render; a 0.1 mm margin each way
+                a, b = 2.0, 0.28
+                if rot % 180 == 0:
+                    box = (x, y - a, x + w, y - b) if rot == 0 else (x - w, y - a, x, y - b)
+                else:
+                    box = (x + b, y - w, x + a, y) if rot == 90 else (x - a, y, x - b, y + w)
             texts.append((f"label {node[1]}", box, None, (x, y)))
         elif tag == Sym("text"):
             pass

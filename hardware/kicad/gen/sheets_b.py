@@ -63,9 +63,9 @@ def hub(project, num, page, sheet_path, plib):
         ref, unit = [("J4", 1), ("J4", 2), ("J5", 1), ("J5", 2)][n - 1]
         j = s.add("calico-electromechanical", "USB_A_Stacked2", ref, f"USB-A PORT{n}", (394.97, Y + 6.35), unit=unit, footprint=FP["USBA2"])   # D-/D+ rows on the ESD's I/O rows
         esd = s.add("Power_Protection", "USBLC6-2SC6", f"U4{7+n:02d}", "USBLC6-2SC6", (369.57, Y), footprint=FP["SOT236"])
-        tps = s.add("calico-ic", "TPS2553DBV", f"U40{2+n}", "TPS2553DBV", (327.66, Y + 16.51), footprint=FP["SOT236"])   # OUT (its second right-hand row) on the VBUS row
+        tps = s.add("calico-ic", "TPS2553DBV", f"U40{2+n}", "TPS2553DBV", (327.66, Y + 13.97), footprint=FP["SOT236"])   # OUT (its third right-hand row) on the VBUS row
         ports.append((esd, tps, j, unit))
-    u407 = s.add("calico-ic", "TPS2553DBV", "U407", "TPS2553DBV", (215, 259.46), footprint=FP["SOT236"])
+    u407 = s.add("calico-ic", "TPS2553DBV", "U407", "TPS2553DBV", (215, 256.92), footprint=FP["SOT236"])   # OUT (its third right-hand row) at 256.92
     for pin in ("A8", "B8"): s.pin_nc(j1, pin)
     for pin in (29, 26, 23, 20, 30, 39, 36, 28, 22, 32, 18, 16, 14): s.pin_nc(u, str(pin))
     pd10 = lambda: chain(Ser("R", "10k", None), P("GND"))
