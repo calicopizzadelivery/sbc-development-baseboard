@@ -51,7 +51,7 @@ def hub(project, num, page, sheet_path, plib):
             "NON_REM=11 (pin 40 up, pin 45 up) marks ports 1-3 non-removable and LOCAL_PWR high reports self-powered.",
             "LED_A/B pins pulled down: PRT_SWP normal polarity, BOOST=00, GANG_EN=0 (individual over-current).",
             "Port power is switched by TPS2553 under K64 GPIO (boot ON via pull-ups); PRTPWR outputs unused; /FAULT feeds OCSx_N."], (16, 17), 1.5)
-    u = s.add("sbcbb", "USB2517", "U402", "USB2517", (165, 150), footprint="Package_DFN_QFN:QFN-64-1EP_9x9mm_P0.5mm_EP7.15x7.15mm")
+    u = s.add("calico-ic", "USB2517", "U402", "USB2517", (165, 150), footprint="Package_DFN_QFN:QFN-64-1EP_9x9mm_P0.5mm_EP7.15x7.15mm")
     j1 = s.add("Connector", "USB_C_Receptacle_USB2.0_16P", "J1", "USB-C upstream", (35, 74.92), footprint=FP["USBC"])
     esd0 = s.add("Power_Protection", "USBLC6-2SC6", "U401", "USBLC6-2SC6", (78.74, 74.93), footprint=FP["SOT236"])     # I/O rows = J1 B7 (D-) and A6 (D+); VBUS pin lands on J1's plain VBUS stretch
     yx = s.add("Device", "Crystal_GND24", "Y401", "24MHz", (72.39, 129.54), 90, footprint=FP["XTAL4"])   # its GND row clear of the load caps' GND pins
@@ -61,11 +61,11 @@ def hub(project, num, page, sheet_path, plib):
     for n in range(1, 5):
         Y = 45.72 + (n - 1) * 50.8                                    # D- row of this port
         ref, unit = [("J4", 1), ("J4", 2), ("J5", 1), ("J5", 2)][n - 1]
-        j = s.add("sbcbb", "USB_A_Stacked2", ref, f"USB-A PORT{n}", (394.97, Y + 8.89), unit=unit, footprint=FP["USBA2"])
+        j = s.add("calico-electromechanical", "USB_A_Stacked2", ref, f"USB-A PORT{n}", (394.97, Y + 6.35), unit=unit, footprint=FP["USBA2"])   # D-/D+ rows on the ESD's I/O rows
         esd = s.add("Power_Protection", "USBLC6-2SC6", f"U4{7+n:02d}", "USBLC6-2SC6", (369.57, Y), footprint=FP["SOT236"])
-        tps = s.add("sbcbb", "TPS2553DBV", f"U40{2+n}", "TPS2553DBV", (327.66, Y + 17.78), footprint=FP["SOT236"])   # OUT (its second right-hand row) on the VBUS row
+        tps = s.add("calico-ic", "TPS2553DBV", f"U40{2+n}", "TPS2553DBV", (327.66, Y + 16.51), footprint=FP["SOT236"])   # OUT (its second right-hand row) on the VBUS row
         ports.append((esd, tps, j, unit))
-    u407 = s.add("sbcbb", "TPS2553DBV", "U407", "TPS2553DBV", (215, 259.46), footprint=FP["SOT236"])
+    u407 = s.add("calico-ic", "TPS2553DBV", "U407", "TPS2553DBV", (215, 259.46), footprint=FP["SOT236"])
     for pin in ("A8", "B8"): s.pin_nc(j1, pin)
     for pin in (29, 26, 23, 20, 30, 39, 36, 28, 22, 32, 18, 16, 14): s.pin_nc(u, str(pin))
     pd10 = lambda: chain(Ser("R", "10k", None), P("GND"))

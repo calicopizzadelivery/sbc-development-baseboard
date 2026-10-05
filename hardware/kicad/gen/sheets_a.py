@@ -31,7 +31,7 @@ def power(project, num, page, sheet_path, plib):
     j2 = s.add("Connector", "USB_C_Receptacle_USB2.0_16P", "J2", "USB-C PD in", (28, 85), footprint=FP["USBC"])
     u1 = s.add("Interface_USB", "STUSB4500QTR", "U101", "STUSB4500QTR", (147, 85), footprint="Package_DFN_QFN:QFN-24-1EP_4x4mm_P0.5mm_EP2.7x2.7mm")
     q1 = s.Q("Transistor_FET", "2N7002", "2N7002", (250, 45))       # right of the STUSB4500 routes, above buck 1
-    u2 = s.add("sbcbb", "PCA9517A", "U102", "PCA9517A", (150, 185), footprint="Package_SO:TSSOP-8_4.4x3mm_P0.65mm")   # below the STUSB4500's I2C lanes
+    u2 = s.add("calico-ic", "PCA9517A", "U102", "PCA9517A", (150, 185), footprint="Package_SO:TSSOP-8_4.4x3mm_P0.65mm")   # below the STUSB4500's I2C lanes
     j17 = s.add("Connector_Generic", "Conn_01x04", "J17", "Qwiic PD", (40, 165), 0, mirror="y", footprint=FP["QWIIC"])
     q2 = s.Q("Transistor_FET", "2N7002", "2N7002", (150, 215))
     d8 = s.D("Diode", "BAT54C", "BAT54C", (70, 268), rot=180, fp=FP["SOT23"])   # common cathode on top
@@ -78,7 +78,7 @@ def power(project, num, page, sheet_path, plib):
     s.series("+3V3_PRG", "PD_PROG_DET", "100k", (225, 262))
     # ---- bucks 1 and 2
     for ref, y, rail in (("U103", 75, "+5V_PORTS"), ("U104", 150, "+5V_TGT")):
-        u = s.add("sbcbb", "TPS54560BDDA", ref, "TPS54560BDDA", (280, y), footprint="Package_SO:HSOP-8-1EP_3.9x4.9mm_P1.27mm_EP2.41x3.1mm")
+        u = s.add("calico-ic", "TPS54560BDDA", ref, "TPS54560BDDA", (280, y), footprint="Package_SO:HSOP-8-1EP_3.9x4.9mm_P1.27mm_EP2.41x3.1mm")
         lind = s.add("Device", "L", s.ref("L"), "10u/6A", (330, y - 12.7), 90, footprint=FP["L_PWR"])
         fan(s, u, {2: chain(Ladder([("100n/50V", None), ("10u/50V", FP["C1210"]), ("10u/50V", FP["C1210"])]), P("VBUS_IN")),
                    3: L("BUCK_EN"),
@@ -112,7 +112,7 @@ def mcu(project, num, page, sheet_path, plib):
             "USB regulator: VREGIN fed only from J3 VBUS through D201, so the K64 cannot back-feed the target and the D+ pull-up",
             "disappears when the target is off. VOUT33 powers the transceiver. Pin allocation in docs/hardware-spec.md.",
             "Spare pins (PTA1, PTA2, PTB23, PTD7, PTE0-6, PTE26, ADC, DAC) are left no-connect."], (16, 17), 1.5)
-    u = s.add("sbcbb", "MK64FN1M0VLL12", "U201", "MK64FN1M0VLL12", (200, 150), footprint="Package_QFP:LQFP-100_14x14mm_P0.5mm")
+    u = s.add("calico-ic", "MK64FN1M0VLL12", "U201", "MK64FN1M0VLL12", (200, 150), footprint="Package_QFP:LQFP-100_14x14mm_P0.5mm")
     j3 = s.add("Connector", "USB_C_Receptacle_USB2.0_16P", "J3", "USB-C HID to target", (35, 118), footprint=FP["USBC"])
     j16 = s.add("Connector", "Conn_ARM_JTAG_SWD_10", "J16", "SWD", (360, 60), 0, mirror="y", footprint=FP["SWD10"])   # signals face the K64, VTref up, GND down
     rgb = s.add("Device", "LED_RGBA", "D202", "RGB heartbeat", (355, 225), footprint=FP["RGB"])

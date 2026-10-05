@@ -8,6 +8,7 @@ lib_symbols section, with its pin geometry available for wiring.
 import math, os, re, glob
 
 KICAD_SYMBOLS = "/usr/share/kicad/symbols"
+EXTRA_LIBS = {}                      # nickname -> .kicad_sym path, for libraries outside KiCad's own (the house submodule)
 
 
 # ----------------------------------------------------------------------------- s-expr
@@ -141,7 +142,7 @@ _lib_cache = {}
 def load_lib(libname):
     if libname in _lib_cache:
         return _lib_cache[libname]
-    path = os.path.join(KICAD_SYMBOLS, libname + ".kicad_sym")
+    path = EXTRA_LIBS.get(libname) or os.path.join(KICAD_SYMBOLS, libname + ".kicad_sym")
     tree = parse(open(path, encoding="utf-8").read())
     syms = {}
     for el in tree:

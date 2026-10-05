@@ -76,7 +76,7 @@ def relays(project, num, page, sheet_path, plib):
                    2: Conn(jx, 3), 4: Conn(jx, 2), 3: Conn(jx, 1)}, side_dir={8: -1})
         fan(s, q, {1: chain(Pull("GND", "R", "100k", None), Ser("R", "1k", None), L(f"RLY{n}_DRV")), 2: P("GND")})
     # passthrough
-    k3 = s.add("sbcbb", "JW1FSN", "K803", "JW1FSN-DC5V", (150, 225), footprint="Relay_THT:Relay_SPDT_Panasonic_JW1_FormC")
+    k3 = s.add("calico-electromechanical", "JW1FSN", "K803", "JW1FSN-DC5V", (150, 225), footprint="Relay_THT:Relay_SPDT_Panasonic_JW1_FormC")
     q3 = s.Q("Transistor_FET", "AO3400A", "AO3400A", (70, 252))
     j18 = s.add("Connector_Generic", "Conn_01x02", "J18", "PSU in (isolated)", (300, 212), footprint=FP["PH2"])
     j19 = s.add("Connector_Generic", "Conn_01x02", "J19", "PSU out (isolated)", (300, 237), footprint=FP["PH2"])

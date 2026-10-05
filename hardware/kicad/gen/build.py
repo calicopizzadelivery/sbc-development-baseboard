@@ -6,20 +6,24 @@
 The generated files are a first pass. Once they are edited by hand in KiCad,
 the KiCad files are the source of truth and this generator is retired.
 """
-import os, sys, json, subprocess, shutil
+import os, sys, json, subprocess, shutil, glob
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+import kisym
 from sch import Schematic, uid
 from kit import Sheet, FP
-import parts, sheets_a, sheets_b, sheets_c
+import sheets_a, sheets_b, sheets_c
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 OUT = os.path.normpath(os.path.join(HERE, "..", "sbc-baseboard"))
+LIBS = os.path.normpath(os.path.join(HERE, "..", "libs"))          # the ecad-libraries submodule
 PROJECT = "sbc-baseboard"
+# the house symbol libraries, by their nickname (file stem), as the project's sym-lib-table names them
+kisym.EXTRA_LIBS = {os.path.splitext(os.path.basename(f))[0]: f for f in glob.glob(os.path.join(LIBS, "symbols", "*.kicad_sym"))}
 
 
 def main():
     os.makedirs(OUT, exist_ok=True)
-    plib = parts.project_lib()
+    plib = None                                   # every symbol comes from KiCad's libraries or the house submodule
     root = Schematic(PROJECT, "SBC development baseboard", "A3", 1, "/")
     root.comments = ["140 x 80 mm, four M3. Spec: docs/hardware-spec.md"]
     defs = [("Power", "power.kicad_sch", sheets_a.power, 1), ("MCU", "mcu.kicad_sch", sheets_a.mcu, 2),
@@ -59,10 +63,9 @@ def main():
            "pcbnew": {"page_layout_descr_file": ""}, "schematic": {"legacy_lib_dir": "", "legacy_lib_list": []},
            "sheets": [[root.uuid, "Root"]], "text_variables": {}}
     json.dump(pro, open(os.path.join(OUT, f"{PROJECT}.kicad_pro"), "w"), indent=2)
-    parts.write_lib(os.path.join(OUT, f"{PROJECT}.kicad_sym"))
-    open(os.path.join(OUT, "sym-lib-table"), "w").write(
-        '(sym_lib_table\n\t(version 7)\n\t(lib (name "sbcbb")(type "KiCad")(uri "${KIPRJMOD}/' + PROJECT + '.kicad_sym")(options "")(descr "project symbols"))\n)\n')
-    open(os.path.join(OUT, "fp-lib-table"), "w").write('(fp_lib_table\n\t(version 7)\n)\n')
+    # library tables: the fragments the submodule ships, which refer to it as ${KIPRJMOD}/../libs
+    for table in ("sym-lib-table", "fp-lib-table"):
+        shutil.copyfile(os.path.join(LIBS, "tables", table), os.path.join(OUT, table))
     print(f"wrote {OUT}")
     # ERC + PDF
     sch = os.path.join(OUT, f"{PROJECT}.kicad_sch")

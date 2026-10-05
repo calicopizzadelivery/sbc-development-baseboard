@@ -16,9 +16,9 @@ sbc-baseboard/
   daplink.kicad_sch         MK20DX128 DAPLink
   target.kicad_sch          console, GPIO/I2C breakout, +5V_TGT eFuse
   relays.kicad_sch          two signal relays, PSU passthrough relay and its opto monitor
-  sbc-baseboard.kicad_sym   project symbols: K64, USB2517, TPS2553, PCA9517A, JW1FSN,
+  libs/                     the house symbol libraries (ecad-libraries), a git submodule pinned to a tag
+  sym-lib-table             names them calico-ic and calico-electromechanical, as ${KIPRJMOD}/../libs/...
                             and the stacked USB-A as two units (one per port)
-  sym-lib-table             maps the "sbcbb" nickname to that library
   sbc-baseboard.pdf         all nine sheets
   erc.txt, bom.csv
 ```
