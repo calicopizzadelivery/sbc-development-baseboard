@@ -504,6 +504,11 @@ def fan(s, hub, atts, reach=None, min_pitch=PITCH, group_gap=0, align="center", 
                 end, _ = s.stub(hub, pin, 2.54 if j % 2 == 0 else 6.35)   # stagger so adjacent symbols do not overprint
                 if isinstance(att, P):
                     gnd = att.rail == "GND" or att.rail.endswith("GND")
+                    if att.hook:                                            # sideways (and on) before the symbol
+                        dx, dy = att.hook
+                        far = (snap(end[0] + dx), snap(end[1] + dy))
+                        s.wire(end, (far[0], end[1]), far)
+                        end = far
                     s.power(att.rail, end, 0 if (d == "U") != gnd else 180)
                 elif isinstance(att, (Conn, To)):
                     att.render(s, end, 1, j, vertical=(-1 if d == "U" else 1))
@@ -661,6 +666,7 @@ def fan(s, hub, atts, reach=None, min_pitch=PITCH, group_gap=0, align="center", 
                     routed = True
                 m = m.next
             k += routed
+        s.channel_edge[(hub.ref, side)] = snap(base + sx * k * 1.27)      # for clusters drawn beyond the routes (crystal())
         for i, (pin, att) in enumerate(items):
             px, py = hub.pin(pin)
             Y = lane_y[i]
@@ -838,6 +844,43 @@ def jog(s, hub, pin, rail, up=2.54, over=7.62):
     s.wire((px, py), T, J)
     s.power(rail, J, 0 if (d == "U") != gnd else 180)
     return J
+
+
+def crystal(s, hub, key_a, key_b, ref, value, fp, cap, cap_fp=None, drop=10.16, margin=8.89):
+    """A clock source drawn to flow downward. The two XTAL lanes end in End(key_a) and
+    End(key_b); from there they run on, beyond the hub's route channels, to two columns
+    7.62 mm apart and drop straight down: through the crystal's pins (the crystal lies
+    across the two columns), on into one load capacitor each, and into a shared GND rail
+    with one GND symbol under the crystal, which also takes the crystal's own ground pins.
+    The upper lane takes the outer column, so nothing crosses. Every wire meets its part
+    at a right angle; the texts sit on the outer side, away from the hub."""
+    (Ea, sx), (Eb, _) = End.registry[(id(s), key_a)], End.registry[(id(s), key_b)]
+    E_hi, E_lo = (Ea, Eb) if Ea[1] <= Eb[1] else (Eb, Ea)
+    edge = s.channel_edge[(hub.ref, "L" if sx < 0 else "R")]
+    x_near = snap(edge + sx * margin)                  # room beside the near capacitor for its text
+    x_far = snap(x_near + sx * 7.62)
+    xc = snap((x_near + x_far) / 2)
+    y_cr = snap(max(E_hi[1], E_lo[1]) + drop)
+    for E, x in ((E_hi, x_far), (E_lo, x_near)):
+        s.wire(E, (x, E[1]), (x, y_cr)); s.junction((x, y_cr))
+    four = fp is None or "4Pin" in fp or "4-Pin" in fp or "GND24" in fp
+    y = s.add("Device", "Crystal_GND24" if four else "Crystal", ref, value, (xc, y_cr), 0, footprint=fp or "")
+    just_out, just_in = ("right", "left") if sx < 0 else ("left", "right")
+    y.ref_at, y.val_at = (snap(x_far + sx * 1.27), snap(y_cr - 1.27)), (snap(x_far + sx * 1.27), snap(y_cr + 1.27))
+    y.ref_just = y.val_just = just_out
+    y_cap, y_rail = snap(y_cr + 10.16), snap(y_cr + 13.97)
+    for x, out in ((x_far, True), (x_near, False)):
+        c = s.C(cap, (x, y_cap), rot=0, **({"fp": cap_fp} if cap_fp else {}))
+        s.wire((x, y_cr), (x, snap(y_cap - 3.81)))
+        tx = snap(x + sx * 2.2) if out else snap(x - sx * 2.2)
+        c.ref_at, c.val_at = (tx, snap(y_cap - 1.4)), (tx, snap(y_cap + 1.4))
+        c.ref_just = c.val_just = just_out if out else just_in
+    # the rail in two pieces meeting under the crystal: a pin only connects at a wire end
+    s.wire((x_far, y_rail), (xc, y_rail)); s.wire((xc, y_rail), (x_near, y_rail)); s.junction((xc, y_rail))
+    if four:
+        s.wire((xc, snap(y_cr + 5.08)), (xc, y_rail))
+    s.power("GND", (xc, y_rail), 0)
+    return y
 
 
 def mark_end(s, key, pt, sx=1):

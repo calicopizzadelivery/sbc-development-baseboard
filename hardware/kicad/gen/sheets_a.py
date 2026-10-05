@@ -2,7 +2,7 @@
 net fans out of its hub to whatever it connects to."""
 from kit import Sheet, FP
 from sch import snap
-from fanout import fan, chain, L, P, Ser, Pull, PullLED, Tag, Flag, Conn, End, To, BusEnd, bus_join, rail_bus, decap_row, join_pins, top_caps, top_bus, Skip, Ladder, jog, mark_end, Gap
+from fanout import fan, chain, L, P, Ser, Pull, PullLED, Tag, Flag, Conn, End, To, BusEnd, bus_join, rail_bus, decap_row, join_pins, top_caps, top_bus, Skip, Ladder, jog, mark_end, Gap, crystal
 
 AMBER, GREEN, RED = "LED AMBER", "LED GREEN", "LED RED"
 def TVS(v="PESD5V0S1UL"):
@@ -113,10 +113,9 @@ def mcu(project, num, page, sheet_path, plib):
             "disappears when the target is off. VOUT33 powers the transceiver. Pin allocation in docs/hardware-spec.md.",
             "Spare pins (PTA1, PTA2, PTB23, PTD7, PTE0-6, PTE26, ADC, DAC) are left no-connect."], (16, 17), 1.5)
     u = s.add("calico-ic", "MK64FN1M0VLL12", "U201", "MK64FN1M0VLL12", (200, 150), footprint="Package_QFP:LQFP-100_14x14mm_P0.5mm")
-    j3 = s.add("Connector", "USB_C_Receptacle_USB2.0_16P", "J3", "USB-C HID to target", (35, 118), footprint=FP["USBC"])
+    j3 = s.add("Connector", "USB_C_Receptacle_USB2.0_16P", "J3", "USB-C HID to target", (35, 73.66), footprint=FP["USBC"])        # D-/D+ rows on U202's, which sit on the K64's USB rows
     j16 = s.add("Connector", "Conn_ARM_JTAG_SWD_10", "J16", "SWD", (360, 60), 0, mirror="y", footprint=FP["SWD10"])   # signals face the K64, VTref up, GND down
     rgb = s.add("Device", "LED_RGBA", "D202", "RGB heartbeat", (355, 225), footprint=FP["RGB"])
-    yx = s.add("Device", "Crystal", "Y201", "32.768kHz", (70, 182), 90, footprint=FP["XTAL2"])
     for pin in (51, 14, 15, 16, 17, 18, 19, 20, 21, 26, 27, 35, 36, 69, 100, 1, 2, 3, 4, 5, 6, 7, 33): s.pin_nc(u, str(pin))
     for pin in ("A8", "B8"): s.pin_nc(j3, pin)
     for pin in (6, 7, 8): s.pin_nc(j16, str(pin))
@@ -126,8 +125,8 @@ def mcu(project, num, page, sheet_path, plib):
                 "A5": chain(Ser("R", "5.1k", None, step=12.7), P("GND")),       # the upper GND lands past the lower row's end
                 "B5": chain(Ser("R", "5.1k", None, step=7.62), P("GND")),
                 "A1": P("GND"), "SH": P("GND")}, align="top")
-    esd = s.add("Power_Protection", "USBLC6-2SC6", "U202", "USBLC6-2SC6", (83.82, 118.11), footprint=FP["SOT236"])  # I/O rows = J3 B7 (D-) and A6 (D+); VBUS pin lands on J3's VBUS lane
-    esd.val_at = (83.82, 134.62)                                            # value under the part, clear of the K64's route columns
+    esd = s.add("Power_Protection", "USBLC6-2SC6", "U202", "USBLC6-2SC6", (83.82, 74.93), footprint=FP["SOT236"])  # I/O rows = J3 B7 (D-) and A6 (D+); VBUS pin lands on J3's VBUS lane
+    esd.val_at = (83.82, 91.44)                                            # value under the part, clear of the K64's route columns
     jx = snap(j3.pin("A6")[0] + 7.62)                                   # the joined pairs continue straight into the ESD array
     for pin, row in (("1", j3.pin("B7")[1]), ("3", j3.pin("A6")[1])):
         s.wire((jx, row), esd.pin(pin)); s.junction((jx, row))
@@ -143,7 +142,7 @@ def mcu(project, num, page, sheet_path, plib):
         12: Pull("GND", "C", "2u2", None),
         10: Conn(esd, 4), 11: Conn(esd, 6),                   # I/O2 carries D+, I/O1 D-
         50: L("RMII_CLK_50M"),
-        29: chain(Pull("GND", "C", "12p", None), Conn(yx, 2)), 28: chain(Pull("GND", "C", "12p", None), Conn(yx, 1)),
+        29: End("extal32"), 28: End("xtal32"),                                # the 32 kHz crystal hangs below, drawn by crystal()
         52: chain(Tag("K64_RESET_N", None), Pull("+3V3", "R", "10k", None), Pull("GND", "C", "1u", None), Pull("GND", ("Switch", "SW_Push", "1"), "RESET", None, fp=FP["SW"])),
         38: Pull("+3V3", "R", "10k", None),
         # right: everything the K64 drives elsewhere
@@ -166,6 +165,7 @@ def mcu(project, num, page, sheet_path, plib):
     # of resistors to one rail symbol, as the strap buses are drawn. Hung one per lane they would stagger
     # past each other off the sheet.
     bus_join(s, "pu_bus", then=P("+3V3"), sx=1)
+    crystal(s, u, "extal32", "xtal32", "Y201", "32.768kHz", FP["XTAL2"], "12p", margin=1.27)   # the K64's left routes are straight, so the columns are free
     top_bus(s, u, [8, 40, 48, 61, 75, 89, 30], "+3V3", caps_left=[("100n", None)] * 6 + [("10u", FP["C0805"])], rail_at="left", height=12.7)
     top_bus(s, u, [22, 23], "+3V3A", caps_right=[("100n", None), ("10u", FP["C0805"])], rail_at="left", height=22.86, margin=2.54,
             extra=chain(Ser("FB", "600R@100MHz", None), P("+3V3")))
