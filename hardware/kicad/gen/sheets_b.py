@@ -50,7 +50,8 @@ def hub(project, num, page, sheet_path, plib):
             "NON_REM=11 (pin 40 up, pin 45 up) marks ports 1-3 non-removable and LOCAL_PWR high reports self-powered.",
             "LED_A/B pins pulled down: PRT_SWP normal polarity, BOOST=00, GANG_EN=0 (individual over-current).",
             "Port power is switched by TPS2553 under K64 GPIO (boot ON via pull-ups); PRTPWR outputs unused; /FAULT feeds OCSx_N.",
-            "USB 2.0 pairs are named *_P / *_N (KiCad's differential-pair convention) and sit in net class USB: 90 ohm differential, routed as pairs, no stubs. Each ESD array splits its pair into a hub side (HUB_DNn) and a connector side (PORTn_D). Set the class's width and gap from the stackup before routing."], (16, 17), 1.5)
+            "USB 2.0 pairs are named *_P / *_N (KiCad's differential-pair convention) and sit in net class USB: 90 ohm differential, routed as pairs, no stubs. Each ESD array splits its pair into a hub side (HUB_DNn) and a connector side (PORTn_D). Set the class's width and gap from the stackup before routing.",
+            'Current: PORTn_VBUS and FTDI_VBUS are laid out for 3 A each (class USB_VBUS_3A, 2 mm traces); +5V_PORTS feeds them at up to 6 A (PWR_6A).'], (16, 17), 1.5)
     u = s.add("calico-ic", "USB2517", "U402", "USB2517", (165, 150), footprint="Package_DFN_QFN:QFN-64-1EP_9x9mm_P0.5mm_EP7.15x7.15mm")
     j1 = s.add("Connector", "USB_C_Receptacle_USB2.0_16P", "J1", "USB-C upstream", (35, 74.92), footprint=FP["USBC"])
     esd0 = s.add("Power_Protection", "USBLC6-2SC6", "U401", "USBLC6-2SC6", (78.74, 74.93), footprint=FP["SOT236"])     # I/O rows = J1 B7 (D-) and A6 (D+); VBUS pin lands on J1's plain VBUS stretch
@@ -126,10 +127,12 @@ def hub(project, num, page, sheet_path, plib):
         if unit == 1:
             jatts["SH"] = P("GND")
         fan(s, j, jatts, align="top")
+        s.netclass_flag("USB_VBUS_3A", s.lane_end[(j.ref, str(vb))], 90)       # the port's VBUS is laid out for 3 A
     fan(s, u407, {1: chain(Pull("GND", "C", "100n", None), P("+5V_PORTS")), 3: chain(Pull("+3V3", "R", "10k", None), L("FTDI_EN")),
                   5: chain(Ser("R", "23.7k", None), P("GND")),
                   6: chain(Pull("GND", "C", "10u", None, fp=FP["C0805"]), PullLED(GREEN, "1k", None), P("FTDI_VBUS")),
                   4: L("FTDI_FAULT_N"), 2: P("GND")})
+    s.flag_class("FTDI_VBUS", (140, 265), "USB_VBUS_3A")                     # the FT231X's VBUS: its class on the sheet, beside a rail symbol of its own
     s.note(["TPS2553 ILIM 23.7k -> ~1.1 A (datasheet: 20k -> 1.3 A typ, 15k -> 1.7 A). EN/FAULT pull-ups set the boot-ON state.",
             "U407 switches the FT231X's VBUS (hub port 2) under FTDI CYCLE, outside PORT ALL."], (20, 276), 1.3)
     return s

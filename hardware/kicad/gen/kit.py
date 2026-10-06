@@ -161,11 +161,23 @@ class Sheet(Schematic):
             self.pin_nc(u, str(pin))
         return u
 
-    def flag_rail(self, rail, at):
+    def flag_rail(self, rail, at, cls=None):
         x, y = sp(at)
         self.power(rail, (x, y))
         self.flag((x + 10.16, y))
-        self.wire((x, y), (x + 10.16, y))
+        if cls:                                        # the net class directive sits on the flag wire, split there
+            self.wire((x, y), (x + 5.08, y)); self.wire((x + 5.08, y), (x + 10.16, y))
+            self.netclass_flag(cls, (x + 5.08, y), 270)             # pointing down, its text below the strip
+        else:
+            self.wire((x, y), (x + 10.16, y))
+
+    def flag_class(self, rail, at, cls):
+        """A rail symbol with its net class directive beside it, for a net that is already
+        driven (no PWR_FLAG: two power outputs on one net is an ERC error)."""
+        x, y = sp(at)
+        self.power(rail, (x, y))
+        self.wire((x, y), (x + 5.08, y))
+        self.netclass_flag(cls, (x + 5.08, y), 270)
 
     def flag_net(self, net, at):
         x, y = sp(at)

@@ -4394,6 +4394,17 @@
 		)
 		(uuid "f356924f-b8b8-5e6b-b678-d08e4abe9a1f")
 	)
+	(text "Current: PORTn_VBUS and FTDI_VBUS are laid out for 3 A each (class USB_VBUS_3A, 2 mm traces); +5V_PORTS feeds them at up to 6 A (PWR_6A)."
+		(exclude_from_sim no)
+		(at 16 35.9 0)
+		(effects
+			(font
+				(size 1.5 1.5)
+			)
+			(justify left bottom)
+		)
+		(uuid "d0be5918-8424-5d1d-8763-ad84929d784b")
+	)
 	(symbol
 		(lib_id "calico-ic:USB2517")
 		(at 165.1 149.86 0)
@@ -16710,6 +16721,29 @@
 			)
 		)
 	)
+	(netclass_flag ""
+		(length 2.54)
+		(shape round)
+		(at 370.84 60.96 90)
+		(fields_autoplaced no)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left bottom)
+		)
+		(uuid "cb1ddda8-b85a-5288-9bf2-d0f440534d68")
+		(property "Netclass" "USB_VBUS_3A"
+			(at 371.84 58.12 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+					(italic yes)
+				)
+				(justify left)
+			)
+		)
+	)
 	(wire
 		(pts
 			(xy 367.03 96.52)
@@ -18406,6 +18440,29 @@
 					(reference "#PWR05046")
 					(unit 1)
 				)
+			)
+		)
+	)
+	(netclass_flag ""
+		(length 2.54)
+		(shape round)
+		(at 370.84 111.76 90)
+		(fields_autoplaced no)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left bottom)
+		)
+		(uuid "8e8a5dd2-949c-5960-8abc-b8c4e6c35a5a")
+		(property "Netclass" "USB_VBUS_3A"
+			(at 371.84 108.92 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+					(italic yes)
+				)
+				(justify left)
 			)
 		)
 	)
@@ -20197,6 +20254,29 @@
 			)
 		)
 	)
+	(netclass_flag ""
+		(length 2.54)
+		(shape round)
+		(at 370.84 162.56 90)
+		(fields_autoplaced no)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left bottom)
+		)
+		(uuid "4dd6fe54-8379-5ca2-b582-96fa6207b697")
+		(property "Netclass" "USB_VBUS_3A"
+			(at 371.84 159.72 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+					(italic yes)
+				)
+				(justify left)
+			)
+		)
+	)
 	(wire
 		(pts
 			(xy 367.03 198.12)
@@ -21896,6 +21976,29 @@
 			)
 		)
 	)
+	(netclass_flag ""
+		(length 2.54)
+		(shape round)
+		(at 370.84 213.36 90)
+		(fields_autoplaced no)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left bottom)
+		)
+		(uuid "fdbff64e-2e33-58c2-9413-9feca4b9eee4")
+		(property "Netclass" "USB_VBUS_3A"
+			(at 371.84 210.52 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+					(italic yes)
+				)
+				(justify left)
+			)
+		)
+	)
 	(wire
 		(pts
 			(xy 204.47 251.46)
@@ -23382,6 +23485,118 @@
 					(reference "#PWR05073")
 					(unit 1)
 				)
+			)
+		)
+	)
+	(symbol
+		(lib_id "power:+3V3")
+		(at 139.7 265.43 0)
+		(unit 1)
+		(body_style 1)
+		(exclude_from_sim no)
+		(in_bom no)
+		(on_board no)
+		(in_pos_files yes)
+		(dnp no)
+		(fields_autoplaced no)
+		(uuid "14b2b391-e507-56c0-85dc-e1c115839ad9")
+		(property "Reference" "#PWR05074"
+			(at 139.7 265.43 0)
+			(hide yes)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Value" "FTDI_VBUS"
+			(at 139.7 261.62 0)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Footprint" ""
+			(at 139.7 265.43 0)
+			(hide yes)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Datasheet" "~"
+			(at 139.7 265.43 0)
+			(hide yes)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Description" "Power symbol creates a global label with name \"+3V3\""
+			(at 139.7 265.43 0)
+			(hide yes)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(pin "1"
+			(uuid "9c98af4d-5bb0-5bd2-b87a-0b932c27f6f6")
+		)
+		(instances
+			(project "sbc-baseboard"
+				(path "/a2d817ed-39de-52b8-83f3-f52a7c9ed802/495ba2f0-b590-56ac-8c98-db51b6e98c32"
+					(reference "#PWR05074")
+					(unit 1)
+				)
+			)
+		)
+	)
+	(wire
+		(pts
+			(xy 139.7 265.43)
+			(xy 144.78 265.43)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "7a51759c-f2af-5041-8f8b-c5db4c64e54c")
+	)
+	(netclass_flag ""
+		(length 2.54)
+		(shape round)
+		(at 144.78 265.43 270)
+		(fields_autoplaced no)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left bottom)
+		)
+		(uuid "d41383cf-42c4-5008-b5a1-3cac4e49c5a0")
+		(property "Netclass" "USB_VBUS_3A"
+			(at 145.78 269.17 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+					(italic yes)
+				)
+				(justify left)
 			)
 		)
 	)

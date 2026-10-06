@@ -5096,6 +5096,17 @@
 		)
 		(uuid "c97af50b-9a34-5486-9d0a-f8e537b77910")
 	)
+	(text "Current: VBUS_IN is laid out for 3 A (class USB_VBUS_3A, 2 mm); +5V_PORTS and +5V_TGT for 6 A (class PWR_6A, 4 mm or pours)."
+		(exclude_from_sim no)
+		(at 16 33.2 0)
+		(effects
+			(font
+				(size 1.5 1.5)
+			)
+			(justify left bottom)
+		)
+		(uuid "e13b2c82-6852-598f-84f2-beb1ff61fdc5")
+	)
 	(symbol
 		(lib_id "Connector:USB_C_Receptacle_USB2.0_16P")
 		(at 27.94 85.09 0)
@@ -23916,13 +23927,47 @@
 	(wire
 		(pts
 			(xy 25.4 246.38)
+			(xy 30.48 246.38)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "d40cf7e3-6e1e-532d-9ee8-db4c86371419")
+	)
+	(wire
+		(pts
+			(xy 30.48 246.38)
 			(xy 35.56 246.38)
 		)
 		(stroke
 			(width 0)
 			(type default)
 		)
-		(uuid "758a247f-8c81-5d29-95d7-81beef6d6ecd")
+		(uuid "097627d3-b2f7-5402-b832-ba6de1af2ae2")
+	)
+	(netclass_flag ""
+		(length 2.54)
+		(shape round)
+		(at 30.48 246.38 270)
+		(fields_autoplaced no)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left bottom)
+		)
+		(uuid "ea87f845-4dca-5d54-98e8-236650f781d8")
+		(property "Netclass" "USB_VBUS_3A"
+			(at 31.48 250.12 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+					(italic yes)
+				)
+				(justify left)
+			)
+		)
 	)
 	(symbol
 		(lib_id "power:GND")
@@ -24584,13 +24629,47 @@
 	(wire
 		(pts
 			(xy 127 246.38)
+			(xy 132.08 246.38)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "d106dae2-9a5c-5393-a904-3821b28a39e9")
+	)
+	(wire
+		(pts
+			(xy 132.08 246.38)
 			(xy 137.16 246.38)
 		)
 		(stroke
 			(width 0)
 			(type default)
 		)
-		(uuid "245feebb-1c7c-53a5-9e8f-641a8febb370")
+		(uuid "f8bbe4ce-4427-587d-b252-fedfb6f9a401")
+	)
+	(netclass_flag ""
+		(length 2.54)
+		(shape round)
+		(at 132.08 246.38 270)
+		(fields_autoplaced no)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left bottom)
+		)
+		(uuid "fa0637a8-fe1b-50a8-bd92-79f8a352b545")
+		(property "Netclass" "PWR_6A"
+			(at 133.08 250.12 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+					(italic yes)
+				)
+				(justify left)
+			)
+		)
 	)
 	(symbol
 		(lib_id "power:+5V")
@@ -24751,13 +24830,47 @@
 	(wire
 		(pts
 			(xy 25.4 259.08)
+			(xy 30.48 259.08)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "35f8bbcf-a2e6-57f8-8ca2-e2ed74f6789f")
+	)
+	(wire
+		(pts
+			(xy 30.48 259.08)
 			(xy 35.56 259.08)
 		)
 		(stroke
 			(width 0)
 			(type default)
 		)
-		(uuid "1266b83d-9b96-5b33-a0eb-5b3049913bc4")
+		(uuid "094f8f22-1d11-51fc-9a88-b8805b1081ff")
+	)
+	(netclass_flag ""
+		(length 2.54)
+		(shape round)
+		(at 30.48 259.08 270)
+		(fields_autoplaced no)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left bottom)
+		)
+		(uuid "725d2d00-e6f8-5650-a5c6-09782dc58ae6")
+		(property "Netclass" "PWR_6A"
+			(at 31.48 262.82 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+					(italic yes)
+				)
+				(justify left)
+			)
+		)
 	)
 	(symbol
 		(lib_id "power:+3V3")

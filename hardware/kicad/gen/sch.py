@@ -183,6 +183,11 @@ class Schematic:
     def nc(self, at):
         self.items.append(("nc", sp(at)))
 
+    def netclass_flag(self, cls, at, rot=90):
+        """KiCad net class directive: a flag on a wire that puts the net in class `cls`,
+        drawn on the sheet so layout sees the class (and the current in its name)."""
+        self.items.append(("netclass", (cls, sp(at), rot)))
+
     def text(self, s, at, size=1.5, bold=False):
         self.items.append(("text", (s, at, size, bold)))
 
@@ -257,6 +262,16 @@ class Schematic:
                 else:
                     out.append([Sym("label"), net, [Sym("at"), at[0], at[1], rot], [Sym("fields_autoplaced"), Sym("yes")],
                                 effects(1.27, just + " bottom"), [Sym("uuid"), uid("label", fname, net, _xy(at), rot)]])
+            elif kind == "netclass":
+                cls, at, rot = it
+                dx, dy = {0: (2.54, 0), 90: (0, -2.54), 180: (-2.54, 0), 270: (0, 2.54)}[rot]
+                if rot == 180:   tx, ty, just = round(at[0] + dx - 1.0, 4), round(at[1] - 0.3, 4), "right"
+                elif rot == 270: tx, ty, just = round(at[0] + 1.0, 4), round(at[1] + dy + 1.2, 4), "left"
+                else:            tx, ty, just = round(at[0] + dx + 1.0, 4), round(at[1] + dy - 0.3, 4), "left"
+                out.append([Sym("netclass_flag"), "", [Sym("length"), 2.54], [Sym("shape"), Sym("round")], [Sym("at"), at[0], at[1], rot],
+                            [Sym("fields_autoplaced"), Sym("no")], effects(1.27, just + " bottom"), [Sym("uuid"), uid("netclass", fname, cls, _xy(at))],
+                            [Sym("property"), "Netclass", cls, [Sym("at"), tx, ty, 0],
+                             [Sym("effects"), [Sym("font"), [Sym("size"), 1.27, 1.27], [Sym("italic"), Sym("yes")]], [Sym("justify"), Sym(just)]]]])
             elif kind == "text":
                 s, at, size, bold = it
                 e = [Sym("effects"), [Sym("font"), [Sym("size"), size, size]] + ([[Sym("bold"), Sym("yes")]] if bold else []),

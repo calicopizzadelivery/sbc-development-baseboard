@@ -3283,6 +3283,17 @@
 		)
 		(uuid "b21372f8-9295-5e67-817e-b8ab9b4a68ed")
 	)
+	(text "Current: the passthrough J18 -> K803 -> J19 (PSU_VP, PSU_VOUT, PSU_GND) is laid out for 3 A continuous: class PSU_3A, 2 mm traces or pours, two vias per layer change."
+		(exclude_from_sim no)
+		(at 16 33.2 0)
+		(effects
+			(font
+				(size 1.5 1.5)
+			)
+			(justify left bottom)
+		)
+		(uuid "25961acd-dbce-58ac-9e23-d66dd8816c58")
+	)
 	(symbol
 		(lib_id "Relay:G6K-2")
 		(at 149.86 74.93 0)
@@ -7860,35 +7871,35 @@
 	(wire
 		(pts
 			(xy 289.56 212.09)
-			(xy 281.94 212.09)
+			(xy 278.13 212.09)
 		)
 		(stroke
 			(width 0)
 			(type default)
 		)
-		(uuid "e9204121-f9ff-5f05-9be1-7c0f3d651d03")
+		(uuid "29afbe94-e696-5f86-9088-ab5c26879a16")
 	)
 	(wire
 		(pts
-			(xy 281.94 212.09)
-			(xy 281.94 222.25)
+			(xy 278.13 212.09)
+			(xy 278.13 222.25)
 		)
 		(stroke
 			(width 0)
 			(type default)
 		)
-		(uuid "f87ea8bb-ce98-519c-9b31-23aa09cdb1b1")
+		(uuid "c93b32a1-febf-5d44-96c6-f312b5cc7ea8")
 	)
 	(wire
 		(pts
-			(xy 281.94 222.25)
+			(xy 278.13 222.25)
 			(xy 167.64 222.25)
 		)
 		(stroke
 			(width 0)
 			(type default)
 		)
-		(uuid "97ecf987-91fd-57b2-bb72-03942049f6a3")
+		(uuid "a209e1d1-cffa-5ec8-a5d8-811a432bfbf0")
 	)
 	(wire
 		(pts
@@ -7993,35 +8004,35 @@
 	(wire
 		(pts
 			(xy 289.56 237.49)
-			(xy 281.94 237.49)
+			(xy 278.13 237.49)
 		)
 		(stroke
 			(width 0)
 			(type default)
 		)
-		(uuid "2932c290-07d8-5d6d-8093-f1687a60ca01")
+		(uuid "c30b0c43-c1d3-5e7f-8a65-89416429c1d2")
 	)
 	(wire
 		(pts
-			(xy 281.94 237.49)
-			(xy 281.94 224.79)
+			(xy 278.13 237.49)
+			(xy 278.13 224.79)
 		)
 		(stroke
 			(width 0)
 			(type default)
 		)
-		(uuid "2177dbfd-c2f3-542c-8c78-993ecb8abe90")
+		(uuid "28a934ca-866c-5123-a1b5-6526182d18a0")
 	)
 	(wire
 		(pts
-			(xy 281.94 224.79)
+			(xy 278.13 224.79)
 			(xy 167.64 224.79)
 		)
 		(stroke
 			(width 0)
 			(type default)
 		)
-		(uuid "c251a961-f2cc-5698-ba4c-68a76904362e")
+		(uuid "dc11c635-5918-5de9-84e9-7ad4af3e22ce")
 	)
 	(wire
 		(pts
@@ -8109,6 +8120,74 @@
 					(reference "#PWR09017")
 					(unit 1)
 				)
+			)
+		)
+	)
+	(label "PSU_VP"
+		(at 289.56 212.09 180)
+		(fields_autoplaced yes)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify right bottom)
+		)
+		(uuid "75538045-fa5b-5ef5-8ace-2a62faabbdfa")
+	)
+	(netclass_flag ""
+		(length 2.54)
+		(shape round)
+		(at 289.56 212.09 90)
+		(fields_autoplaced no)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left bottom)
+		)
+		(uuid "031708bf-8281-55f2-9702-b4ff235235c1")
+		(property "Netclass" "PSU_3A"
+			(at 290.56 209.25 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+					(italic yes)
+				)
+				(justify left)
+			)
+		)
+	)
+	(label "PSU_VOUT"
+		(at 289.56 237.49 180)
+		(fields_autoplaced yes)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify right bottom)
+		)
+		(uuid "76a646b4-afb9-535d-8db9-63c85f03b677")
+	)
+	(netclass_flag ""
+		(length 2.54)
+		(shape round)
+		(at 289.56 237.49 90)
+		(fields_autoplaced no)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left bottom)
+		)
+		(uuid "00150fde-dc7c-53f1-aec3-f00db02b5b2a")
+		(property "Netclass" "PSU_3A"
+			(at 290.56 234.65 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+					(italic yes)
+				)
+				(justify left)
 			)
 		)
 	)
@@ -9113,13 +9192,47 @@
 	(wire
 		(pts
 			(xy 25.4 271.78)
+			(xy 30.48 271.78)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "96414988-f3e7-59ef-aba2-1d41896552cd")
+	)
+	(wire
+		(pts
+			(xy 30.48 271.78)
 			(xy 35.56 271.78)
 		)
 		(stroke
 			(width 0)
 			(type default)
 		)
-		(uuid "6a0c88b1-e895-53b2-9f13-6b0b5eb8ff27")
+		(uuid "9488a74d-81cf-5e4d-a2c0-f6942e85306b")
+	)
+	(netclass_flag ""
+		(length 2.54)
+		(shape round)
+		(at 30.48 271.78 270)
+		(fields_autoplaced no)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left bottom)
+		)
+		(uuid "e1be7e0c-9af9-51fb-a6e4-9580ef018603")
+		(property "Netclass" "PSU_3A"
+			(at 31.48 275.52 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+					(italic yes)
+				)
+				(justify left)
+			)
+		)
 	)
 	(text "Opto LED: 2x1.8k 1206 in series, 1 mA at 5 V, 8 mA / 0.12 W each at 30 V. The antiparallel 1N4148W protects a reversed PSU."
 		(exclude_from_sim no)

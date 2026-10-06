@@ -13,10 +13,10 @@ def TVS(v="PESD5V0S1UL"):
     return Pull("GND", "D", v, None, fp=FP["SOD523"])
 
 
-def flags(s, rails, at):
+def flags(s, rails, at, classes=None):
     x, y = at
     for i, r in enumerate(rails):
-        s.flag_rail(r, (x + 25.4 * (i % 5), y + 12.7 * (i // 5)))
+        s.flag_rail(r, (x + 25.4 * (i % 5), y + 12.7 * (i // 5)), (classes or {}).get(r))
 
 
 def power(project, num, page, sheet_path, plib):
@@ -26,7 +26,8 @@ def power(project, num, page, sheet_path, plib):
             "so the rails only come up once a sink contract (or plain Type-C 5 V) is valid. No series VBUS FET.",
             "J17 (Qwiic) programs the STUSB4500 NVM and powers it through VSYS when the board is dead.",
             "PCA9517A: A side = PD segment (+3V3_PD, diode-OR of +3V3 and the programmer), B side = K64 I2C0.",
-            "A programmer on J17 pulls PCA_EN low through Q102: the K64 is disconnected from the PD bus in hardware."], (16, 17), 1.5)
+            "A programmer on J17 pulls PCA_EN low through Q102: the K64 is disconnected from the PD bus in hardware.",
+            'Current: VBUS_IN is laid out for 3 A (class USB_VBUS_3A, 2 mm); +5V_PORTS and +5V_TGT for 6 A (class PWR_6A, 4 mm or pours).'], (16, 17), 1.5)
     # ---- parts
     j2 = s.add("Connector", "USB_C_Receptacle_USB2.0_16P", "J2", "USB-C PD in", (28, 85), footprint=FP["USBC"])
     u1 = s.add("Interface_USB", "STUSB4500QTR", "U101", "STUSB4500QTR", (147, 85), footprint="Package_DFN_QFN:QFN-24-1EP_4x4mm_P0.5mm_EP2.7x2.7mm")
@@ -101,7 +102,8 @@ def power(project, num, page, sheet_path, plib):
                 6: chain(Ser("L", "470n/4A", None), Pull("GND", "C", "22u", None, fp=FP["C0805"]), Pull("GND", "C", "22u", None, fp=FP["C0805"]), PullLED(AMBER, "470", None), P("+3V3")),
                 2: chain(Pull("GND", "R", "100k", None), Pull("+3V3", "R", "453k", None), Pull("+3V3", "C", "120p", None)),   # TPS62823 datasheet: R2 100k, R1 for 3.3 V, Cff 120 pF
                 3: P("GND"), 5: P("GND")})
-    flags(s, ["VBUS_IN", "GND", "+3V3_PRG", "+3V3_PD", "+5V_PORTS", "+5V_TGT", "+3V3"], (25, 246))
+    flags(s, ["VBUS_IN", "GND", "+3V3_PRG", "+3V3_PD", "+5V_PORTS", "+5V_TGT", "+3V3"], (25, 246),
+          classes={"VBUS_IN": "USB_VBUS_3A", "+5V_PORTS": "PWR_6A", "+5V_TGT": "PWR_6A"})   # the high-current rails carry their class (and current) on the sheet
     return s
 
 

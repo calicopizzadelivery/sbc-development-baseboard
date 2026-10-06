@@ -111,6 +111,17 @@ def main(path, verbose=False):
                 else:
                     box = (x + b, y - w, x + a, y) if rot == 90 else (x - a, y, x - b, y + w)
             texts.append((f"label {node[1]}", box, None, (x, y)))
+        elif tag == Sym("netclass_flag"):
+            at = child(node, "at")
+            x, y, rot = float(at[1]), float(at[2]), float(at[3]) if len(at) > 3 else 0.0
+            dx, dy = {0: (2.54, 0), 90: (0, -2.54), 180: (-2.54, 0), 270: (0, 2.54)}[int(rot) % 360]
+            wires.append(((x, y), (x + dx, y + dy)))                      # the stem, as a wire nothing may print over
+            for pr in node[1:]:
+                if isinstance(pr, list) and pr and pr[0] == Sym("property") and pr[1] == "Netclass":
+                    pat = child(pr, "at"); px, py = float(pat[1]), float(pat[2])
+                    w = glyph_w(pr[2], SIZE) + 0.5
+                    box = (px - w, py - 0.9, px, py + 0.9) if int(rot) % 360 == 180 else (px, py - 0.9, px + w, py + 0.9)
+                    texts.append((f"netclass {pr[2]}", box, None, (x, y)))
         elif tag == Sym("text"):
             pass
         elif tag == Sym("symbol"):

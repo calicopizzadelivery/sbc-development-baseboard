@@ -161,24 +161,22 @@ Pin 1 is silkscreened `BLK` and pin 6 `GRN`, as the breakouts do, because that
 is how people actually orient the cable. TXD and RXD are named from the
 FT231X's side, which is also the convention, and the silkscreen carries arrows.
 
-**Pin 6 is a solder jumper, default DTR#.** The FTDI cable puts RTS# there; the
-SparkFun breakout and the Arduino Pro Mini put DTR#, for auto-reset, and that is
-the reason most boards with this header have a pin 6 at all. Either is one
-`ioctl` away on the workstation, so the choice only matters when a bootloader
-expects one of them.
-
-**Pin 3 VCC is a solder jumper, default open.** The breakouts source 3.3 V or
-5 V here to power a Pro Mini. On this board every path from a board rail onto
-the target is a back-feed path, by the §5 rule, so it ships disconnected.
-Closing the jumper connects the FT231X's own `3V3OUT`, which is limited to
-50 mA — enough for a level shifter, deliberately not enough to run a board.
+**The header is the Adafruit FTDI Friend** (decided 2026-10-06), jumpers
+included. **Pin 6 is RTS# by default** (JP501, bridged A–C), DTR# when the
+jumper is cut and bridged B–C; the Friend ships RTS and the Arduino IDE
+toggles both, so either uploads to a Pro Mini. **Pin 3 VCC is 5 V by
+default** (JP502, bridged A–C), from `FTDI_VBUS` — the switched port supply,
+so FTDI CYCLE cuts it — or the FT231X's `3V3OUT` (50 mA) when bridged B–C.
+This is a deliberate exception to the §5 back-feed rule: an FTDI header is
+expected to power the little board it is plugged into, exactly as the Friend
+does, and it is the only board rail that reaches the target by design.
 
 **It is a 3.3 V port.** `VCCIO` comes from `3V3OUT`. Connected to a 1.8 V
 console, TXD drives 3.3 V into the target's RX pad. 470 Ω in series with TXD
 and pin 6 holds that to a couple of milliamps through the target's clamp, so
 the mistake is survivable, but it is still a mistake — **1.8 V consoles go on
-J13**, which follows VREF. Open question 12 is whether pin 3 should be able to
-*take* a VREF instead.
+J13**, which follows VREF. Question 12 asked whether pin 3 should be able to
+*take* a VREF instead; it cannot, because the Friend's pin 3 is an output.
 
 **Its VBUS goes through a TPS2553, like a port, but it is not a port.** The
 bench notes record a CP2102N that stayed enumerated and openable while
@@ -675,6 +673,21 @@ dielectric at εr 4.6 with 1 oz copper). These are the `USB` net class's
 differential width and gap in the project file. State the stackup in the
 fab notes and ask for controlled impedance on the USB class; the fab's
 impedance calculator has the last word on the width and gap.
+
+### Current pathways
+
+Laid out for the current in the class name, on 1 oz outer copper at a
+10 °C rise (IPC-2221: 3 A ≈ 1.4 mm, 6 A ≈ 3.6 mm), rounded up. Each class
+is a net class directive flag on the schematic and a pattern in the project
+file.
+
+| Class | Nets | Current | Width | Vias per layer change |
+|---|---|---|---|---|
+| `PSU_3A` | PSU_VP, PSU_VOUT, PSU_GND (J18 → K803 → J19) | 3 A continuous | 2 mm or pour | two, 0.5 mm drill |
+| `USB_VBUS_3A` | VBUS_IN, PORT1–4_VBUS, FTDI_VBUS | 3 A each | 2 mm or pour | two, 0.5 mm drill |
+| `PWR_6A` | +5V_PORTS, +5V_TGT | 6 A | 4 mm or pour | two, 0.6 mm drill |
+
+J1's and J3's VBUS carry no load (sense only) and are not classed.
 
 ## 9. Schematic
 

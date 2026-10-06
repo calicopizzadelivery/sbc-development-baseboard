@@ -63,7 +63,8 @@ def relays(project, num, page, sheet_path, plib):
             "Red LEDs sit across each coil and show the energized state. Flyback 1N4148W on every coil.",
             "Passthrough J18 -> K803 (NO contact) -> J19 on nets PSU_VP / PSU_VOUT / PSU_GND that touch no board net: PSU_GND is its own ground.",
             "Only the optocoupler's emitter sits across the passthrough, sized for 5-30 V. No indicator LED there.",
-            "K803 JW1FSN pad map COM=6 NO=4 NC=2: VERIFY against the Panasonic terminal drawing before fab."], (16, 17), 1.5)
+            "K803 JW1FSN pad map COM=6 NO=4 NC=2: VERIFY against the Panasonic terminal drawing before fab.",
+            'Current: the passthrough J18 -> K803 -> J19 (PSU_VP, PSU_VOUT, PSU_GND) is laid out for 3 A continuous: class PSU_3A, 2 mm traces or pours, two vias per layer change.'], (16, 17), 1.5)
     for n, y in ((1, 75), (2, 150)):
         # flipped top-to-bottom so COM (3) is on top and NC/NO (2/4) below, the header's COM/NO/NC order:
         # the three routes reach J1n without crossing. The coil has no polarity (no internal diode).
@@ -90,11 +91,13 @@ def relays(project, num, page, sheet_path, plib):
                 8: chain(Pull("+5V_PORTS", ("Diode", "1N4148W", "1"), "1N4148W", None, fp=FP["SOD123"]), PullLED(RED, "2.2k", None, rail="+5V_PORTS"), Conn(q3, 3)),
                 6: End("psu_in"), 4: End("psu_out")})                       # the contacts' lanes end here; J18/J19 route to them
     fan(s, q3, {1: chain(Pull("GND", "R", "100k", None), Ser("R", "1k", None), L("RLY_PSU_DRV")), 2: P("GND")})
-    fan(s, j18, {1: To("psu_in"), 2: P("PSU_GND")}); fan(s, j19, {1: To("psu_out"), 2: P("PSU_GND")})
+    fan(s, j18, {1: To("psu_in"), 2: P("PSU_GND")}, channels={"L": 278.13}); fan(s, j19, {1: To("psu_out"), 2: P("PSU_GND")}, channels={"L": 278.13})   # routes turn clear of the net labels
+    for ref, net in (("J18", "PSU_VP"), ("J19", "PSU_VOUT")):               # the passthrough nets: named, and flagged as the 3 A class
+        e = s.lane_end[(ref, "1")]; s.label(net, e, 180); s.netclass_flag("PSU_3A", e, 90)
     fan(s, opto, {1: chain(Pull("PSU_GND", ("Diode", "1N4148W", "1"), "1N4148W", None, fp=FP["SOD123"]), Ser("R", "1.8k", None, fp=FP["R1206"]), Ser("R", "1.8k", None, fp=FP["R1206"]), To("psu_in", direct=True)),
                   2: P("PSU_GND"), 4: chain(Pull("+3V3", "R", "10k", None), L("PSU_PRESENT_N")), 3: P("GND")})
     s.junction(End.registry[(id(s), "psu_in")][0])                        # the COM lane, J18's route and the opto's tap meet there
-    flags(s, ["PSU_GND"], (25, 272))
+    flags(s, ["PSU_GND"], (25, 272), classes={"PSU_GND": "PSU_3A"})
     s.note(["Opto LED: 2x1.8k 1206 in series, 1 mA at 5 V, 8 mA / 0.12 W each at 30 V. The antiparallel 1N4148W protects a reversed PSU.",
             "PSU_PRESENT_N is active low at the K64."], (95, 272), 1.3)
     return s

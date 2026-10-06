@@ -37,9 +37,16 @@ def net_settings():
     # 90 ohm differential microstrip on Advanced Circuits' standard 4-layer 62 mil stackup: 1 oz outer
     # copper over a 12 mil prepreg (er 4.6) to the L2 ground plane -> 0.35 mm traces, 0.20 mm gap
     # (edge-coupled microstrip estimate, ~91 ohm); the fab's impedance calculator has the last word
-    return {"classes": [netclass("Default"), netclass("USB", priority=0, diff_pair_width=0.35, diff_pair_gap=0.2, track_width=0.35)], "meta": {"version": 4}, "net_colors": None,
+    # current-carrying classes, the current in the name (1 oz outer copper, 10 C rise: 3 A ~ 1.5 mm, 6 A ~ 3.6 mm)
+    return {"classes": [netclass("Default"), netclass("USB", priority=0, diff_pair_width=0.35, diff_pair_gap=0.2, track_width=0.35),
+                        netclass("PSU_3A", priority=1, track_width=2.0, clearance=0.3, via_diameter=1.0, via_drill=0.5),
+                        netclass("USB_VBUS_3A", priority=2, track_width=2.0, via_diameter=1.0, via_drill=0.5),
+                        netclass("PWR_6A", priority=3, track_width=4.0, via_diameter=1.2, via_drill=0.6)], "meta": {"version": 4}, "net_colors": None,
             "netclass_assignments": None,
-            "netclass_patterns": [{"netclass": "USB", "pattern": p} for p in ("*_USB_?", "*_D_?", "HUB_UP_?", "HUB_DN?_?")]}
+            "netclass_patterns": [{"netclass": "USB", "pattern": p} for p in ("*_USB_?", "*_D_?", "HUB_UP_?", "HUB_DN?_?")]
+                               + [{"netclass": "PSU_3A", "pattern": p} for p in ("PSU_V*", "PSU_GND")]
+                               + [{"netclass": "USB_VBUS_3A", "pattern": p} for p in ("VBUS_IN", "PORT?_VBUS", "FTDI_VBUS")]
+                               + [{"netclass": "PWR_6A", "pattern": p} for p in ("+5V_PORTS", "+5V_TGT")]}
 
 
 def main():
