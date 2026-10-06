@@ -17,6 +17,7 @@ HERE = os.path.dirname(os.path.abspath(__file__))
 OUT = os.path.normpath(os.path.join(HERE, "..", "sbc-baseboard"))
 LIBS = os.path.normpath(os.path.join(HERE, "..", "libs"))          # the ecad-libraries submodule
 PROJECT = "sbc-baseboard"
+PAIR_CLASSES = {"USB"}                        # the controlled-impedance classes; every _P/_N net is in one (checked at build)
 # the house symbol libraries, by their nickname (file stem), as the project's sym-lib-table names them
 kisym.EXTRA_LIBS = {os.path.splitext(os.path.basename(f))[0]: f for f in glob.glob(os.path.join(LIBS, "symbols", "*.kicad_sym"))}
 
@@ -44,7 +45,7 @@ def net_settings():
                         netclass("PWR_6A", priority=3, track_width=4.0, via_diameter=1.2, via_drill=0.6),
                         netclass("PSU_ISO", priority=4, track_width=0.25)],               # the opto's sense nets: isolated like PSU_3A, thin "meta": {"version": 4}, "net_colors": None,
             "netclass_assignments": None,
-            "netclass_patterns": [{"netclass": "USB", "pattern": p} for p in ("*_USB_?", "*_D_?", "HUB_UP_?", "HUB_DN?_?")]
+            "netclass_patterns": [{"netclass": "USB", "pattern": p} for p in ("*_USB_?", "*_D_?", "*HUB_UP_?", "*HUB_DN?_?")]   # sheet-local nets carry their sheet path: the leading * matches it
                                + [{"netclass": "PSU_3A", "pattern": p} for p in ("*PSU_VP", "*PSU_VOUT", "PSU_GND")]   # local nets carry their sheet path
                                + [{"netclass": "PSU_ISO", "pattern": "*PSU_SENSE*"}]
                                + [{"netclass": "USB_VBUS_3A", "pattern": p} for p in ("VBUS_IN", "PORT?_VBUS", "FTDI_VBUS")]
@@ -113,6 +114,18 @@ def main():
     lines = open(erc, encoding="utf-8").read().split("\n")
     lines[0] = re.sub(r"\(\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}", f"({DATE}T00:00:00", lines[0])
     open(erc, "w", encoding="utf-8").write("\n".join(lines))
+    # every pair net (named _P/_N, on either side of a flow-through ESD array) must be in a pair class, or it is
+    # routed at the default geometry instead of its impedance (ecad-standards/layout.md 3.8)
+    xml = os.path.join(OUT, "netlist-check.xml")
+    subprocess.run(["kicad-cli", "sch", "export", "netlist", "--format", "kicadxml", "-o", xml, sch], capture_output=True, text=True)
+    import xml.etree.ElementTree as ET
+    classes = {n.get("name"): (n.get("class") or "Default") for n in ET.parse(xml).getroot().iter("net")}
+    pairs = {n: c for n, c in classes.items() if re.search(r"_[PN]$", n) and (n[:-1] + ("N" if n.endswith("P") else "P")) in classes}   # a _P with its _N
+    os.remove(xml)
+    unclassed = sorted(n for n, c in pairs.items() if c not in PAIR_CLASSES)
+    print(f"pair nets: {len(pairs)}, in a pair class: {len(pairs) - len(unclassed)}" + (f"; NOT classed: {' '.join(unclassed)}" if unclassed else ""))
+    if unclassed:
+        raise SystemExit("pair nets outside a pair class")
     # BOM: grouped by value and footprint, full reference lists (no ranges), as the README documents
     r = subprocess.run(["kicad-cli", "sch", "export", "bom", "--fields", "Reference,Value,Footprint,${QUANTITY}",
                         "--labels", "Reference,Value,Footprint,QUANTITY", "--group-by", "Value,Footprint",

@@ -141,7 +141,11 @@ to the bottom, tucked under their host's pin row, clear of through-hole pads
 and exposed-pad via fields (the directives' Sides section); the rest stay on
 top. The lanes the directives declare (the PSU passthrough: J18 to the relay
 to J19) are laid first as footprint keep-outs on both sides and as 2 mm
-tracks, so nothing is placed in the way of the 3 A path. `placement.txt`
+tracks, so nothing is placed in the way of the 3 A path. ESD parts go down
+before anything else, on top, in the first ring at their connector's signal
+pins; the USB arrays are flow-through, turned with their receptacle-side
+pins toward the receptacle, and both nets of each pair are in the `USB`
+class (the schematic build refuses a `_P`/`_N` pair outside it). `placement.txt`
 records every part's host, side and ring; the generator prints the parts it
 could not keep within 8 mm of their pin. The silkscreen pass places each reference designator where it
 overlaps nothing (1.0 mm, then 0.8 mm text) and omits it otherwise, per the

@@ -77,6 +77,9 @@ LANE_MARGIN = 0.25
 # these kinds, up to the courtyard area given, may go to the bottom, under the pin it serves
 BOTTOM_MAX_AREA = {"R": 7.0, "C": 7.0, "D": 8.0, "Q": 12.0}   # mm2: up to 1206, SOD-123, SOT-23
 BOTTOM_NEVER_CLASSES = {"USB_VBUS_3A", "PWR_6A", "PSU_3A", "USB"}   # parts on these nets stay on top (current paths, pairs); PSU_ISO parts may go under
+# ---- ESD protection (ecad-standards/layout.md section 3.8): recognised by value; placed first of all, on top, at the
+# connector's signal pins, a flow-through array turned so its connector-side pins face the connector
+ESD_VALUES = ("USBLC", "PESD", "ESDA", "TPD", "SRV05", "IP42", "TVS")
 BOTTOM_TUCK = 1.0     # a bottom part's inner edge sits this far inside its host's courtyard edge, under the pin row
 THT_MARGIN = 1.0      # bottom parts keep this far from through-hole pads (hand soldering)
 EP_MARGIN = 0.6       # and from an exposed pad's via field

@@ -167,7 +167,16 @@ are in [layout-guidelines.md](layout-guidelines.md).
 
 - **USB 2.0 pairs** (class `USB`, 0.35 mm / 0.20 mm, 90 Ω): on L1 over the
   L2 ground plane, routed as pairs, no stubs, length-matched within 1 mm,
-  the ESD arrays in line with the pair next to their receptacle.
+  90 Ω end to end from the receptacle through the ESD array to the
+  transceiver (standard 3.8). The USBLC6-2 arrays are flow-through: the
+  receptacle's pair enters pins 1/3, the IC's pair leaves pins 6/4, and the
+  two are separate nets, both in the `USB` class (`J1_D_?` and `HUB_UP_?`,
+  `PORTn_D_?` and `HUB_DNn_?`, `J3_D_?` and `K64_USB_?`); the build refuses
+  a pair outside the class. The arrays are placed first, on top, at the
+  receptacle's signal pins, turned so pins 1/3 face the receptacle.
+- **ESD on single lines** (PESD5V0S1UL on J9's four signals and J13's
+  console, ESDA25W at the PD inlet): on top at the connector pin, first,
+  the signal passing the diode's pad, the ground pad to the plane by a via.
 - **High current**: `PSU_3A` (PSU_VP, PSU_VOUT, PSU_GND) and `USB_VBUS_3A`
   (VBUS_IN, PORTn_VBUS, FTDI_VBUS) at 2 mm or pours; `PWR_6A` (+5V_PORTS,
   +5V_TGT) at 4 mm or pours; two 0.5 mm vias per layer change on any of them.

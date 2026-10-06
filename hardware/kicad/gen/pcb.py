@@ -174,11 +174,14 @@ class Placer:
         pa, pb = self.schpos.get(a), self.schpos.get(b)
         return bool(pa and pb and pa[0] == pb[0])
 
+    def is_esd(self, ref):
+        return self.values[ref].upper().startswith(L.ESD_VALUES)
+
     def bottom_ok(self, ref, host):
-        """May this part go to the bottom (directives: small parts of the listed kinds, not LEDs, not on a
+        """May this part go to the bottom (directives: small parts of the listed kinds, not LEDs, not ESD, not on a
         current-carrying, pair or switching-loop net, not a crystal's load capacitor)."""
         p = prefix(ref)
-        if p not in L.BOTTOM_MAX_AREA or self.area[ref] > L.BOTTOM_MAX_AREA[p]:
+        if p not in L.BOTTOM_MAX_AREA or self.area[ref] > L.BOTTOM_MAX_AREA[p] or self.is_esd(ref):
             return False
         if self.values[ref].upper().startswith("LED"):
             return False
@@ -366,6 +369,8 @@ class Placer:
             x = sum(p.x for p in pts) / len(pts) / 1e6; y = sum(p.y for p in pts) / len(pts) / 1e6
             a = self.area[ref]
             tier = (4 if a >= L.BIG_AREA else 2) if kind(host) != "passive" else 1
+            if self.is_esd(ref) and kind(host) == "conn":
+                tier = 6                                           # ESD first of all: the connector's signal pins are its
             return host, (lambda: (x, y)), specific[host][0][1], (tier, a if tier > 1 else 0, scores[host])
         # only planes shared (a decoupling or bulk capacitor, or a part waiting for its partner): among the parts
         # on its rail, the one the schematic drew it beside, on the same sheet, an IC counting as nearer than a
@@ -395,14 +400,26 @@ class Placer:
         tier = 0 if waiting else 5 if a < L.SMALL_AREA else 3      # small decoupling first of all; bulk after the big parts on the pins
         return host, resolve, rail, (tier, a if tier > 0 else 0, scores[host])
 
-    def orientation(self, ref, hostnet, side, layer):
-        """Two-pin parts turn so the pad carrying the host's net faces the host; others stay upright."""
+    def orientation(self, ref, hostnet, side, layer, host=None):
+        """Two-pin parts turn so the pad carrying the host's net faces the host; a flow-through part (an ESD array
+        with the connector's pair on one pin row and the IC's on the other) turns its host-side row to the host;
+        others stay upright."""
         pads = list(self.fps[ref].Pads())
-        if len(pads) != 2:
-            return 0
         ob = self.origin_box(ref, 0, layer); cx, cy = (ob[0] + ob[2]) / 2, (ob[1] + ob[3]) / 2
-        near = next((p for p in pads if self.pad_net.get((ref, p.GetNumber())) == hostnet), pads[0])
-        v = (near.GetPosition().x / 1e6 - cx, near.GetPosition().y / 1e6 - cy)
+        if len(pads) == 2:
+            near = next((p for p in pads if self.pad_net.get((ref, p.GetNumber())) == hostnet), pads[0])
+            v = (near.GetPosition().x / 1e6 - cx, near.GetPosition().y / 1e6 - cy)
+        else:
+            hostnets = {net for _, net in self.pads_of[host] if net} if host else {hostnet}
+            near = [p for p in pads if self.pad_net.get((ref, p.GetNumber())) in hostnets]
+            far = [p for p in pads if self.pad_net.get((ref, p.GetNumber())) not in hostnets and not (self.pad_net.get((ref, p.GetNumber())) or "GND").endswith("GND")]
+            if not near or not far:
+                return 0
+            nx = sum(p.GetPosition().x for p in near) / len(near) / 1e6; ny = sum(p.GetPosition().y for p in near) / len(near) / 1e6
+            fx = sum(p.GetPosition().x for p in far) / len(far) / 1e6; fy = sum(p.GetPosition().y for p in far) / len(far) / 1e6
+            v = (nx - fx, ny - fy)
+            if abs(v[0]) < 0.05 and abs(v[1]) < 0.05:
+                return 0
         want = {"L": (1, 0), "R": (-1, 0), "T": (0, 1), "B": (0, -1)}[side]
         return max((0, 90, 180, 270), key=lambda d: rot_vec(v, d)[0] * want[0] + rot_vec(v, d)[1] * want[1])
 
@@ -421,7 +438,7 @@ class Placer:
         base = -L.BOTTOM_TUCK if (layer == "B" and self.side[host] == "F") else L.RING_GAP   # under the host's pin row, or beside it
         d = {"L": point[0] - hb[0], "R": hb[2] - point[0], "T": point[1] - hb[1], "B": hb[3] - point[1]}
         for side in sorted(d, key=d.get):                      # nearest side first, the others if it is full
-            rot = self.orientation(ref, hostnet, side, layer)
+            rot = self.orientation(ref, hostnet, side, layer, host)
             ob = self.origin_box(ref, rot, layer)
             w, h = ob[2] - ob[0], ob[3] - ob[1]
             normal, along = (w, h) if side in ("L", "R") else (h, w)
@@ -785,6 +802,18 @@ def main():
           f"bottom: {hows[('ring', 'B')]} in rings under their pins, {hows[('free', 'B')]} at the nearest free spot; "
           f"{len(P.parked)} parked in SPARE{': ' + ' '.join(P.parked) if P.parked else ''}; {residual} residual overlap(s); "
           f"{sides['F']} parts on top, {sides['B']} on the bottom")
+    esd = []
+    for ref, host, layer, how in P.order:
+        if P.is_esd(ref):
+            hb = P.box_of(host); hx, hy = (hb[0] + hb[2]) / 2, (hb[1] + hb[3]) / 2
+            hostnets = {net for _, net in P.pads_of[host] if net}
+            pads = list(fps[ref].Pads())
+            near = [p for p in pads if pad_net.get((ref, p.GetNumber())) in hostnets]
+            farp = [p for p in pads if p not in near and not (pad_net.get((ref, p.GetNumber())) or "GND").endswith("GND")]
+            dist = lambda ps: sum(math.hypot(p.GetPosition().x / 1e6 - hx, p.GetPosition().y / 1e6 - hy) for p in ps) / len(ps)
+            facing = (dist(near) <= dist(farp) + 0.01) if (near and farp) else True
+            esd.append(f"{ref}@{host} {layer}{how}{'' if facing else ' NOT FACING'}")
+    print("ESD at their connectors, host-side pins toward it: " + ", ".join(esd))
     far = [(ref, host, how) for ref, host, _, how in P.order if how.startswith("free") and float(how[5:]) >= 8]
     if far:
         print("   far from their pin (mm): " + ", ".join(f"{ref}@{host} {how[5:]}" for ref, host, how in far))
