@@ -85,7 +85,7 @@ def relays(project, num, page, sheet_path, plib):
     j19 = s.add("Connector_Generic", "Conn_01x02", "J19", "PSU out (isolated)", (300, 237), footprint=FP["PH2"])
     # the optocoupler sits between the relay and the PSU connectors, above the passthrough wires: its LED side
     # faces the relay's COM (PSU in) and taps that lane from above; its transistor side faces the board
-    opto = s.add("Isolator", "LTV-817", "U801", "LTV-817", (232.41, 193.04), 0, footprint=FP["DIP4"])   # far enough right that its LED chain ends before the COM lane's end
+    opto = s.add("Isolator", "LTV-817", "U801", "LTV-817", (254.0, 193.04), 0, footprint=FP["DIP4"])   # far enough right that its LED chain, labels included, ends before the COM lane's end
     s.pin_nc(k3, "2")
     fan(s, k3, {1: P("+5V_PORTS"),
                 8: chain(Pull("+5V_PORTS", ("Diode", "1N4148W", "1"), "1N4148W", None, fp=FP["SOD123"]), PullLED(RED, "2.2k", None, rail="+5V_PORTS"), Conn(q3, 3)),
@@ -94,7 +94,8 @@ def relays(project, num, page, sheet_path, plib):
     fan(s, j18, {1: To("psu_in"), 2: P("PSU_GND")}, channels={"L": 278.13}); fan(s, j19, {1: To("psu_out"), 2: P("PSU_GND")}, channels={"L": 278.13})   # routes turn clear of the net labels
     for ref, net in (("J18", "PSU_VP"), ("J19", "PSU_VOUT")):               # the passthrough nets: named, and flagged as the 3 A class
         e = s.lane_end[(ref, "1")]; s.label(net, e, 180); s.netclass_flag("PSU_3A", e, 90)
-    fan(s, opto, {1: chain(Pull("PSU_GND", ("Diode", "1N4148W", "1"), "1N4148W", None, fp=FP["SOD123"]), Ser("R", "1.8k", None, fp=FP["R1206"]), Ser("R", "1.8k", None, fp=FP["R1206"]), To("psu_in", direct=True)),
+    # the opto's LED nets are named so they join the isolated class (their creepage rule), as PSU_SENSE
+    fan(s, opto, {1: chain(Tag("PSU_SENSE", None), Pull("PSU_GND", ("Diode", "1N4148W", "1"), "1N4148W", None, fp=FP["SOD123"]), Ser("R", "1.8k", None, fp=FP["R1206"]), Tag("PSU_SENSE_R", None), Ser("R", "1.8k", None, fp=FP["R1206"]), To("psu_in", direct=True)),
                   2: P("PSU_GND"), 4: chain(Pull("+3V3", "R", "10k", None), L("PSU_PRESENT_N")), 3: P("GND")})
     s.junction(End.registry[(id(s), "psu_in")][0])                        # the COM lane, J18's route and the opto's tap meet there
     flags(s, ["PSU_GND"], (25, 272), classes={"PSU_GND": "PSU_3A"})

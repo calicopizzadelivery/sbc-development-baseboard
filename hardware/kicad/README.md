@@ -114,6 +114,35 @@ next step is layout.
 cd gen && ./build.py        # regenerate everything (only while nothing has been hand-edited)
 ```
 
+## Layout
+
+The board file `sbc-baseboard.kicad_pcb` was generated once, by `gen/pcb.py`
+on KiCad's `pcbnew` Python module, from the schematic's netlist, the project
+file and the directives in `gen/layout.py`, which are
+[docs/layout-directives.md](../../docs/layout-directives.md) as data. It
+carries the 140 × 80 mm outline with 2 mm corners, the four M3 holes on GND
+with their corner keep-outs, Advanced Circuits' 4-layer stackup, every
+footprint with its nets, the edge connectors on their edges facing outward,
+the interior parts packed by function next to the connector they serve, the
+L2 ground plane with the isolated PSU_GND island, and `sbc-baseboard.kicad_dru`
+with the passthrough's isolation rules. `gen/pcb.py` also runs
+`kicad-cli pcb drc`; its report is `drc.txt`.
+
+The generated board is a starting placement, not a layout: DRC reports no
+errors other than the 499 unrouted connections and twelve inside the GCT
+USB-C footprints, whose mounting holes sit 0.19 mm from their own shield pads
+against the 0.25 mm hole clearance set for the fab (confirm with Advanced
+Circuits or trim the footprint), and leaves the silkscreen warnings
+(reference designators over pads and each other) for the layout work. From here the board file is the source of truth and is edited in
+KiCad; `gen/pcb.py` is not run again over it. The schematic generator stays
+usable: its derived UUIDs keep the footprints linked.
+
+Layout order, per [ecad-standards/layout.md](https://github.com/calicopizzadelivery/ecad-standards/blob/main/layout.md):
+check the edge connectors against the mechanical drawing (the terminal
+blocks' orientation in the 3D view first), settle the isolated passthrough
+block, then the USB 2.0 pairs from each receptacle through its ESD array to
+the hub, the bucks' switching loops and the PWR_6A pours, and the rest.
+
 ## Design decisions that were made during capture
 
 These are also reflected in `docs/hardware-spec.md`.

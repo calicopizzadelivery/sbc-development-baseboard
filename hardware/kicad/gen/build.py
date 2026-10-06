@@ -24,7 +24,7 @@ kisym.EXTRA_LIBS = {os.path.splitext(os.path.basename(f))[0]: f for f in glob.gl
 def netclass(name, **kw):
     """A net class as KiCad 10 writes it (net_settings version 4). Geometry is KiCad's default;
     the USB class's differential width and gap are set from the stackup before routing."""
-    c = {"bus_width": 12, "clearance": 0.2, "diff_pair_gap": 0.25, "diff_pair_via_gap": 0.25, "diff_pair_width": 0.2,
+    c = {"bus_width": 12, "clearance": 0.2, "diff_pair_gap": 0.25, "diff_pair_via_gap": 0.25, "diff_pair_width": 0.2,   # Default clearance 0.15: 0.5 mm pitch parts (fab minimum 0.127)
          "line_style": 0, "microvia_diameter": 0.3, "microvia_drill": 0.1, "name": name, "pcb_color": "rgba(0, 0, 0, 0.000)",
          "priority": 2147483647, "schematic_color": "rgba(0, 0, 0, 0.000)", "track_width": 0.25, "via_diameter": 0.6,
          "via_drill": 0.3, "wire_width": 6}
@@ -38,13 +38,15 @@ def net_settings():
     # copper over a 12 mil prepreg (er 4.6) to the L2 ground plane -> 0.35 mm traces, 0.20 mm gap
     # (edge-coupled microstrip estimate, ~91 ohm); the fab's impedance calculator has the last word
     # current-carrying classes, the current in the name (1 oz outer copper, 10 C rise: 3 A ~ 1.5 mm, 6 A ~ 3.6 mm)
-    return {"classes": [netclass("Default"), netclass("USB", priority=0, diff_pair_width=0.35, diff_pair_gap=0.2, track_width=0.35),
+    return {"classes": [netclass("Default", clearance=0.15), netclass("USB", priority=0, diff_pair_width=0.35, diff_pair_gap=0.2, track_width=0.35),
                         netclass("PSU_3A", priority=1, track_width=2.0, clearance=0.3, via_diameter=1.0, via_drill=0.5),
                         netclass("USB_VBUS_3A", priority=2, track_width=2.0, via_diameter=1.0, via_drill=0.5),
-                        netclass("PWR_6A", priority=3, track_width=4.0, via_diameter=1.2, via_drill=0.6)], "meta": {"version": 4}, "net_colors": None,
+                        netclass("PWR_6A", priority=3, track_width=4.0, via_diameter=1.2, via_drill=0.6),
+                        netclass("PSU_ISO", priority=4, track_width=0.25)],               # the opto's sense nets: isolated like PSU_3A, thin "meta": {"version": 4}, "net_colors": None,
             "netclass_assignments": None,
             "netclass_patterns": [{"netclass": "USB", "pattern": p} for p in ("*_USB_?", "*_D_?", "HUB_UP_?", "HUB_DN?_?")]
-                               + [{"netclass": "PSU_3A", "pattern": p} for p in ("PSU_V*", "PSU_GND")]
+                               + [{"netclass": "PSU_3A", "pattern": p} for p in ("*PSU_VP", "*PSU_VOUT", "PSU_GND")]   # local nets carry their sheet path
+                               + [{"netclass": "PSU_ISO", "pattern": "*PSU_SENSE*"}]
                                + [{"netclass": "USB_VBUS_3A", "pattern": p} for p in ("VBUS_IN", "PORT?_VBUS", "FTDI_VBUS")]
                                + [{"netclass": "PWR_6A", "pattern": p} for p in ("+5V_PORTS", "+5V_TGT")]}
 
@@ -86,7 +88,12 @@ def main():
         root.text(ln, (30, 175 + i * 3.2), size=1.6, bold=(i == 0))
     root.emit(os.path.join(OUT, f"{PROJECT}.kicad_sch"), root.uuid)
     # project file, project symbol library, lib table
-    pro = {"board": {"design_settings": {"defaults": {}, "rules": {}}, "layer_presets": [], "viewports": []},
+    # board constraints: Advanced Circuits' standard-process minimums (0.005" trace/space, 0.010" copper to edge,
+    # 0.006" drill); thermal vias in the library footprints are 0.2 mm, which the fab allows
+    rules = {"min_clearance": 0.127, "min_track_width": 0.127, "min_through_hole_diameter": 0.2, "min_hole_clearance": 0.25,
+             "min_hole_to_hole": 0.25, "min_copper_edge_clearance": 0.25, "min_via_diameter": 0.5, "min_via_annular_width": 0.125,
+             "min_connection": 0.127, "solder_mask_to_copper_clearance": 0.0}
+    pro = {"board": {"design_settings": {"defaults": {}, "rules": rules}, "layer_presets": [], "viewports": []},
            "boards": [], "cvpcb": {"equivalence_files": []}, "libraries": {"pinned_footprint_libs": [], "pinned_symbol_libs": []},
            "meta": {"filename": f"{PROJECT}.kicad_pro", "version": 1}, "net_settings": net_settings(),
            "pcbnew": {"page_layout_descr_file": ""}, "schematic": {"legacy_lib_dir": "", "legacy_lib_list": []},

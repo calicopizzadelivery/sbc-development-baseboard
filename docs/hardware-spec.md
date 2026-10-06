@@ -216,6 +216,10 @@ board can sit against a wall or a DIN rail.
 | Front, right end | J9 FTDI (right-angle) · J11, J12 relays · J14 +5V_TGT | 52 mm |
 | Inboard, vertical | J16 Cortex debug · J15 GPIO header | — |
 
+Revised at layout (2026-10-06), see [layout-directives.md](layout-directives.md):
+the RJ45 measures 22 mm, so J17 became a top-entry part inboard; J19 moved
+beside J18 so the isolated passthrough is one region; J9 took the right edge.
+
 J16 and J15 are pin headers that take a ribbon or jumpers from any direction,
 so they earn no edge. J9 is right-angle because that is what an FTDI header is.
 

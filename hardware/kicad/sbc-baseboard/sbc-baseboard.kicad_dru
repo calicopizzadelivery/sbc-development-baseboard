@@ -1,0 +1,8 @@
+(version 1)
+# PSU passthrough isolation: only the isolated classes' copper inside the region, and 2.0 mm creepage to board nets
+(rule "psu_isolation_keepout"
+    (condition "A.intersectsArea('psu_iso') && !(A.NetClass == 'PSU_3A' || A.NetClass == 'PSU_ISO')")
+    (constraint disallow track via zone))
+(rule "psu_isolation_gap"
+    (condition "(A.NetClass == 'PSU_3A' || A.NetClass == 'PSU_ISO') && !(B.NetClass == 'PSU_3A' || B.NetClass == 'PSU_ISO')")
+    (constraint clearance (min 2.0mm)))

@@ -28,27 +28,37 @@ The user sits at the **left** edge; the target is at the **right** edge; the
 **back** edge carries nothing, so the board can sit against a wall or a DIN
 rail.
 
-| Edge | Connectors, in order from the back corner to the front | Faces | Bodies |
+| Edge | Connectors, in order from the back corner to the front | Faces | Bodies (measured) |
 |---|---|---|---|
-| Left (x = 0), 54 mm usable | J10 RJ45 · J1 USB-C upstream · J2 USB-C PD in · J17 Qwiic programming | workstation / charger / user | 41 mm |
-| Right (x = 140), 54 mm usable | J3 USB-C HID · J13 console · J19 PSU out | target | 37 mm |
-| Front (y = 80), left end | J4, J5 USB-A stacks · J18 PSU in | bench / PSU | 39 mm |
-| Front (y = 80), right end | J9 FTDI right-angle · J11, J12 relays · J14 +5V_TGT | target | 52 mm |
-| Inboard, vertical | J16 Cortex debug · J15 GPIO header | any (ribbon, jumpers) | — |
+| Left (x = 0), 54 mm usable | J10 RJ45 · J1 USB-C upstream · J2 USB-C PD in | workstation / charger | 22.4 + 10.6 + 10.6 = 43.6 mm |
+| Right (x = 140), 54 mm usable | J3 USB-C HID · J13 console · J9 FTDI right-angle | target | 10.6 + 16.5 + 16.3 = 43.4 mm |
+| Front (y = 80), left end | J4, J5 USB-A stacks · J18 PSU in · J19 PSU out | bench / PSU | 17.2 + 17.2 + 13.2 + 13.2 = 60.8 mm |
+| Front (y = 80), right end | J14 +5V_TGT · J12, J11 relays | target | 13.2 + 13.05 + 13.05 = 39.3 mm |
+| Inboard | J16 Cortex debug · J15 GPIO header · **J17 programming, top entry** (BM04B-SRSS-TB) | any | — |
 
-Edge connectors sit flush with their edge; the USB-C and RJ45 receptacles
-and the USB-A stacks overhang per their footprints. Pluggable terminal
-blocks (Phoenix MC 1,5 3.5 mm and 5.08 mm) face outward with their plug
-entry at the edge.
+Three things moved from the spec's first table once the footprints were
+measured (2026-10-06): the RJ45 is 22 mm wide, not 16, so the left edge
+could not also take J17, which is now a top-entry part inboard beside J2;
+**J19 sits beside J18** so the PSU passthrough is one compact isolated
+region behind the two of them instead of a strip across the board; and J9
+takes J19's place on the right edge, where an FTDI header facing the
+target belongs anyway. Bodies are packed 1 mm apart from 13.5 mm after each
+corner. Edge connectors sit with their mating face flush with the edge, or
+on the footprint's own "PCB Edge" mark where it has one (the USB-C
+receptacles overhang by 1.1 mm). Verify the terminal blocks' orientation in
+the 3D view before ordering.
 
 ## Keep-outs
 
 - The 13 mm from each corner along every edge (standoff pads and screw
   heads): no connectors, no tall parts.
 - **Isolation**: the PSU passthrough (J18, J19, K803's contact side, the
-  opto-coupler's LED side, D807, R810, R811) sits in its own region at the
-  front-left, on its own **PSU_GND** copper with **no L2 ground plane under
-  it**; a 2 mm creepage gap separates that region from every board net. Only
+  opto-coupler's LED side, D807, R810, R811) sits in its own region behind
+  J18/J19 at the front, x 48–84, y 42–80, with the barrier running through
+  K803 between its coil and contact pins (x = 64) and through U801 between
+  its LED and transistor pins (y = 42). It has its own **PSU_GND** copper on
+  L2 with **no board ground plane under it**, and a 2 mm creepage gap to
+  every board net, enforced by a DRC rule (`sbc-baseboard.kicad_dru`). Only
   the opto-coupler and the relay body cross the gap.
 - Under the Ethernet magnetics (inside J10): no copper on any layer under
   the magnetics side of the jack.
@@ -59,19 +69,24 @@ entry at the edge.
 Parts go next to the connector they serve; the groups below are the
 starting placement the generator uses, refined by hand afterwards.
 
-| Group | Parts | Where |
+| Group | Rectangle (x0, y0, x1, y1) | Anchors |
 |---|---|---|
-| Ethernet | U301 KSZ8081, Y301, its passives, D3xx | behind J10, left-back |
-| Power in | U101 STUSB4500, Q101, U102 PCA9517A, J17 side | behind J2, left |
-| Bucks | U103, U104, L101, L102, their diodes and capacitors, U105 | left-centre, behind the inlet, with a thermal copper area on L1 |
-| MCU | U201 K64, Y201, J16, its decoupling | centre |
-| Hub | U402 USB2517, Y401, U401 | front-left centre, behind J4/J5 |
-| Port switches | U403–U406, U408–U411, C4xx, D40x | between the hub and J4/J5 |
-| FTDI | U501, JP501, JP502, D50x | front-right, behind J9 |
-| DAPLink | U601 K20, Y601, J601 | centre-front, between the hub and the K64 |
-| Target I/O | U701 TPS26630, U702–U704 level shifters, J15 | right, behind J13/J14 |
-| Signal relays | K801, K802, Q801, Q802 | front-right, behind J11/J12 |
-| Passthrough | K803, Q803, U801, J18, J19 | front-left corner region, isolated (above) |
+| Ethernet | 22, 1, 52, 11 | U301, Y301 (behind J10) |
+| Hub and port switches | 22, 11, 52, 56 | U402, Y401, U403–U406, U408–U411, U407, U105 (behind J4/J5) |
+| Power in | 5, 37, 22, 58 | U101, U102, Q101, Q102, U401, J17 (beside J1/J2) |
+| Bucks | 52, 1, 85, 36 | U103, U104, L101, L102 |
+| Passthrough driver | 48, 36, 70, 42 | Q803 (board side of the barrier) |
+| Passthrough, isolated | 64, 56, 84, 66 | D807, R810, R811; K803 and U801 fixed across the barrier |
+| MCU | 85, 1, 113, 38 | U201, Y201, J16, SW201, D202 |
+| DAPLink | 84, 42, 100, 66 | U601, Y601, J601, SW601 |
+| FTDI | 100, 38, 113, 66 | U501, JP501, JP502 (behind J9) |
+| Target I/O | 113, 1, 127, 38 | U701–U704, J15, U202 (behind J3/J13) |
+| Signal relays | 113, 38, 128.5, 64 | K801, K802, Q801, Q802 (behind J11/J12/J14) |
+
+Every other part joins the group of the IC it shares the most signal nets
+with. The rectangles are the generator's starting placement (`gen/layout.py`);
+they are sized from the parts' courtyards and are the first thing to adjust
+by hand.
 
 ## Special considerations
 

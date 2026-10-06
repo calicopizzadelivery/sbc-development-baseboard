@@ -19,7 +19,7 @@ FP = dict(
     JP2="Jumper:SolderJumper-2_P1.3mm_Open_RoundedPad1.0x1.5mm", JP3="Jumper:SolderJumper-3_P1.3mm_Open_RoundedPad1.0x1.5mm", JP3B="Jumper:SolderJumper-3_P1.3mm_Bridged12_RoundedPad1.0x1.5mm",
     USBC="Connector_USB:USB_C_Receptacle_GCT_USB4105-xx-A_16P_TopMnt_Horizontal",
     USBA2="Connector_USB:USB_A_Wuerth_61400826021_Horizontal_Stacked",
-    QWIIC="Connector_JST:JST_SH_SM04B-SRSS-TB_1x04-1MP_P1.00mm_Horizontal",
+    QWIIC="Connector_JST:JST_SH_BM04B-SRSS-TB_1x04-1MP_P1.00mm_Vertical",
     PH3="Connector_Phoenix_MC:PhoenixContact_MC_1,5_3-G-3.5_1x03_P3.50mm_Horizontal",
     PH4="Connector_Phoenix_MC:PhoenixContact_MC_1,5_4-G-3.5_1x04_P3.50mm_Horizontal",
     PH2="Connector_Phoenix_MSTB:PhoenixContact_MSTBA_2,5_2-G-5,08_1x02_P5.08mm_Horizontal",
