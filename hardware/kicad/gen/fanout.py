@@ -846,6 +846,52 @@ def jog(s, hub, pin, rail, up=2.54, over=7.62):
     return J
 
 
+class Reset(Att):
+    """A reset network at the lane end, drawn to flow downward: the rail symbol, the
+    pull-up, the node row where the lane arrives, the capacitor straight below in the
+    same column and one GND under it. A push button, when there is one, hangs from the
+    lane one column nearer the hub and shares the GND rail. Every wire meets its part
+    at a right angle. The button's texts face the hub, under the lane; the resistor's
+    and capacitor's face away. Put the net's label on the lane before it (Tag)."""
+    h_up, h_down = 19.05, 17.78
+
+    def __init__(self, rail, r, c, sw=None, sw_fp=None, r_fp=None, c_fp=None):
+        super().__init__(None)
+        self.rail, self.r, self.c, self.sw = rail, r, c, sw
+        self.r_fp, self.c_fp, self.sw_fp = r_fp, c_fp, sw_fp
+        self.col = 7.62 if sw else 0.0                       # the R/C column lies this far beyond the lane end
+        self.lext = max(1.27, 2.54 + max(text_w("SW000"), text_w(sw))) if sw else 1.27
+        out = 2.54 + max(text_w("R000"), text_w(r), text_w("C000"), text_w(c))
+        self.end_w = self.col + max(out, text_w(rail) / 2 + 0.5)
+
+    def render(self, s, E, sx, lane):
+        x1, y = E
+        x2 = snap(x1 + sx * self.col)
+        y_part, y_rail = snap(y + 7.62), snap(y + 13.97)
+        just_out, just_in = ("left", "right") if sx > 0 else ("right", "left")
+        tx_out = snap(x2 + sx * 2.54)
+        r = s.R(self.r, (x2, snap(y - 7.62)), rot=0, **({"fp": self.r_fp} if self.r_fp else {}))
+        s.wire((x2, y), r.pin("2")); s.pin_power(r, "1", self.rail)
+        r.ref_at, r.val_at = (tx_out, snap(y - 7.62 - 1.27)), (tx_out, snap(y - 7.62 + 1.27))
+        r.ref_just = r.val_just = just_out
+        c = s.C(self.c, (x2, y_part), rot=0, **({"fp": self.c_fp} if self.c_fp else {}))
+        s.wire((x2, y), c.pin("1")); s.wire(c.pin("2"), (x2, y_rail))
+        c.ref_at, c.val_at = (tx_out, snap(y_part - 1.27)), (tx_out, snap(y_part + 1.27))
+        c.ref_just = c.val_just = just_out
+        s.power("GND", (x2, y_rail), 0)
+        s.junction((x2, y))
+        if self.sw:
+            s.wire(E, (x2, y)); s.junction(E)
+            # the button's actuator points away from the hub: rot 90 on a left lane, 270 on a right one
+            sw = s.add("Switch", "SW_Push", s.ref("SW"), self.sw, (x1, y_part), 90 if sx < 0 else 270, footprint=self.sw_fp or "")
+            top, bot = sorted(("1", "2"), key=lambda p: sw.pin(p)[1])
+            s.wire(E, sw.pin(top)); s.wire(sw.pin(bot), (x1, y_rail)); s.wire((x1, y_rail), (x2, y_rail)); s.junction((x2, y_rail))
+            tx_in = snap(x1 - sx * 2.54)
+            sw.ref_at, sw.val_at = (tx_in, snap(y_part - 1.27)), (tx_in, snap(y_part + 1.27))
+            sw.ref_just = sw.val_just = just_in
+        return E
+
+
 def crystal(s, hub, key_a, key_b, ref, value, fp, cap, cap_fp=None, drop=10.16, margin=8.89):
     """A clock source drawn to flow downward. The two XTAL lanes end in End(key_a) and
     End(key_b); from there they run on, beyond the hub's route channels, to two columns

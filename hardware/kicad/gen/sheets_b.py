@@ -1,7 +1,7 @@
 """Ethernet, USB hub, FTDI and DAPLink sheets, component-centric."""
 from kit import Sheet, FP
 from sch import snap
-from fanout import fan, chain, L, P, Ser, Pull, PullLED, Tag, Flag, Conn, End, To, BusEnd, bus_join, rail_bus, decap_row, join_pins, top_caps, top_bus, Skip, jog, mark_end, Gap, crystal
+from fanout import fan, chain, L, P, Ser, Pull, PullLED, Tag, Flag, Conn, End, To, BusEnd, bus_join, rail_bus, decap_row, join_pins, top_caps, top_bus, Skip, jog, mark_end, Gap, crystal, Reset
 from sheets_a import flags, TVS
 
 AMBER, GREEN, RED = "LED AMBER", "LED GREEN", "LED RED"
@@ -71,7 +71,7 @@ def hub(project, num, page, sheet_path, plib):
     join_pins(s, j1, ["A6", "B6"], length=7.62); join_pins(s, j1, ["A7", "B7"], length=7.62)
     atts = {59: End("usbup_dp"), 58: End("usbup_dm"), 44: chain(Pull("GND", "R", "100k", None), Pull("GND", "C", "1u", None), Ser("R", "100k", None), L("J1_VBUS")),     # VBUS_DET divider as on EVB-USB2517: 100k/100k with 1 uF, at the pin that reads it
             61: End("xtal1"), 60: End("xtal2"),                                # the crystal hangs below, drawn by crystal()
-            43: chain(Pull("+3V3", "R", "10k", None), Pull("GND", "C", "1u", None), L("HUB_RESET_N")),
+            43: chain(Tag("HUB_RESET_N", None, step=35.56), Reset("+3V3", "10k", "1u")),      # the R/C column lands beyond the VBUS_DET divider's capacitor and its text
             63: chain(Ser("R", "12.0k 1%", None), P("GND")), 19: P("GND"),
             13: pd10(), 42: pd10(), 41: pd10(), 40: pu10(), 45: pu10(),
             65: P("GND"),
@@ -165,7 +165,7 @@ def daplink(project, num, page, sheet_path, plib):
     for pin in (6, 7, 8): s.pin_nc(j, str(pin))
     fan(s, u, {12: Conn(j, 4), 15: Conn(j, 2), 16: Pull("K20_3V3", "R", "10k", None),
                17: End("xtalin"), 18: End("xtalout"),                           # the crystal hangs below, drawn by crystal()
-               19: chain(Gap(5.08), Pull("K20_3V3", "R", "10k", None), Pull("GND", "C", "100n", None), Pull("GND", ("Switch", "SW_Push", "1"), "DAP RESET", None, fp=FP["SW"]), Conn(j, 10)),   # its rail name clear of the crystal caps
+               19: chain(Tag("K20_RESET_N", None), Reset("K20_3V3", "10k", "100n", "DAP RESET", sw_fp=FP["SW"])),   # J601 pin 10 carries the same label
                3: L("HUB_DN1_DP"), 4: L("HUB_DN1_DM"), 5: chain(Pull("GND", "C", "2u2", None), P("K20_3V3")),
                21: L("K64_RESET_N"), 24: L("K64_UART0_TX"), 25: L("K64_UART0_RX"), 26: L("SWCLK"), 27: L("SWDIO"),
                29: chain(Ser("D", "LED GREEN", None, lib="Device", name="LED", near="1", fp=FP["LED"]), Ser("R", "470", None), P("K20_3V3")),
@@ -173,5 +173,5 @@ def daplink(project, num, page, sheet_path, plib):
     top_bus(s, u, [1, 7], "K20_3V3", caps_right=[("100n", None), ("100n", None)], rail_at="right", height=12.7)
     top_caps(s, u, 6, [("2u2", None)], height=20.32, sx=-1, rail="+5V_PORTS")
     crystal(s, u, "xtalin", "xtalout", "Y601", "8MHz", FP["XTAL4"], "18p")
-    fan(s, j, {1: P("K20_3V3"), 3: P("GND"), 9: P("GND")})
+    fan(s, j, {1: P("K20_3V3"), 3: P("GND"), 9: P("GND"), 10: L("K20_RESET_N")})
     return s

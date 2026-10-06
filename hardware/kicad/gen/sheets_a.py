@@ -2,7 +2,7 @@
 net fans out of its hub to whatever it connects to."""
 from kit import Sheet, FP
 from sch import snap
-from fanout import fan, chain, L, P, Ser, Pull, PullLED, Tag, Flag, Conn, End, To, BusEnd, bus_join, rail_bus, decap_row, join_pins, top_caps, top_bus, Skip, Ladder, jog, mark_end, Gap, crystal
+from fanout import fan, chain, L, P, Ser, Pull, PullLED, Tag, Flag, Conn, End, To, BusEnd, bus_join, rail_bus, decap_row, join_pins, top_caps, top_bus, Skip, Ladder, jog, mark_end, Gap, crystal, Reset
 
 AMBER, GREEN, RED = "LED AMBER", "LED GREEN", "LED RED"
 def TVS(v="PESD5V0S1UL"):
@@ -143,7 +143,7 @@ def mcu(project, num, page, sheet_path, plib):
         10: Conn(esd, 4), 11: Conn(esd, 6),                   # I/O2 carries D+, I/O1 D-
         50: L("RMII_CLK_50M"),
         29: End("extal32"), 28: End("xtal32"),                                # the 32 kHz crystal hangs below, drawn by crystal()
-        52: chain(Tag("K64_RESET_N", None), Pull("+3V3", "R", "10k", None), Pull("GND", "C", "1u", None), Pull("GND", ("Switch", "SW_Push", "1"), "RESET", None, fp=FP["SW"])),
+        52: chain(Tag("K64_RESET_N", None), Reset("+3V3", "10k", "1u", "RESET", sw_fp=FP["SW"])),   # pull-up, cap and button in one downward-flowing cluster
         38: Pull("+3V3", "R", "10k", None),
         # right: everything the K64 drives elsewhere
         34: chain(Tag("SWCLK", None), Conn(j16, 4)), 37: chain(Tag("SWDIO", None), Conn(j16, 2)),
