@@ -137,6 +137,9 @@ Circuits or trim the footprint), and leaves the silkscreen warnings
 KiCad; `gen/pcb.py` is not run again over it. The schematic generator stays
 usable: its derived UUIDs keep the footprints linked.
 
+The ICs' own layout rules, with sources, are in
+[docs/layout-guidelines.md](../../docs/layout-guidelines.md).
+
 Layout order, per [ecad-standards/layout.md](https://github.com/calicopizzadelivery/ecad-standards/blob/main/layout.md):
 check the edge connectors against the mechanical drawing (the terminal
 blocks' orientation in the 3D view first), settle the isolated passthrough

@@ -42,11 +42,13 @@ could not also take J17, which is now a top-entry part inboard beside J2;
 **J19 sits beside J18** so the PSU passthrough is one compact isolated
 region behind the two of them instead of a strip across the board; and J9
 takes J19's place on the right edge, where an FTDI header facing the
-target belongs anyway. Bodies are packed 1 mm apart from 13.5 mm after each
+target belongs anyway. Bodies are packed 1 mm apart from 14 mm after each
 corner. Edge connectors sit with their mating face flush with the edge, or
 on the footprint's own "PCB Edge" mark where it has one (the USB-C
-receptacles overhang by 1.1 mm). Verify the terminal blocks' orientation in
-the 3D view before ordering.
+receptacles overhang by 1.1 mm). The mating face is the end of the body
+farthest from the solder pins, which sit at the rear of every horizontal
+connector in KiCad's library (the RJ45's long axis runs inboard, so it mates
+along it); a pin header mates where its pins point. Checked in the 3D view.
 
 ## Keep-outs
 
@@ -63,6 +65,11 @@ the 3D view before ordering.
 - Under the Ethernet magnetics (inside J10): no copper on any layer under
   the magnetics side of the jack.
 - The back edge: nothing within 5 mm, so it can lie flat against a rail.
+- No part other than an edge connector within 3 mm of any edge (a
+  tailoring of ECSS-Q-ST-70-12C 14.3.2 c, whose 5 mm is for the assembler's
+  conveyor; the assembler is consulted).
+- Parent standard for everything not stated here: ECSS-Q-ST-70-12C Rev.1,
+  with the tailorings listed in ecad-standards/layout.md section 0.
 
 ## Placement groups
 
@@ -87,6 +94,14 @@ Every other part joins the group of the IC it shares the most signal nets
 with. The rectangles are the generator's starting placement (`gen/layout.py`);
 they are sized from the parts' courtyards and are the first thing to adjust
 by hand.
+
+## Flow
+
+Power enters at J2 on the left edge and moves right: the PD controller and
+its parts at the connector, then the eFuse, then the bucks, then the rails
+as polygons to each block. Signals read the same way, from the user's edge
+on the left to the target's edge on the right. Each IC's own layout rules
+are in [layout-guidelines.md](layout-guidelines.md).
 
 ## Special considerations
 
