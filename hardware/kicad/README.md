@@ -41,7 +41,7 @@ exports the PDF and BOM. Pin-position maths and power-symbol net naming were
 calibrated against `kicad-cli`'s netlist export before any real sheet was
 built.
 
-Four checks run on every build and all pass at zero: `kicad-cli sch erc
+Five checks guard every build and all pass: `kicad-cli sch erc
 --severity-all`; `gen/check_geom.py`, which finds wire ends and pin ends that
 land on a foreign wire (the shorts a netlist shows only as a merged net);
 `gen/netcheck.py`, which traces wire-level connectivity in each sheet and
@@ -52,7 +52,8 @@ anything on the sheet frame or the title block, pin numbers treated as text
 like any other, and pin names inside a symbol that print over each other
 (`gen/check_pins.py`, run on library symbols too; its `--gaps` option lists the
 closest name pairs). Text widths come from a per-glyph table fitted to the text
-extents KiCad writes into its own PDF export. The netlist was also diffed against the
+extents KiCad writes into its own PDF export. The fifth is reproducibility:
+build, `git add` the outputs, build again, and `git status` must be empty. The netlist was also diffed against the
 first label-style pass with passive renumbering factored out, so the re-layout
 changed drawing, not connectivity (the JP501 default and the J1 VBUS divider
 tap, which became a local label, are the two intended exceptions).
