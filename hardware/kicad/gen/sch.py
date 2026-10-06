@@ -123,6 +123,7 @@ class Schematic:
         self.instances = []
         self.project_lib = {}
         self.channel_edge = {}          # (hub ref, side) -> first free column beyond that side's route channels
+        self.lane_end = {}              # (hub ref, pin) -> where the pin's lane ends and its chain begins
         self.refs = set()
         self.comments = []
         self.wire_log = []

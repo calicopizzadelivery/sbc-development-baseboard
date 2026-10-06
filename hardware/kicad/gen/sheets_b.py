@@ -49,7 +49,8 @@ def hub(project, num, page, sheet_path, plib):
             "Port map: 1 = DAPLink, 2 = FT231X, 3 = disabled (DN3 pulled up), 4..7 = USB-A PORT1..PORT4 (J4A/J4B = PORT1/PORT2 on hub ports 4,5; J5A/J5B = PORT3/PORT4 on ports 6,7).",
             "NON_REM=11 (pin 40 up, pin 45 up) marks ports 1-3 non-removable and LOCAL_PWR high reports self-powered.",
             "LED_A/B pins pulled down: PRT_SWP normal polarity, BOOST=00, GANG_EN=0 (individual over-current).",
-            "Port power is switched by TPS2553 under K64 GPIO (boot ON via pull-ups); PRTPWR outputs unused; /FAULT feeds OCSx_N."], (16, 17), 1.5)
+            "Port power is switched by TPS2553 under K64 GPIO (boot ON via pull-ups); PRTPWR outputs unused; /FAULT feeds OCSx_N.",
+            "USB 2.0 pairs are named *_P / *_N (KiCad's differential-pair convention) and sit in net class USB: 90 ohm differential, routed as pairs, no stubs. Each ESD array splits its pair into a hub side (HUB_DNn) and a connector side (PORTn_D). Set the class's width and gap from the stackup before routing."], (16, 17), 1.5)
     u = s.add("calico-ic", "USB2517", "U402", "USB2517", (165, 150), footprint="Package_DFN_QFN:QFN-64-1EP_9x9mm_P0.5mm_EP7.15x7.15mm")
     j1 = s.add("Connector", "USB_C_Receptacle_USB2.0_16P", "J1", "USB-C upstream", (35, 74.92), footprint=FP["USBC"])
     esd0 = s.add("Power_Protection", "USBLC6-2SC6", "U401", "USBLC6-2SC6", (78.74, 74.93), footprint=FP["SOT236"])     # I/O rows = J1 B7 (D-) and A6 (D+); VBUS pin lands on J1's plain VBUS stretch
@@ -59,30 +60,34 @@ def hub(project, num, page, sheet_path, plib):
     for n in range(1, 5):
         Y = 45.72 + (n - 1) * 50.8                                    # D- row of this port
         ref, unit = [("J4", 1), ("J4", 2), ("J5", 1), ("J5", 2)][n - 1]
-        j = s.add("calico-electromechanical", "USB_A_Stacked2", ref, "USB-A x2", (394.97, Y + 6.35), unit=unit, footprint=FP["USBA2"])   # one value for both units: KiCad treats differing unit values as an annotation error   # D-/D+ rows on the ESD's I/O rows
-        esd = s.add("Power_Protection", "USBLC6-2SC6", f"U4{7+n:02d}", "USBLC6-2SC6", (369.57, Y), footprint=FP["SOT236"])
-        tps = s.add("calico-ic", "TPS2553DBV", f"U40{2+n}", "TPS2553DBV", (327.66, Y + 13.97), footprint=FP["SOT236"])   # OUT (its third right-hand row) on the VBUS row
+        j = s.add("calico-electromechanical", "USB_A_Stacked2", ref, "USB-A x2", (394.97, Y + 7.62), unit=unit, footprint=FP["USBA2"])   # D-/D+ on the ESD's I/O rows; one value for both units (differing unit values are an annotation error)   # D-/D+ rows on the ESD's I/O rows
+        esd = s.add("Power_Protection", "USBLC6-2SC6", f"U4{7+n:02d}", "USBLC6-2SC6", (361.95, Y), footprint=FP["SOT236"])   # room for the pair's labels before the receptacle
+        esd.ref_at, esd.val_at = (361.95 - 1.27, Y - 5.715), (361.95 - 1.27, Y - 3.81)   # texts left of its VBUS stub, clear of the labels
+        esd.ref_just = esd.val_just = "right"
+        tps = s.add("calico-ic", "TPS2553DBV", f"U40{2+n}", "TPS2553DBV", (327.66, Y + 15.24), footprint=FP["SOT236"])   # OUT (its third right-hand row) on the VBUS row
         ports.append((esd, tps, j, unit))
     u407 = s.add("calico-ic", "TPS2553DBV", "U407", "TPS2553DBV", (215, 256.92), footprint=FP["SOT236"])   # OUT (its third right-hand row) at 256.92
     for pin in ("A8", "B8"): s.pin_nc(j1, pin)
     for pin in (29, 26, 23, 20, 30, 39, 36, 28, 22, 32, 18, 16, 14): s.pin_nc(u, str(pin))
     pd10 = lambda: chain(Ser("R", "10k", None), P("GND"))
     pu10 = lambda: Pull("+3V3", "R", "10k", None)
-    join_pins(s, j1, ["A6", "B6"], length=7.62); join_pins(s, j1, ["A7", "B7"], length=7.62)
+    jx = join_pins(s, j1, ["A6", "B6"], length=10.16)[0]; join_pins(s, j1, ["A7", "B7"], length=10.16)   # room for the pair's labels on the lower stubs
     atts = {59: End("usbup_dp"), 58: End("usbup_dm"), 44: chain(Pull("GND", "R", "100k", None), Pull("GND", "C", "1u", None), Ser("R", "100k", None), L("J1_VBUS")),     # VBUS_DET divider as on EVB-USB2517: 100k/100k with 1 uF, at the pin that reads it
             61: End("xtal1"), 60: End("xtal2"),                                # the crystal hangs below, drawn by crystal()
             43: chain(Tag("HUB_RESET_N", None, step=35.56), Reset("+3V3", "10k", "1u")),      # the R/C column lands beyond the VBUS_DET divider's capacitor and its text
             63: chain(Ser("R", "12.0k 1%", None), P("GND")), 19: P("GND"),
             13: pd10(), 42: pd10(), 41: pd10(), 40: pu10(), 45: pu10(),
             65: P("GND"),
-            2: L("HUB_DN1_DP"), 1: L("HUB_DN1_DM"), 4: L("HUB_DN2_DP"), 3: L("HUB_DN2_DM"), 7: pu10(), 6: pu10(),
+            2: L("HUB_DN1_P"), 1: L("HUB_DN1_N"), 4: L("HUB_DN2_P"), 3: L("HUB_DN2_N"), 7: pu10(), 6: pu10(),
             27: L("FTDI_FAULT_N"), 21: L("PORT1_FAULT_N"), 35: L("PORT2_FAULT_N"), 38: L("PORT3_FAULT_N"), 37: L("PORT4_FAULT_N")}
     for pin in (51, 49, 47, 33, 31, 17, 15, 50, 48, 34):
         atts[pin] = chain(Ser("R", "10k", None), BusEnd("strap_gnd"))      # LED_A/B straps: one shared GND bus
     for n, (esd, tps, j, unit) in enumerate(ports, start=1):
         dp, dm = {1: (9, 8), 2: (12, 11), 3: (54, 53), 4: (56, 55)}[n]
-        atts[dp] = Conn(esd, 3); atts[dm] = Conn(esd, 1)                   # I/O2 is the D+ row, I/O1 the D- row
+        atts[dp] = chain(Tag(f"HUB_DN{n + 3}_P", None), Conn(esd, 3)); atts[dm] = chain(Tag(f"HUB_DN{n + 3}_N", None), Conn(esd, 1))   # I/O2 is the D+ row, I/O1 the D- row; hub ports 4..7
     ends = fan(s, u, atts, align={"L": "top"}, channels={"R": 270.51}, turn_at={"L": 118.11})    # left rows stay on their pins for U401; routes clear the cap ladder and pull-ups; the strap lanes turn clear of the bottom ladders
+    for pin, net in (("58", "HUB_UP_N"), ("59", "HUB_UP_P")):          # the upstream pair to U401, named for the router: at the lane end, text toward the hub
+        s.label(net, s.lane_end[(u.ref, pin)], 0)
     bus_join(s, "strap_gnd", then=P("GND"), sx=1)
     top_bus(s, u, [46, 24, 64, 5, 10, 52, 57], "+3V3", caps_left=[("100n", None)] * 4, caps_right=[("100n", None)] * 3 + [("4u7", FP["C0805"])],
             rail_at="left", height=12.7)
@@ -93,16 +98,20 @@ def hub(project, num, page, sheet_path, plib):
                 "A4": chain(Flag(None), Gap(22.86), L("J1_VBUS")),                  # plain stretch: U401 taps it, the divider sits at U402 pin 44
                 "A5": chain(Ser("R", "5.1k", None, step=12.7), P("GND")),       # the upper GND lands past the lower row's end
                 "B5": chain(Ser("R", "5.1k", None, step=7.62), P("GND")), "A1": P("GND"), "SH": P("GND")}, align="top")
-    jx = snap(j1.pin("A6")[0] + 7.62)                                   # the joined pairs continue straight into the ESD array
+    # the joined pairs continue straight into the ESD array from their join
     for pin, row in (("1", j1.pin("B7")[1]), ("3", j1.pin("A6")[1])):
         s.wire((jx, row), esd0.pin(pin)); s.junction((jx, row))
-    fan(s, esd0, {6: To("usbup_dm"), 4: To("usbup_dp"), 2: P("GND")})     # I/O1 sits on the D- row, I/O2 on D+
+    fan(s, esd0, {6: To("usbup_dm"), 4: To("usbup_dp"), 2: P("GND")})
+    for pin, net in (("B7", "J1_D_N"), ("B6", "J1_D_P")):              # the connector side of the pair, named for the router: on the lower stub of each joined pair
+        s.label(net, j1.pin(pin), 0)     # I/O1 sits on the D- row, I/O2 on D+
     vx, vy = esd0.pin("5")                                              # VBUS pin straight up onto J1's VBUS lane
     vb = (vx, j1.pin("A4")[1])
     s.wire((vx, vy), vb); s.junction(vb)
     for n, (esd, tps, j, unit) in enumerate(ports, start=1):
         vb, dmp, dpp, gnd = (1, 2, 3, 4) if unit == 1 else (5, 6, 7, 8)
         fan(s, esd, {6: Conn(j, dmp), 4: Conn(j, dpp), 2: P("GND")})
+        for cpin, net in ((dmp, f"PORT{n}_D_N"), (dpp, f"PORT{n}_D_P")):   # the connector side of the pair, named for the router; at the wire end
+            s.label(net, j.pin(cpin), 180)
         e5 = esd.pin("5")                                              # VBUS pin: short stub up, label reading right
         s.wire(e5, (e5[0], snap(e5[1] - 2.54)), (snap(e5[0] + 5.08), snap(e5[1] - 2.54)))
         s.label(f"PORT{n}_VBUS", (snap(e5[0] + 5.08), snap(e5[1] - 2.54)), 0, None)
@@ -140,11 +149,13 @@ def ftdi(project, num, page, sheet_path, plib):
     jp2 = s.add("Jumper", "SolderJumper_2_Open", "JP502", "VCC to J9", (285, 70), footprint=FP["JP2"])
     for pin in (5, 7, 8, 18, 19): s.pin_nc(u, str(pin))
     led = lambda: chain(Ser("D", "LED GREEN", None, lib="Device", name="LED", near="1", fp=FP["LED"]), Ser("R", "470", None), P("FTDI_3V3"))
-    fan(s, u, {20: chain(Ser("R", "470", None), TVS(), Conn(j9, 4)), 4: chain(TVS(), Conn(j9, 5)), 9: chain(TVS(), Conn(j9, 2)),
+    ends = fan(s, u, {20: chain(Ser("R", "470", None), TVS(), Conn(j9, 4)), 4: chain(TVS(), Conn(j9, 5)), 9: chain(TVS(), Conn(j9, 2)),
                2: Conn(jp, 3, stub=5.08), 1: Conn(jp, 1, stub=5.08), 10: led(), 17: led(),
                # FT231X datasheet figure 6.1: 27 R in series, 47 pF to ground on the bus side
-               11: chain(Ser("R", "27", None), Pull("GND", "C", "47p", None), L("HUB_DN2_DP")), 12: chain(Ser("R", "27", None), Pull("GND", "C", "47p", None), L("HUB_DN2_DM")), 13: chain(Pull("GND", "C", "100n", None), Gap(7.62), P("FTDI_3V3")),   # its name clear of the VCC ladder's rail
-               14: Pull("FTDI_3V3", "R", "10k", None), 3: P("FTDI_3V3"), 6: P("GND"), 16: P("GND")})
+               11: chain(Ser("R", "27", None), Pull("GND", "C", "47p", None), L("HUB_DN2_P")), 12: chain(Ser("R", "27", None), Pull("GND", "C", "47p", None), L("HUB_DN2_N")), 13: chain(Pull("GND", "C", "100n", None), Gap(7.62), P("FTDI_3V3")),   # its name clear of the VCC ladder's rail
+               14: Pull("FTDI_3V3", "R", "10k", None), 3: P("FTDI_3V3"), 6: P("GND"), 16: P("GND")}, reach={"L": 19.05})
+    for pin, net in (("11", "FTDI_USB_P"), ("12", "FTDI_USB_N")):        # the chip side of the pair, named for the router: at the lane end, text toward the chip
+        s.label(net, s.lane_end[(u.ref, pin)], 0 if u.pin_dir(pin) == "L" else 180)
     top_caps(s, u, 15, [("10u", FP["C0805"]), ("100n", None)], height=15.24, sx=-1, rail="FTDI_VBUS")
     fan(s, jp, {2: chain(Ser("R", "470", None), TVS(), Conn(j9, 6))})
     fan(s, jp2, {1: P("FTDI_3V3"), 2: Conn(j9, 3)})
@@ -166,7 +177,7 @@ def daplink(project, num, page, sheet_path, plib):
     fan(s, u, {12: Conn(j, 4), 15: Conn(j, 2), 16: Pull("K20_3V3", "R", "10k", None),
                17: End("xtalin"), 18: End("xtalout"),                           # the crystal hangs below, drawn by crystal()
                19: chain(Tag("K20_RESET_N", None), Reset("K20_3V3", "10k", "100n", "DAP RESET", sw_fp=FP["SW"])),   # J601 pin 10 carries the same label
-               3: L("HUB_DN1_DP"), 4: L("HUB_DN1_DM"), 5: chain(Pull("GND", "C", "2u2", None), P("K20_3V3")),
+               3: L("HUB_DN1_P"), 4: L("HUB_DN1_N"), 5: chain(Pull("GND", "C", "2u2", None), P("K20_3V3")),
                21: L("K64_RESET_N"), 24: L("K64_UART0_TX"), 25: L("K64_UART0_RX"), 26: L("SWCLK"), 27: L("SWDIO"),
                29: chain(Ser("D", "LED GREEN", None, lib="Device", name="LED", near="1", fp=FP["LED"]), Ser("R", "470", None), P("K20_3V3")),
                11: P("K20_3V3"), 2: P("GND"), 8: P("GND"), 33: P("GND")})

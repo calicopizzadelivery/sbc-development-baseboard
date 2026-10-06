@@ -58,6 +58,18 @@ first label-style pass with passive renumbering factored out, so the re-layout
 changed drawing, not connectivity (the JP501 default and the J1 VBUS divider
 tap, which became a local label, are the two intended exceptions).
 
+**Differential pairs are named for the router.** Every USB 2.0 pair carries
+net names `<base>_P` / `<base>_N`, the suffixes KiCad's PCB editor pairs up:
+`J1_D`, `J3_D` and `PORT1_D`..`PORT4_D` on the receptacle side of each ESD
+array, `HUB_UP` and `HUB_DN1`..`HUB_DN7` at the hub, `K64_USB` and
+`FTDI_USB` at the chips (the ESD arrays' pass-through pins and the FT231X's
+series resistors each split a pair into two nets, and both halves are named).
+The project file carries a `USB` net class matched by pattern
+(`*_USB_?`, `*_D_?`, `HUB_UP_?`, `HUB_DN?_?`); its differential width and
+gap are KiCad's defaults until the stackup is chosen, then set them from the
+fab's impedance calculator for 90 Ω before routing. Route each pair as a
+pair, no stubs, over an unbroken reference plane.
+
 **Builds are reproducible.** Every UUID in the generated files is derived,
 not drawn: a UUID5 in a namespace made from the project name, keyed by what
 the element is (a symbol by its reference and unit, a pin by its symbol, a

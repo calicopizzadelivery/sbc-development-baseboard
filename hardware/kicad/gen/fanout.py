@@ -322,8 +322,9 @@ class Conn(Att):
     """Wire from the lane end to a placed instance's pin (Z-route, channel staggered by lane)."""
     route = True
 
-    def __init__(self, inst, pin, stub=2.54):
+    def __init__(self, inst, pin, stub=2.54, join=True):
         super().__init__(None); self.inst, self.pin, self.stub = inst, str(pin), stub
+        self.join = join               # the last leg runs into the pin as one wire; False keeps a separate stub that several routes can share
         self.channel_x = None          # set by fan(): beyond every lane's attachments
 
     def render(self, s, E, sx, lane, vertical=None):
@@ -331,15 +332,17 @@ class Conn(Att):
         d = self.inst.pin_dir(self.pin)
         dx, dy = {"L": (-self.stub, 0), "R": (self.stub, 0), "U": (0, -self.stub), "D": (0, self.stub)}[d]
         T = (snap(px + dx), snap(py + dy))
+        # the last leg runs straight into the pin as one wire (no separate stub), so a label at
+        # the pin end owns the whole straight stretch
+        horiz = d in ("L", "R") and self.join         # a side pin: the stub lies along the last leg and folds into it
         if vertical is not None:                      # lane leaves a top/bottom pin: go vertical first
             chy = snap(E[1] + vertical * (2.54 + lane * 1.27))
-            s.wire(E, (E[0], chy), (T[0], chy), T)
+            s.wire(E, (E[0], chy), (T[0], chy), *([T, (px, py)] if horiz else [(px, py)]))
         elif abs(T[1] - E[1]) < 1e-6:
-            s.wire(E, T)
+            s.wire(E, *([(px, py)] if horiz else [T, (px, py)]))
         else:
             ch = self.channel_x if self.channel_x is not None else snap(E[0] + sx * (2.54 + lane * 1.27))
-            s.wire(E, (ch, E[1]), (ch, T[1]), T)
-        s.wire(T, (px, py))
+            s.wire(E, (ch, E[1]), (ch, T[1]), *([(px, py)] if horiz else [T, (px, py)]))
         return T
 
 
@@ -476,6 +479,7 @@ def fan(s, hub, atts, reach=None, min_pitch=PITCH, group_gap=0, align="center", 
     crosses. `align` places a spread stack: "center" on the pin group, "top" or
     "bottom" flush with its first or last pin. `channels` fixes the x where routes
     turn (a value, or {side: value}) when the default would land on something;
+    `reach` (a value, or {side: value}) lengthens the lanes before their chains begin;
     `turn_at` likewise fixes the x of the innermost turn column (default 2.54 mm
     from the pin end) when a column would run through something placed beside the hub
     else. `side_dir` {pin: -1|1} says which way a chain on a top or bottom pin
@@ -492,7 +496,7 @@ def fan(s, hub, atts, reach=None, min_pitch=PITCH, group_gap=0, align="center", 
         by_side.setdefault(d, []).append((str(pin), att))
     reach_arg = reach
     for d, items in by_side.items():
-        reach = reach_arg
+        reach = reach_arg.get(d) if isinstance(reach_arg, dict) else reach_arg      # a value, or {side: value}
         al = align.get(d, "center") if isinstance(align, dict) else align
         ch_base = channels.get(d) if isinstance(channels, dict) else channels
         t_base = turn_at.get(d) if isinstance(turn_at, dict) else turn_at      # innermost turn column, when given
@@ -521,6 +525,7 @@ def fan(s, hub, atts, reach=None, min_pitch=PITCH, group_gap=0, align="center", 
                     s.wire(end, lead)
                     att.render(s, lead, sxd, j)
                 ends[pin] = end
+                s.lane_end[(hub.ref, pin)] = end
             continue
         sx = 1 if d == "R" else -1
         items.sort(key=lambda it: hub.pin(it[0])[1])            # top to bottom
@@ -679,6 +684,7 @@ def fan(s, hub, atts, reach=None, min_pitch=PITCH, group_gap=0, align="center", 
                 s.wire((px, py), E)
             else:
                 s.wire((px, py), (xt, py), (xt, Y), E)
+            s.lane_end[(hub.ref, pin)] = E
             ends[pin] = att.render(s, E, sx, i)
     return ends
 

@@ -84,8 +84,8 @@ def power(project, num, page, sheet_path, plib):
                    3: L("BUCK_EN"),
                    4: Pull("GND", "R", "243k", None),
                    6: chain(Pull("GND", "C", "47p", None), Ser("R", "16.9k", None), Ser("C", "4n7", None), P("GND")),   # TPS54560B datasheet 5 V / 400 kHz example, same 141 uF output
-                   1: chain(Ser("C", "100n/50V", None), Conn(lind, 1)),
-                   8: chain(Pull("GND", ("Device", "D_Schottky", "1"), "B560C", None, fp=FP["SMA"]), Conn(lind, 1)),
+                   1: chain(Ser("C", "100n/50V", None), Conn(lind, 1, join=False)),   # two routes share the inductor's stub
+                   8: chain(Pull("GND", ("Device", "D_Schottky", "1"), "B560C", None, fp=FP["SMA"]), Conn(lind, 1, join=False)),
                    }, align={"L": "top"})                                   # VIN stays on its pin with the input ladder
         fan(s, u, {
                    5: chain(Gap(7.62), Pull("GND", "R", "9.76k", None), Pull(rail, "R", "51.1k", None)),   # past the catch diode's text on the SW lane
@@ -111,7 +111,8 @@ def mcu(project, num, page, sheet_path, plib):
     s.note(["MCU", "MK64FN1M0VLL12 (LQFP-100). Clock: 50 MHz RMII REF_CLK from the KSZ8081 into EXTAL0, as on the FRDM-K64F.",
             "USB regulator: VREGIN fed only from J3 VBUS through D201, so the K64 cannot back-feed the target and the D+ pull-up",
             "disappears when the target is off. VOUT33 powers the transceiver. Pin allocation in docs/hardware-spec.md.",
-            "Spare pins (PTA1, PTA2, PTB23, PTD7, PTE0-6, PTE26, ADC, DAC) are left no-connect."], (16, 17), 1.5)
+            "Spare pins (PTA1, PTA2, PTB23, PTD7, PTE0-6, PTE26, ADC, DAC) are left no-connect.",
+            'USB 2.0: K64_USB_P/N (K64 to U202) and J3_D_P/N (U202 to J3) are 90 ohm differential pairs, net class USB: route as pairs, no stubs.'], (16, 17), 1.5)
     u = s.add("calico-ic", "MK64FN1M0VLL12", "U201", "MK64FN1M0VLL12", (200, 150), footprint="Package_QFP:LQFP-100_14x14mm_P0.5mm")
     j3 = s.add("Connector", "USB_C_Receptacle_USB2.0_16P", "J3", "USB-C HID to target", (35, 73.66), footprint=FP["USBC"])        # D-/D+ rows on U202's, which sit on the K64's USB rows
     j16 = s.add("Connector", "Conn_ARM_JTAG_SWD_10", "J16", "SWD", (360, 60), 0, mirror="y", footprint=FP["SWD10"])   # signals face the K64, VTref up, GND down
@@ -119,7 +120,7 @@ def mcu(project, num, page, sheet_path, plib):
     for pin in (51, 14, 15, 16, 17, 18, 19, 20, 21, 26, 27, 35, 36, 69, 100, 1, 2, 3, 4, 5, 6, 7, 33): s.pin_nc(u, str(pin))
     for pin in ("A8", "B8"): s.pin_nc(j3, pin)
     for pin in (6, 7, 8): s.pin_nc(j16, str(pin))
-    join_pins(s, j3, ["A6", "B6"], length=7.62); join_pins(s, j3, ["A7", "B7"], length=7.62)
+    jx = join_pins(s, j3, ["A6", "B6"], length=10.16)[0]; join_pins(s, j3, ["A7", "B7"], length=10.16)   # room for the pair's labels on the lower stubs
     fan(s, j3, {"A6": Skip(), "B6": Skip(), "A7": Skip(), "B7": Skip(),
                 "A4": chain(Flag(None), Gap(22.86), L("J3_VBUS")),
                 "A5": chain(Ser("R", "5.1k", None, step=12.7), P("GND")),       # the upper GND lands past the lower row's end
@@ -127,10 +128,12 @@ def mcu(project, num, page, sheet_path, plib):
                 "A1": P("GND"), "SH": P("GND")}, align="top")
     esd = s.add("Power_Protection", "USBLC6-2SC6", "U202", "USBLC6-2SC6", (83.82, 74.93), footprint=FP["SOT236"])  # I/O rows = J3 B7 (D-) and A6 (D+); VBUS pin lands on J3's VBUS lane
     esd.val_at = (83.82, 91.44)                                            # value under the part, clear of the K64's route columns
-    jx = snap(j3.pin("A6")[0] + 7.62)                                   # the joined pairs continue straight into the ESD array
+    # the joined pairs continue straight into the ESD array from their join
     for pin, row in (("1", j3.pin("B7")[1]), ("3", j3.pin("A6")[1])):
         s.wire((jx, row), esd.pin(pin)); s.junction((jx, row))
     fan(s, esd, {2: P("GND")})
+    for pin, net in (("B7", "J3_D_N"), ("B6", "J3_D_P")):              # the connector side of the pair, named for the router: on the lower stub of each joined pair
+        s.label(net, j3.pin(pin), 0)
     vx, vy = esd.pin("5")                                               # VBUS pin straight up onto J3's VBUS lane
     vb = (vx, j3.pin("A4")[1])
     s.wire((vx, vy), vb); s.junction(vb)
@@ -161,6 +164,8 @@ def mcu(project, num, page, sheet_path, plib):
         99: chain(Pull("GND", "R", "47k", None), Ser("R", "100k", None), L("J3_VBUS")),      # VBUS sense divider at the ADC pin
         31: chain(Pull("+3V3", "R", "4.7k", None), Gap(17.78), L("I2C0_SCL")), 32: chain(Gap(7.62), Pull("+3V3", "R", "4.7k", None), L("I2C0_SDA")),
     }, align={"L": "top"})
+    for pin, net in (("4", "K64_USB_P"), ("6", "K64_USB_N")):            # the K64 side of the pair, named for the router: at the ESD's pin end, text along the route
+        s.label(net, esd.pin(pin), 0)
     # seven pull-ups to +3V3 on adjacent pins (four port /FAULT, FTDI /FAULT, I2C1 SCL/SDA): one column
     # of resistors to one rail symbol, as the strap buses are drawn. Hung one per lane they would stagger
     # past each other off the sheet.

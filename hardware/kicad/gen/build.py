@@ -21,6 +21,24 @@ PROJECT = "sbc-baseboard"
 kisym.EXTRA_LIBS = {os.path.splitext(os.path.basename(f))[0]: f for f in glob.glob(os.path.join(LIBS, "symbols", "*.kicad_sym"))}
 
 
+def netclass(name, **kw):
+    """A net class as KiCad 10 writes it (net_settings version 4). Geometry is KiCad's default;
+    the USB class's differential width and gap are set from the stackup before routing."""
+    c = {"bus_width": 12, "clearance": 0.2, "diff_pair_gap": 0.25, "diff_pair_via_gap": 0.25, "diff_pair_width": 0.2,
+         "line_style": 0, "microvia_diameter": 0.3, "microvia_drill": 0.1, "name": name, "pcb_color": "rgba(0, 0, 0, 0.000)",
+         "priority": 2147483647, "schematic_color": "rgba(0, 0, 0, 0.000)", "track_width": 0.25, "via_diameter": 0.6,
+         "via_drill": 0.3, "wire_width": 6}
+    c.update(kw)
+    return c
+
+
+def net_settings():
+    # USB 2.0 pairs: every net named <base>_P / <base>_N (J1_D, J3_D, PORTn_D on the connector side; K64_USB, FTDI_USB at the chips; HUB_UP, HUB_DNn at the hub)
+    return {"classes": [netclass("Default"), netclass("USB", priority=0)], "meta": {"version": 4}, "net_colors": None,
+            "netclass_assignments": None,
+            "netclass_patterns": [{"netclass": "USB", "pattern": p} for p in ("*_USB_?", "*_D_?", "HUB_UP_?", "HUB_DN?_?")]}
+
+
 def main():
     os.makedirs(OUT, exist_ok=True)
     set_project(PROJECT)                          # UUIDs are derived in this project's namespace (see sch.py)
@@ -60,7 +78,7 @@ def main():
     # project file, project symbol library, lib table
     pro = {"board": {"design_settings": {"defaults": {}, "rules": {}}, "layer_presets": [], "viewports": []},
            "boards": [], "cvpcb": {"equivalence_files": []}, "libraries": {"pinned_footprint_libs": [], "pinned_symbol_libs": []},
-           "meta": {"filename": f"{PROJECT}.kicad_pro", "version": 1}, "net_settings": {"classes": [], "meta": {"version": 3}},
+           "meta": {"filename": f"{PROJECT}.kicad_pro", "version": 1}, "net_settings": net_settings(),
            "pcbnew": {"page_layout_descr_file": ""}, "schematic": {"legacy_lib_dir": "", "legacy_lib_list": []},
            "sheets": [[root.uuid, "Root"]], "text_variables": {}}
     json.dump(pro, open(os.path.join(OUT, f"{PROJECT}.kicad_pro"), "w"), indent=2)
