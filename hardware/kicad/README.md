@@ -135,18 +135,26 @@ part is placed at the pin it serves, by the generator, in five passes (small
 decoupling capacitors at their pins, the large parts on an IC's own pins,
 bulk capacitors, the small parts on those pins, then parts hosted by other
 passives), each on its host's nearest side with the pad on the host's net
-facing it, packed outward in rings. `placement.txt` records every part's host
-and ring; the generator prints the parts it could not keep within 8 mm of
-their pin. The silkscreen pass places each reference designator where it
+facing it, packed outward in rings. Small resistors, capacitors, diodes and
+transistors that are not on a current-carrying, pair or switching-loop net go
+to the bottom, tucked under their host's pin row, clear of through-hole pads
+and exposed-pad via fields (the directives' Sides section); the rest stay on
+top. The lanes the directives declare (the PSU passthrough: J18 to the relay
+to J19) are laid first as footprint keep-outs on both sides and as 2 mm
+tracks, so nothing is placed in the way of the 3 A path. `placement.txt`
+records every part's host, side and ring; the generator prints the parts it
+could not keep within 8 mm of their pin. The silkscreen pass places each reference designator where it
 overlaps nothing (1.0 mm, then 0.8 mm text) and omits it otherwise, per the
 standard's section 6; ICs and connectors are never omitted, their designator
 steps out to the nearest pocket instead, and the generator lists those too.
 The fabrication layer keeps every designator.
 
-`gen/pcb.py` also runs `kicad-cli pcb drc --severity-all`; its report is
-`drc.txt`. The generated board is a placement, not a layout: DRC reports no
-errors other than the 499 unrouted connections and twelve inside the GCT
-USB-C footprints, whose mounting holes sit 0.19 mm from their own shield pads
+`gen/pcb.py` also runs `kicad-cli pcb drc --severity-all --refill-zones`
+(the planes are filled for the check and not saved, so a plane that fails to
+fill or strays into a keep-out shows; the unconnected count is the ratsnest's
+and does not credit the planes); its report is `drc.txt`. The generated board
+is a placement, not a layout: DRC reports no errors other than the unrouted
+connections and twelve inside the GCT USB-C footprints, whose mounting holes sit 0.19 mm from their own shield pads
 against the 0.25 mm hole clearance set for the fab (confirm with Advanced
 Circuits or trim the footprint), and no warnings. From here the board file is
 the source of truth and is edited in KiCad; `gen/pcb.py` is not run again

@@ -1,8 +1,14 @@
 (version 1)
-# PSU passthrough isolation: only the isolated classes' copper inside the region, and 2.0 mm creepage to board nets
+# PSU passthrough isolation: only the isolated classes' copper inside the region, and 2.0 mm creepage to board nets.
+# (A board-net plane is kept out by the hole drawn in it, and the creepage rule catches a fill that strays in; a
+# disallow on every zone that "intersects" the area would empty the whole ground plane, hole or not.)
 (rule "psu_isolation_keepout"
     (condition "A.intersectsArea('psu_iso') && !(A.NetClass == 'PSU_3A' || A.NetClass == 'PSU_ISO')")
-    (constraint disallow track via zone))
+    (constraint disallow track via))
+(rule "psu_isolation_no_board_zones"
+    (condition "A.Type == 'Zone' && A.enclosedByArea('psu_iso') && !(A.NetClass == 'PSU_3A' || A.NetClass == 'PSU_ISO')")
+    (constraint disallow zone))
+# (a pad with no net, such as the relay's unused NC contact, has no side; it is inside the region by placement)
 (rule "psu_isolation_gap"
-    (condition "(A.NetClass == 'PSU_3A' || A.NetClass == 'PSU_ISO') && !(B.NetClass == 'PSU_3A' || B.NetClass == 'PSU_ISO')")
+    (condition "(A.NetClass == 'PSU_3A' || A.NetClass == 'PSU_ISO') && !(B.NetClass == 'PSU_3A' || B.NetClass == 'PSU_ISO') && B.NetName != ''")
     (constraint clearance (min 2.0mm)))

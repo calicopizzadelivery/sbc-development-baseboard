@@ -193,7 +193,8 @@ activity at the header. TVS on all four signals; the header will be hot-plugged.
 ### Placement and form factor
 
 **140 × 80 mm, four M3 mounting holes 7 mm in from each corner (10 mm until
-the first placement pass, 2026-10-06), components on one side.** Connectors that face you leave the **left** edge; connectors that
+the first placement pass, 2026-10-06); connectors, ICs, relays and large parts
+on top, small passives on the bottom (one side until the placement pass).** Connectors that face you leave the **left** edge; connectors that
 face the target leave the **right** edge. Those are the rules. Here is what
 they produce once the arithmetic is done.
 

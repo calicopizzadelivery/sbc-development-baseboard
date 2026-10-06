@@ -58,8 +58,28 @@ PACK_MARGIN = 0.25          # courtyard to courtyard: with KiCad's 0.25 mm court
 
 # the isolated PSU region: the passthrough block behind J18, a strip along the front and a riser to J19
 ISOLATION = [(64, 42), (84, 42), (84, 80), (48, 80), (48, 62), (64, 62)]   # behind J18/J19; x = 64 runs through K803 between coil and contacts
-ISOLATION_PLANE_HOLE = [(62, 40), (86, 40), (86, 80), (46, 80), (46, 60), (62, 60)]   # the same, grown by ISO_GAP: the ground plane stops here
+ISOLATION_PLANE_HOLE = [(62, 40), (86, 40), (86, 80), (46, 80), (46, 60), (62, 60)]
+# the ground plane on L2 as one outline: the board less a 1 mm edge margin, notched by ISOLATION_PLANE_HOLE from the
+# front edge (a zone outline with a hole does not fill in KiCad; the notch is open to the edge, so none is needed)
+GND_PLANE = [(1, 1), (139, 1), (139, 79), (86, 79), (86, 40), (62, 40), (62, 60), (46, 60), (46, 79), (1, 79)]   # the same, grown by ISO_GAP: the ground plane stops here
 ISO_GAP = 2.0
+# ---- lanes (ecad-standards/layout.md sections 1 and 5): a corridor reserved for one routed path, from pad to pad
+# through axis-aligned legs ("x"/"y" items move along one axis to a coordinate or to another pad's coordinate),
+# as wide as the net class's track plus its clearance plus LANE_MARGIN each side, kept free of parts on both
+# sides of the board, and laid as tracks by the generator
+LANES = {
+    "PSU_VP":   {"net": "PSU_VP",   "layer": "F.Cu", "path": [("J18", "1"), ("y", 65.0), ("x", ("K803", "6")), ("K803", "6")]},
+    "PSU_VOUT": {"net": "PSU_VOUT", "layer": "F.Cu", "path": [("K803", "4"), ("y", 73.0), ("x", ("J19", "1")), ("J19", "1")]},   # under J19's body, past its GND pin
+}
+LANE_MARGIN = 0.25
+# ---- sides (ecad-standards/layout.md section 3.7): connectors, ICs, relays, inductors, crystals, switches, jumpers,
+# LEDs, large parts and the parts on current-carrying, pair and switching-loop nets stay on top; a small part of
+# these kinds, up to the courtyard area given, may go to the bottom, under the pin it serves
+BOTTOM_MAX_AREA = {"R": 7.0, "C": 7.0, "D": 8.0, "Q": 12.0}   # mm2: up to 1206, SOD-123, SOT-23
+BOTTOM_NEVER_CLASSES = {"USB_VBUS_3A", "PWR_6A", "PSU_3A", "USB"}   # parts on these nets stay on top (current paths, pairs); PSU_ISO parts may go under
+BOTTOM_TUCK = 1.0     # a bottom part's inner edge sits this far inside its host's courtyard edge, under the pin row
+THT_MARGIN = 1.0      # bottom parts keep this far from through-hole pads (hand soldering)
+EP_MARGIN = 0.6       # and from an exposed pad's via field
 CURRENT_CLASSES = {"USB_VBUS_3A", "PWR_6A", "PSU_3A", "PSU_ISO"}   # a part on these nets belongs at the connector or IC that carries them
 PAIR_CLASSES = {"USB"}
 ISOLATION_RECTS = [(64, 42, 84, 80), (48, 62, 64, 80)]           # ISOLATION as rectangles, for the placer

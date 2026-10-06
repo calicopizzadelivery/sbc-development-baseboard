@@ -7,8 +7,8 @@ top-left corner, X to the right, Y down, in millimetres, as KiCad draws it.
 
 ## Outline and stackup
 
-- **140 × 80 mm**, 1.6 mm, 2 mm corner radius. Components on the **top side
-  only**.
+- **140 × 80 mm**, 1.6 mm, 2 mm corner radius. Components on **both sides**
+  by the rule under Sides below (2026-10-06; top side only before that).
 - Advanced Circuits standard 4-layer 0.062": L1 signal (1 oz), 0.012"
   prepreg, L2 **ground plane** (1 oz), 0.028" core, L3 power / signal (1 oz),
   0.012" prepreg, L4 signal (1 oz). State it in the fab notes and ask for
@@ -62,8 +62,14 @@ along it); a pin header mates where its pins point. Checked in the 3D view.
   K803 between its coil and contact pins (x = 64) and through U801 between
   its LED and transistor pins (y = 42). It has its own **PSU_GND** copper on
   L2 with **no board ground plane under it**, and a 2 mm creepage gap to
-  every board net, enforced by a DRC rule (`sbc-baseboard.kicad_dru`). Only
-  the opto-coupler and the relay body cross the gap.
+  every board net, enforced by DRC rules (`sbc-baseboard.kicad_dru`: board
+  nets' tracks and vias are kept out of the region, a board-net zone may not
+  lie inside it, and the creepage clearance applies to every board-net item
+  that carries a net; the relay's unused NC contact has no net and sits inside
+  the region by placement). The L2 ground plane is drawn as one outline
+  notched around the region from the front edge. Only the opto-coupler and
+  the relay body cross the gap.
+- **Lanes** (below): no part on either side inside a lane's corridor.
 - Under the Ethernet magnetics (inside J10): no copper on any layer under
   the magnetics side of the jack.
 - The back edge: nothing within 5 mm, so it can lie flat against a rail.
@@ -73,9 +79,44 @@ along it); a pin header mates where its pins point. Checked in the 3D view.
 - Parent standard for everything not stated here: ECSS-Q-ST-70-12C Rev.1,
   with the tailorings listed in ecad-standards/layout.md section 0.
 
+## Lanes
+
+A lane is a corridor reserved for one routed path, from pad to pad through
+axis-aligned legs, as wide as its class's track plus the class clearance plus
+0.25 mm each side, kept free of parts on both sides of the board, and laid as
+copper by the generator at the class width. Two lanes carry the PSU
+passthrough (`LANES` in `gen/layout.py`):
+
+| Lane | Net, class | Path |
+|---|---|---|
+| PSU_VP | PSU_VP, `PSU_3A` (2 mm) | J18 pin 1, up to y = 65, right to the x of K803 pin 6 (COM), up into the relay |
+| PSU_VOUT | PSU_VOUT, `PSU_3A` (2 mm) | K803 pin 4 (NO), down to y = 73 under J19's body past its GND pin, left to the x of J19 pin 1, up into it |
+
+PSU_GND goes from J18 pin 2 to J19 pin 2 through the PSU_GND island on L2.
+The VP leg at y = 65 keeps the 2 mm creepage to the opto-coupler's board-side
+pins (y ≤ 62); the VOUT leg at y = 73 clears J19's GND pad by the class
+clearance. The lanes' corridors stop at the courtyards of the parts they join
+and appear in the board as footprint keep-out rule areas named `lane_*`. The
+USB 2.0 pairs get their lanes when the pairs are placed (standard, section
+8.3).
+
+## Sides
+
+Connectors, ICs, relays, inductors, crystals and their load capacitors,
+switches, jumpers, LEDs, test points, the bulk and large capacitors, the
+parts of each buck's switching loop, the ESD arrays and the series parts on
+the USB pairs, and every part on a `USB_VBUS_3A`, `PWR_6A` or `PSU_3A` net
+stay on the **top**. Resistors and capacitors up to 1206, small diodes
+(SOD-123) and SOT-23 transistors may go to the **bottom**, under the pin they
+serve, 1 mm inside their host's courtyard edge, never within 1 mm of a
+through-hole pad (hand soldering) or 0.6 mm of an exposed pad's via field.
+The corner keep-outs, the 3 mm edge zone, the lanes and the isolation rule
+apply on both sides. The bottom carries nothing taller than 3 mm (the
+standoffs). The area this frees on top is for the blocks' copper zones.
+
 ## Placement
 
-The connectors are locked where the table above puts them (`CONNECTORS` in
+The connectors are locked where the edge table puts them (`CONNECTORS` in
 `gen/layout.py`). The ICs are anchored by flow, below; the two parts that
 straddle the isolation barrier are fixed; **every other part is placed by the
 generator at the pin it serves** (ecad-standards/layout.md section 2): its
