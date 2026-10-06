@@ -34,7 +34,10 @@ def netclass(name, **kw):
 
 def net_settings():
     # USB 2.0 pairs: every net named <base>_P / <base>_N (J1_D, J3_D, PORTn_D on the connector side; K64_USB, FTDI_USB at the chips; HUB_UP, HUB_DNn at the hub)
-    return {"classes": [netclass("Default"), netclass("USB", priority=0)], "meta": {"version": 4}, "net_colors": None,
+    # 90 ohm differential microstrip on Advanced Circuits' standard 4-layer 62 mil stackup: 1 oz outer
+    # copper over a 12 mil prepreg (er 4.6) to the L2 ground plane -> 0.35 mm traces, 0.20 mm gap
+    # (edge-coupled microstrip estimate, ~91 ohm); the fab's impedance calculator has the last word
+    return {"classes": [netclass("Default"), netclass("USB", priority=0, diff_pair_width=0.35, diff_pair_gap=0.2, track_width=0.35)], "meta": {"version": 4}, "net_colors": None,
             "netclass_assignments": None,
             "netclass_patterns": [{"netclass": "USB", "pattern": p} for p in ("*_USB_?", "*_D_?", "HUB_UP_?", "HUB_DN?_?")]}
 
@@ -66,7 +69,7 @@ def main():
              "",
              "VERIFY BEFORE FAB (also in docs/hardware-spec.md section 8):",
              "  - K803 JW1FSN contact pad mapping (COM 6 / NO 4 / NC 2) against the Panasonic drawing",
-             "  - DAPLink k20dx HIC pin assignments (SWCLK PTC5, SWDIO PTC6, nRESET PTB1, LED PTD4, UART1 PTC3/4)",
+             "  - DAPLink K20: pins verified against DAPLink k20dx and the FRDM-K64F OpenSDA circuit; confirm SWD at bring-up",
              "  - TPS54560B compensation values; TPS2553 ILIM at bring-up; TPS26630 UVLO/ILIM",
              "  - STUSB4500 operation from VSYS alone (J17 programmer, no VBUS); PCA9517A isolation with VCC(B) = 0",
              "  - USB2517 VBUS_DET divider (10k/22k) vs the EVB; LED_A/B strap pull-downs",

@@ -652,17 +652,29 @@ firmware is running and its loop is not wedged.
 | 7 | ~~Form factor and mounting~~ **Resolved:** 140 × 80 mm, four M3 at 10 mm from each corner, you on the left edge, the target on the right, overflow to the front edge. §2. | — |
 | 8 | Authentication on the TCP transport. Today anything that can reach the port can cut the target's power and assert its recovery pins. A trusted segment is the assumption; decide whether that is good enough. | Remote management outside the lab |
 | 9 | Should the K64 be able to rewrite the STUSB4500 NVM itself, over the buffered bus? Then J17 is bring-up and recovery only, and PDO changes become a console command. | Firmware scope |
-| 14 | DAPLink k20dx HIC pin assignments as captured (SWCLK PTC5, SWDIO PTC6, nRESET PTB1, LED PTD4, UART1 PTC3/PTC4) — verify against `source/hic_hal/freescale/k20dx/IO_Config.h`. | daplink.kicad_sch |
+| 14 | ~~DAPLink k20dx HIC pin assignments~~ **Resolved** (2026-10-06) against DAPLink's `k20dx/IO_Config.h` and `uart.c` and the FRDM-K64F OpenSDA schematic: SWCLK PTC5, SWDIO out PTC6 **and SWDIO in PTC7** (both on the SWDIO net, as on the FRDM), nRESET PTB1, LED PTD4, UART1 PTC3 RX / PTC4 TX. The FRDM's 33 Ω series resistors on the K20's USB D+/D− are now fitted. PTD6 (POWER_EN) and PTD7 (VTRG_FAULT_B) stay unconnected: nothing here for them to switch or sense. | — |
 | 15 | Component values around every IC follow its datasheet typical application or evaluation board; the comparison and the deliberate deviations are in [reference-design-review.md](reference-design-review.md). Still to confirm at bring-up: crystal load capacitors against the crystals ordered, TPS26630 MODE/OVP strapping, TPS62823 inductor saturation, a load-step check of the TPS54560B compensation, JW1FSN pad mapping. | power / hub / target sheets |
 | 10 | Verify at bring-up, against the datasheets: the STUSB4500 runs and answers I2C from `VSYS` alone with no VBUS; what it asks of an unused `VSYS`; and the PCA9517A's B side with `VCCA` at 0 V. The J17 circuit assumes all three. | J17 circuit |
 | 11 | ~~Power relay NC rating~~ **Resolved** against the datasheets: Panasonic JW1FSN-DC5V, 10 A at 30 VDC on the form C with no NC derate, AgSnO2. G2R-1 and G5LE-1 also pass; G5Q-1, at 3 A NC, does not. The load has since moved to the NO contact, where the headline figure applies. Table in §4. | — |
-| 12 | J9 pin 3: a third jumper position that makes it a VREF *input* feeding the FT231X's `VCCIO`, so the header follows a 1.8 V target. Needs the FT231X's behaviour with `VCCIO` at 0 V (target off) verified first; J13 already covers 1.8 V, so this is convenience, not capability. | J9 |
+| 12 | ~~J9 pin 3 as a VREF input~~ **Resolved** (2026-10-06): J9 mirrors the Adafruit FTDI Friend, whose pin 3 is a VCC *output*. Pinout GND, CTS, VCC, TX, RX, RTS; VCC = 5 V by default (JP502 A–C bridged) or 3.3 V (B–C); pin 6 = RTS by default (JP501 A–C bridged) or DTR; 3.3 V logic. No VREF-input position; 1.8 V consoles use J13. | — |
 | 13 | ~~Passthrough at boot~~ **Resolved:** restore the last commanded state. A watchdog reset must not strand a remote target. The G2RK-1 latching relay stays unfitted unless the reset gap proves to matter. | — |
 
 Item 4 is deferred on purpose. It only becomes expensive if a board leaves the
 lab, and a VID has lead time of its own, so that is the moment to start it.
 
 ---
+
+## 8a. Stackup and controlled impedance
+
+Advanced Circuits' standard 4-layer 0.062" stackup: 1 oz copper on all four
+layers, 0.012" prepreg (εr ≈ 4.6) between L1 and L2 and between L3 and L4,
+0.028" core between L2 and L3. L2 is the ground plane under the USB 2.0
+pairs, which are routed on L1 as 90 Ω edge-coupled microstrip: **0.35 mm
+traces, 0.20 mm gap** (≈ 91 Ω by the IPC-2141 estimate for a 0.305 mm
+dielectric at εr 4.6 with 1 oz copper). These are the `USB` net class's
+differential width and gap in the project file. State the stackup in the
+fab notes and ask for controlled impedance on the USB class; the fab's
+impedance calculator has the last word on the width and gap.
 
 ## 9. Schematic
 

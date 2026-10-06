@@ -65,30 +65,35 @@ def relays(project, num, page, sheet_path, plib):
             "Only the optocoupler's emitter sits across the passthrough, sized for 5-30 V. No indicator LED there.",
             "K803 JW1FSN pad map COM=6 NO=4 NC=2: VERIFY against the Panasonic terminal drawing before fab."], (16, 17), 1.5)
     for n, y in ((1, 75), (2, 150)):
-        k = s.add("Relay", "G6K-2", f"K80{n}", "G6K-2F-Y DC5", (150, y), footprint="Relay_SMD:Relay_DPDT_Omron_G6K-2F-Y")
+        # flipped top-to-bottom so COM (3) is on top and NC/NO (2/4) below, the header's COM/NO/NC order:
+        # the three routes reach J1n without crossing. The coil has no polarity (no internal diode).
+        k = s.add("Relay", "G6K-2", f"K80{n}", "G6K-2F-Y DC5", (150, y), mirror="x", footprint="Relay_SMD:Relay_DPDT_Omron_G6K-2F-Y")
         jx = s.add("Connector_Generic", "Conn_01x03", f"J1{n}", "COM/NO/NC", (230, y), footprint=FP["PH3"])
         q = s.Q("Transistor_FET", "2N7002", "2N7002", (90, y + 42))     # its GND clear of the LED chain's rail name
         for pin in (5, 6, 7): s.pin_nc(k, str(pin))
-        # coil: pin 1 (top-left) to +5V_PORTS; the switched end (pin 8, bottom-left) runs left with
+        # coil: pin 8 (top-left) to +5V_PORTS; the switched end (pin 1, bottom-left) runs left with
         # the flyback diode and the coil LED hanging up to the rail, then down to the FET drain
-        fan(s, k, {1: P("+5V_PORTS"),
-                   8: chain(Pull("+5V_PORTS", ("Diode", "1N4148W", "1"), "1N4148W", None, fp=FP["SOD123"]), PullLED(RED, "2.2k", None, rail="+5V_PORTS"), Conn(q, 3)),
-                   2: Conn(jx, 3), 4: Conn(jx, 2), 3: Conn(jx, 1)}, side_dir={8: -1})
+        fan(s, k, {8: P("+5V_PORTS"),
+                   1: chain(Pull("+5V_PORTS", ("Diode", "1N4148W", "1"), "1N4148W", None, fp=FP["SOD123"]), PullLED(RED, "2.2k", None, rail="+5V_PORTS"), Conn(q, 3)),
+                   3: Conn(jx, 1), 4: Conn(jx, 2), 2: Conn(jx, 3)}, side_dir={1: -1})
         fan(s, q, {1: chain(Pull("GND", "R", "100k", None), Ser("R", "1k", None), L(f"RLY{n}_DRV")), 2: P("GND")})
     # passthrough
     k3 = s.add("calico-electromechanical", "JW1FSN", "K803", "JW1FSN-DC5V", (150, 225), footprint="Relay_THT:Relay_SPDT_Panasonic_JW1_FormC")
     q3 = s.Q("Transistor_FET", "AO3400A", "AO3400A", (70, 252))
     j18 = s.add("Connector_Generic", "Conn_01x02", "J18", "PSU in (isolated)", (300, 212), footprint=FP["PH2"])
     j19 = s.add("Connector_Generic", "Conn_01x02", "J19", "PSU out (isolated)", (300, 237), footprint=FP["PH2"])
-    opto = s.add("Isolator", "LTV-817", "U801", "LTV-817", (230, 250), 0, mirror="y", footprint=FP["DIP4"])   # all above the frame margin and left of the title block
+    # the optocoupler sits between the relay and the PSU connectors, above the passthrough wires: its LED side
+    # faces the relay's COM (PSU in) and taps that lane from above; its transistor side faces the board
+    opto = s.add("Isolator", "LTV-817", "U801", "LTV-817", (232.41, 193.04), 0, footprint=FP["DIP4"])   # far enough right that its LED chain ends before the COM lane's end
     s.pin_nc(k3, "2")
     fan(s, k3, {1: P("+5V_PORTS"),
                 8: chain(Pull("+5V_PORTS", ("Diode", "1N4148W", "1"), "1N4148W", None, fp=FP["SOD123"]), PullLED(RED, "2.2k", None, rail="+5V_PORTS"), Conn(q3, 3)),
-                6: Conn(j18, 1), 4: Conn(j19, 1)})
+                6: End("psu_in"), 4: End("psu_out")})                       # the contacts' lanes end here; J18/J19 route to them
     fan(s, q3, {1: chain(Pull("GND", "R", "100k", None), Ser("R", "1k", None), L("RLY_PSU_DRV")), 2: P("GND")})
-    fan(s, j18, {2: P("PSU_GND", hook=(7.62, 5.08))}); fan(s, j19, {2: P("PSU_GND", hook=(7.62, 5.08))})   # under the connector, clear of the relay routes
-    fan(s, opto, {1: chain(Pull("PSU_GND", ("Diode", "1N4148W", "1"), "1N4148W", None, fp=FP["SOD123"]), Ser("R", "1.8k", None, fp=FP["R1206"]), Ser("R", "1.8k", None, fp=FP["R1206"]), Conn(j18, 1)),
+    fan(s, j18, {1: To("psu_in"), 2: P("PSU_GND")}); fan(s, j19, {1: To("psu_out"), 2: P("PSU_GND")})
+    fan(s, opto, {1: chain(Pull("PSU_GND", ("Diode", "1N4148W", "1"), "1N4148W", None, fp=FP["SOD123"]), Ser("R", "1.8k", None, fp=FP["R1206"]), Ser("R", "1.8k", None, fp=FP["R1206"]), To("psu_in", direct=True)),
                   2: P("PSU_GND"), 4: chain(Pull("+3V3", "R", "10k", None), L("PSU_PRESENT_N")), 3: P("GND")})
+    s.junction(End.registry[(id(s), "psu_in")][0])                        # the COM lane, J18's route and the opto's tap meet there
     flags(s, ["PSU_GND"], (25, 272))
     s.note(["Opto LED: 2x1.8k 1206 in series, 1 mA at 5 V, 8 mA / 0.12 W each at 30 V. The antiparallel 1N4148W protects a reversed PSU.",
             "PSU_PRESENT_N is active low at the K64."], (95, 272), 1.3)

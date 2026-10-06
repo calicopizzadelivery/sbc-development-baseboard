@@ -138,27 +138,28 @@ def hub(project, num, page, sheet_path, plib):
 def ftdi(project, num, page, sheet_path, plib):
     s = Sheet(project, "FTDI: FT231X on hub port 2, standard 6-pin FTDI header", num, page, sheet_path)
     s.project_lib = plib
-    s.note(["FTDI HEADER J9", "Pinout = TTL-232R / SparkFun: 1 GND (blk)  2 CTS (brn)  3 VCC (red)  4 TXD (org)  5 RXD (yel)  6 RTS/DTR (grn).",
+    s.note(["FTDI HEADER J9", "Pinout = Adafruit FTDI Friend (the TTL-232R order): 1 GND (blk)  2 CTS (brn)  3 VCC (red)  4 TXD (org)  5 RXD (yel)  6 RTS/DTR (grn).",
             "TXD/RXD named from the FT231X side: TXD drives the target's RX. 3.3 V levels only; 1.8 V consoles use J13.",
-            "JP501: pin 6 = DTR# (bridge C-A, default) or RTS# (bridge C-B). JP502: pin 3 VCC from 3V3OUT (50 mA), open by default.",
+            "JP501: pin 6 = RTS# (A-C, bridged by default) or DTR# (cut, bridge B-C). JP502: pin 3 VCC = FTDI_VBUS 5 V (A-C, default) or 3V3OUT 3.3 V / 50 mA (B-C).",
             "VCC comes from the TPS2553 on the hub sheet (FTDI_VBUS): FTDI CYCLE power-cycles the bridge without a replug.",
             "CBUS defaults: CBUS1 = RXLED#, CBUS2 = TXLED# (factory MTP); change with FT_PROG if ever needed."], (16, 17), 1.5)
     u = s.add("Interface_USB", "FT231XS", "U501", "FT231XS", (150, 120), footprint="Package_SO:SSOP-20_3.9x8.7mm_P0.635mm")
     j9 = s.add("Connector_Generic", "Conn_01x06", "J9", "FTDI header", (330, 110), footprint=FP["HDR6"])
-    jp = s.add("Jumper", "SolderJumper_3_Open", "JP501", "RTS/DTR", (262, 130.08), 90, footprint=FP["JP3"])   # below the DTR route, so that passes above pin 3
-    jp2 = s.add("Jumper", "SolderJumper_2_Open", "JP502", "VCC to J9", (285, 70), footprint=FP["JP2"])
+    jp = s.add("Jumper", "SolderJumper_3_Bridged12", "JP501", "RTS/DTR", (262, 130.08), 90, mirror="x", footprint=FP["JP3B"])   # A on top (bridged to C) = RTS#, as on the FTDI Friend; C faces J9   # below the DTR route, so that passes above pin 3
+    jp2 = s.add("Jumper", "SolderJumper_3_Bridged12", "JP502", "VCC 5V/3V3", (285, 70), footprint=FP["JP3B"])   # A-C bridged: J9 VCC = 5 V, as on the FTDI Friend
+    jp2.ref_at, jp2.val_at, jp2.val_just = (285, 64.77), (288.9, 76.2), "left"                 # ref above between the rail names, value beside the C pin's route
     for pin in (5, 7, 8, 18, 19): s.pin_nc(u, str(pin))
     led = lambda: chain(Ser("D", "LED GREEN", None, lib="Device", name="LED", near="1", fp=FP["LED"]), Ser("R", "470", None), P("FTDI_3V3"))
     ends = fan(s, u, {20: chain(Ser("R", "470", None), TVS(), Conn(j9, 4)), 4: chain(TVS(), Conn(j9, 5)), 9: chain(TVS(), Conn(j9, 2)),
-               2: Conn(jp, 3, stub=5.08), 1: Conn(jp, 1, stub=5.08), 10: led(), 17: led(),
+               2: Conn(jp, 1, stub=5.08), 1: Conn(jp, 3, stub=5.08), 10: led(), 17: led(),
                # FT231X datasheet figure 6.1: 27 R in series, 47 pF to ground on the bus side
-               11: chain(Ser("R", "27", None), Pull("GND", "C", "47p", None), L("HUB_DN2_P")), 12: chain(Ser("R", "27", None), Pull("GND", "C", "47p", None), L("HUB_DN2_N")), 13: chain(Pull("GND", "C", "100n", None), Gap(7.62), P("FTDI_3V3")),   # its name clear of the VCC ladder's rail
-               14: Pull("FTDI_3V3", "R", "10k", None), 3: P("FTDI_3V3"), 6: P("GND"), 16: P("GND")}, reach={"L": 19.05})
+               11: chain(Ser("R", "27", None), Pull("GND", "C", "47p", None), L("HUB_DN2_P")), 12: chain(Ser("R", "27", None), Pull("GND", "C", "47p", None), L("HUB_DN2_N")), 13: chain(Gap(38.1), Pull("GND", "C", "100n", None), Gap(7.62), P("FTDI_3V3")),   # its name clear of the VCC ladder's rail
+               14: Pull("FTDI_3V3", "R", "10k", None), 3: P("FTDI_3V3"), 6: P("GND"), 16: P("GND")}, reach={"L": 19.05}, align={"L": "top"})   # 3V3OUT: its cap and rail far out on a lane that stays on its pin, clear of the VCC decoupling above
     for pin, net in (("11", "FTDI_USB_P"), ("12", "FTDI_USB_N")):        # the chip side of the pair, named for the router: at the lane end, text toward the chip
         s.label(net, s.lane_end[(u.ref, pin)], 0 if u.pin_dir(pin) == "L" else 180)
     top_caps(s, u, 15, [("10u", FP["C0805"]), ("100n", None)], height=15.24, sx=-1, rail="FTDI_VBUS")
     fan(s, jp, {2: chain(Ser("R", "470", None), TVS(), Conn(j9, 6))})
-    fan(s, jp2, {1: P("FTDI_3V3"), 2: Conn(j9, 3)})
+    fan(s, jp2, {1: P("FTDI_VBUS"), 2: Conn(j9, 3), 3: P("FTDI_3V3")})
     fan(s, j9, {1: P("GND", hook=(-5.08, -7.62))})     # off the row below, which carries the RXD route
     return s
 
@@ -168,19 +169,25 @@ def daplink(project, num, page, sheet_path, plib):
     s.project_lib = plib
     s.note(["DAPLINK", "MK20DX128VFM5 running DAPLink (k20dx HIC), powered from +5V_PORTS through its own USB regulator (VOUT33 -> VDD).",
             "Pin use follows the DAPLink k20dx HIC: PTC5 = SWCLK, PTC6 = SWDIO, PTB1 = nRESET to the K64, PTD4 = LED,",
-            "UART1 PTC3/PTC4 bridges to the K64 UART0 (CDC console). Verify against DAPLink source/hic_hal/freescale/k20dx/IO_Config.h.",
+            "UART1 PTC3/PTC4 bridges to the K64 UART0 (CDC console). Pins verified against DAPLink k20dx IO_Config.h and the FRDM-K64F OpenSDA circuit:",
+            "PTC7 (SWDIO_IN) ties to SWDIO, 33 R in series with USB D+/D- (FRDM R20/R22). No level shifters: the K64 target is 3.3 V like the K20.",
             "J601 programs the K20 itself (bootloader + DAPLink). SW601 held at power-up enters DAPLink maintenance mode."], (16, 17), 1.5)
     u = s.add("MCU_NXP_Kinetis", "MK20DX128VFM5", "U601", "MK20DX128VFM5", (170, 115), footprint="Package_DFN_QFN:QFN-32-1EP_5x5mm_P0.5mm_EP3.45x3.45mm")
     j = s.add("Connector", "Conn_ARM_JTAG_SWD_10", "J601", "SWD (K20)", (34.92, 100), footprint=FP["SWD10"])   # its pin stubs clear of the K20's route columns
-    for pin in (9, 10, 13, 14, 20, 22, 23, 28, 30, 31, 32): s.pin_nc(u, str(pin))
+    # USB pins 3/4 end as routes so their rows spread for the series resistors' texts; the HUB_DN1 labels sit on those ends
+    for pin in (9, 10, 13, 14, 20, 22, 23, 30, 31, 32): s.pin_nc(u, str(pin))   # PTD6 POWER_EN / PTD7 VTRG_FAULT_B: DAPLink drives / ignores them, nothing to power here
     for pin in (6, 7, 8): s.pin_nc(j, str(pin))
     fan(s, u, {12: Conn(j, 4), 15: Conn(j, 2), 16: Pull("K20_3V3", "R", "10k", None),
                17: End("xtalin"), 18: End("xtalout"),                           # the crystal hangs below, drawn by crystal()
                19: chain(Tag("K20_RESET_N", None), Reset("K20_3V3", "10k", "100n", "DAP RESET", sw_fp=FP["SW"])),   # J601 pin 10 carries the same label
-               3: L("HUB_DN1_P"), 4: L("HUB_DN1_N"), 5: chain(Pull("GND", "C", "2u2", None), P("K20_3V3")),
-               21: L("K64_RESET_N"), 24: L("K64_UART0_TX"), 25: L("K64_UART0_RX"), 26: L("SWCLK"), 27: L("SWDIO"),
+               3: chain(Ser("R", "33", None), End("dn1_p")), 4: chain(Ser("R", "33", None), End("dn1_n")), 5: chain(Pull("GND", "C", "2u2", None), P("K20_3V3")),
+               21: L("K64_RESET_N"), 24: L("K64_UART0_TX"), 25: L("K64_UART0_RX"), 26: L("SWCLK"), 27: L("SWDIO"), 28: L("SWDIO"),   # PTC6 drives, PTC7 reads SWDIO (DAPLink k20dx, FRDM-K64F)
                29: chain(Ser("D", "LED GREEN", None, lib="Device", name="LED", near="1", fp=FP["LED"]), Ser("R", "470", None), P("K20_3V3")),
-               11: P("K20_3V3"), 2: P("GND"), 8: P("GND"), 33: P("GND")})
+               11: P("K20_3V3"), 2: P("GND"), 8: P("GND"), 33: P("GND")}, reach={"L": 21.59})   # room on the pair lanes for the chip-side labels before the lanes' turns
+    for pin, net in (("3", "K20_USB_P"), ("4", "K20_USB_N")):            # the chip side of the pair, named for the router
+        s.label(net, s.lane_end[(u.ref, pin)], 0)
+    for key, net in (("dn1_p", "HUB_DN1_P"), ("dn1_n", "HUB_DN1_N")):      # the hub side of the pair, beyond the series resistors
+        s.label(net, End.registry[(id(s), key)][0], 180)
     top_bus(s, u, [1, 7], "K20_3V3", caps_right=[("100n", None), ("100n", None)], rail_at="right", height=12.7)
     top_caps(s, u, 6, [("2u2", None)], height=20.32, sx=-1, rail="+5V_PORTS")
     crystal(s, u, "xtalin", "xtalout", "Y601", "8MHz", FP["XTAL4"], "18p")

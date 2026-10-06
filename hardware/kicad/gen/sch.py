@@ -124,6 +124,7 @@ class Schematic:
         self.project_lib = {}
         self.channel_edge = {}          # (hub ref, side) -> first free column beyond that side's route channels
         self.lane_end = {}              # (hub ref, pin) -> where the pin's lane ends and its chain begins
+        self.stubs = set()              # (ref, pin) whose route stub is already drawn (several routes may share it)
         self.refs = set()
         self.comments = []
         self.wire_log = []

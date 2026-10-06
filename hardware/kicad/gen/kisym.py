@@ -229,10 +229,6 @@ def pins_of(symnode):
 def transform(x, y, X, Y, rot, mirror=None):
     """Library point (Y up) -> schematic point for an instance at (X, Y, rot)."""
     dx, dy = x, -y                       # flip to screen (Y down)
-    if mirror == "x":
-        dy = -dy
-    elif mirror == "y":
-        dx = -dx
     r = rot % 360
     if r == 90:
         dx, dy = dy, -dx
@@ -240,6 +236,12 @@ def transform(x, y, X, Y, rot, mirror=None):
         dx, dy = -dx, -dy
     elif r == 270:
         dx, dy = -dy, dx
+    # KiCad mirrors in sheet coordinates after rotating: (mirror x) flips top-to-bottom on the
+    # sheet whatever the rotation, (mirror y) left-to-right
+    if mirror == "x":
+        dy = -dy
+    elif mirror == "y":
+        dx = -dx
     return (round(X + dx, 4), round(Y + dy, 4))
 
 
@@ -252,11 +254,13 @@ def pin_direction(angle, rot, mirror=None):
     # in library coords (Y up), angle 0 means the line goes from (x,y) toward +x:
     # body is at +x, so the connection point is on the body's LEFT.
     base = {0: "L", 180: "R", 90: "D", 270: "U"}[angle % 360]  # 90: line goes +y (up) so point is BELOW body
-    if mirror == "y":
-        base = {"L": "R", "R": "L"}.get(base, base)
-    if mirror == "x":
-        base = {"U": "D", "D": "U"}.get(base, base)
     order = ["R", "U", "L", "D"]           # counter-clockwise on screen
     i = order.index(base)
     steps = (rot % 360) // 90
-    return order[(i + steps) % 4]
+    d = order[(i + steps) % 4]
+    # the mirror applies on the sheet, after the rotation (as KiCad does)
+    if mirror == "y":
+        d = {"L": "R", "R": "L"}.get(d, d)
+    if mirror == "x":
+        d = {"U": "D", "D": "U"}.get(d, d)
+    return d

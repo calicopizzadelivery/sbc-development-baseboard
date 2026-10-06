@@ -1366,7 +1366,7 @@
 		)
 		(uuid "673732ca-2939-5094-ab2e-760e067b9f53")
 	)
-	(text "  - DAPLink k20dx HIC pin assignments (SWCLK PTC5, SWDIO PTC6, nRESET PTB1, LED PTD4, UART1 PTC3/4)"
+	(text "  - DAPLink K20: pins verified against DAPLink k20dx and the FRDM-K64F OpenSDA circuit; confirm SWD at bring-up"
 		(exclude_from_sim no)
 		(at 30 197.4 0)
 		(effects
@@ -1375,7 +1375,7 @@
 			)
 			(justify left bottom)
 		)
-		(uuid "6c24610a-2028-5066-bf43-8f8f69b6413e")
+		(uuid "3e922aea-f927-59f8-87f7-1d308041a5b9")
 	)
 	(text "  - TPS54560B compensation values; TPS2553 ILIM at bring-up; TPS26630 UVLO/ILIM"
 		(exclude_from_sim no)

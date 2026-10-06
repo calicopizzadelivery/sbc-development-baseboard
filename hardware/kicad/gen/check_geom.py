@@ -1,8 +1,9 @@
 #!/usr/bin/env python3
 """Find accidental connections in a generated sheet: any wire whose interior
 passes through a symbol pin, a label, or another wire's endpoint, where no
-junction was placed. KiCad connects on contact, so each of these is a short
-the author did not intend.
+junction was placed, and any two wires that share a stretch. KiCad connects on
+contact, so each of these is a short the author did not intend, or two wires
+drawn over each other.
 
     ./check_geom.py ../sbc-baseboard/ftdi.kicad_sch
 """
@@ -44,6 +45,18 @@ def on_interior(pt, a, b, eps=0.01):
         return abs(y - y1) < eps and min(x1, x2) + eps < x < max(x1, x2) - eps
     return False
 
+def overlap(w1, w2, eps=0.01):
+    """True when two collinear wires share more than a point."""
+    (a1, b1), (a2, b2) = w1, w2
+    if abs(a1[0] - b1[0]) < eps and abs(a2[0] - b2[0]) < eps and abs(a1[0] - a2[0]) < eps:      # both vertical, same x
+        lo, hi = max(min(a1[1], b1[1]), min(a2[1], b2[1])), min(max(a1[1], b1[1]), max(a2[1], b2[1]))
+        return hi - lo > eps
+    if abs(a1[1] - b1[1]) < eps and abs(a2[1] - b2[1]) < eps and abs(a1[1] - a2[1]) < eps:      # both horizontal, same y
+        lo, hi = max(min(a1[0], b1[0]), min(a2[0], b2[0])), min(max(a1[0], b1[0]), max(a2[0], b2[0]))
+        return hi - lo > eps
+    return False
+
+
 def check(path):
     wires, pins, points, juncs = load(path)
     ends = [(w[0], "wire-end"), (w[1], "wire-end")] if False else []
@@ -54,6 +67,13 @@ def check(path):
         for pt, what in pins + points + ends:
             if on_interior(pt, a, b) and (round(pt[0], 2), round(pt[1], 2)) not in juncs:
                 hits.append((pt, what, a, b))
+    # two wires sharing a stretch (one drawn over another): always wrong, junction or not
+    for i, (a1, b1) in enumerate(wires):
+        for (a2, b2) in wires[i + 1:]:
+            if overlap((a1, b1), (a2, b2)):
+                mid = ((max(min(a1[0], b1[0]), min(a2[0], b2[0])) + min(max(a1[0], b1[0]), max(a2[0], b2[0]))) / 2,
+                       (max(min(a1[1], b1[1]), min(a2[1], b2[1])) + min(max(a1[1], b1[1]), max(a2[1], b2[1]))) / 2)
+                hits.append((mid, "overlap", a1, b1))
     # de-duplicate by point
     seen = {}
     for pt, what, a, b in hits:

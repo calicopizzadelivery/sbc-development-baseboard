@@ -281,7 +281,12 @@ class Tag(Att):
     def render(self, s, E, sx, lane):
         s.label(self.net, E, 0 if sx > 0 else 180, self.glob)
         if self.next is not None:
-            far = (snap(E[0] + sx * self.step), E[1]); s.wire(E, far)
+            far = (snap(E[0] + sx * self.step), E[1])
+            if isinstance(self.next, To) and (id(s), self.next.key) in End.registry:
+                T, _ = End.registry[(id(s), self.next.key)]
+                if abs(T[1] - E[1]) < 1e-6 and 0 < (T[0] - E[0]) * sx < self.step + 1e-6:
+                    far = T                       # the route's target lies on this row: the lane ends there, nothing doubles back
+            s.wire(E, far)
             return self.next.render(s, far, sx, lane)
         return E
 
@@ -327,22 +332,33 @@ class Conn(Att):
         self.join = join               # the last leg runs into the pin as one wire; False keeps a separate stub that several routes can share
         self.channel_x = None          # set by fan(): beyond every lane's attachments
 
-    def render(self, s, E, sx, lane, vertical=None):
+    def render(self, s, E, sx, lane, vertical=None, rank=0, count=1):
         px, py = self.inst.pin(self.pin)
         d = self.inst.pin_dir(self.pin)
         dx, dy = {"L": (-self.stub, 0), "R": (self.stub, 0), "U": (0, -self.stub), "D": (0, self.stub)}[d]
         T = (snap(px + dx), snap(py + dy))
         # the last leg runs straight into the pin as one wire (no separate stub), so a label at
         # the pin end owns the whole straight stretch
-        horiz = d in ("L", "R") and self.join         # a side pin: the stub lies along the last leg and folds into it
+        horiz = d in ("L", "R") and self.join and (self.inst.ref, self.pin) not in s.stubs   # a side pin: the stub lies along the last leg and folds into it (unless a stub is already drawn)
+        def stub():                                   # a separate stub, drawn once however many routes share the pin
+            if (self.inst.ref, self.pin) not in s.stubs:
+                s.wire(T, (px, py)); s.stubs.add((self.inst.ref, self.pin))
         if vertical is not None:                      # lane leaves a top/bottom pin: go vertical first
-            chy = snap(E[1] + vertical * (2.54 + lane * 1.27))
-            s.wire(E, (E[0], chy), (T[0], chy), *([T, (px, py)] if horiz else [(px, py)]))
+            # several routes from one side into a stacked connector: the one bound for the farthest
+            # pin takes the nearest row and the outermost column (rank), so none crosses another
+            chy = snap(E[1] + vertical * (2.54 + (count - 1 - rank) * 1.27))
+            xc = snap(T[0] + (1 if dx > 0 else -1) * rank * 1.27) if d in ("L", "R") else T[0]
+            if horiz:
+                s.wire(E, (E[0], chy), (xc, chy), (xc, T[1]), (px, py))
+            else:
+                s.wire(E, (E[0], chy), (xc, chy), (xc, T[1]), T); stub()
         elif abs(T[1] - E[1]) < 1e-6:
-            s.wire(E, *([(px, py)] if horiz else [T, (px, py)]))
+            if horiz: s.wire(E, (px, py))
+            else: s.wire(E, T); stub()
         else:
             ch = self.channel_x if self.channel_x is not None else snap(E[0] + sx * (2.54 + lane * 1.27))
-            s.wire(E, (ch, E[1]), (ch, T[1]), *([(px, py)] if horiz else [T, (px, py)]))
+            if horiz: s.wire(E, (ch, E[1]), (ch, T[1]), (px, py))
+            else: s.wire(E, (ch, E[1]), (ch, T[1]), T); stub()
         return T
 
 
@@ -504,6 +520,11 @@ def fan(s, hub, atts, reach=None, min_pitch=PITCH, group_gap=0, align="center", 
         if d in ("U", "D"):
             # vertical pins: short stubs only (power symbols / labels), no spreading
             items.sort(key=lambda it: hub.pin(it[0])[0])
+            conns = [a for _, a in items if isinstance(a, Conn)]
+            ty = lambda a: a.inst.pin(a.pin)[1]
+            # from below, the lowest target is nearest (rank 0); from above, the highest
+            order = sorted(conns, key=ty, reverse=(d == "D"))
+            rank = {id(a): k for k, a in enumerate(order)}
             for j, (pin, att) in enumerate(items):
                 end, _ = s.stub(hub, pin, 2.54 if j % 2 == 0 else 6.35)   # stagger so adjacent symbols do not overprint
                 if isinstance(att, P):
@@ -514,7 +535,9 @@ def fan(s, hub, atts, reach=None, min_pitch=PITCH, group_gap=0, align="center", 
                         s.wire(end, (far[0], end[1]), far)
                         end = far
                     s.power(att.rail, end, 0 if (d == "U") != gnd else 180)
-                elif isinstance(att, (Conn, To)):
+                elif isinstance(att, Conn):
+                    att.render(s, end, 1, j, vertical=(-1 if d == "U" else 1), rank=rank[id(att)], count=len(order))
+                elif isinstance(att, To):
                     att.render(s, end, 1, j, vertical=(-1 if d == "U" else 1))
                 elif isinstance(att, L):
                     s.label(att.net, end, 90 if d == "U" else 270, att.glob)
@@ -768,6 +791,7 @@ def join_pins(s, hub, pins, length=2.54):
     ends = []
     for p in pins:
         e, _ = s.stub(hub, p, length)
+        s.stubs.add((hub.ref, str(p)))      # routes into a joined pin end at its stub, not over it
         ends.append(e)
     ys = sorted(ends, key=lambda q: q[1])
     s.wire(ys[0], ys[-1])

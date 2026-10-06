@@ -16,7 +16,7 @@ FP = dict(
     FB="Inductor_SMD:L_0603_1608Metric", L_PWR="Inductor_SMD:L_Coilcraft_XAL7020-102", L_SMALL="Inductor_SMD:L_1210_3225Metric",
     XTAL4="Crystal:Crystal_SMD_3225-4Pin_3.2x2.5mm", XTAL2="Crystal:Crystal_SMD_3215-2Pin_3.2x1.5mm",
     SW="Button_Switch_SMD:SW_SPST_PTS645Sx43SMTR92",
-    JP2="Jumper:SolderJumper-2_P1.3mm_Open_RoundedPad1.0x1.5mm", JP3="Jumper:SolderJumper-3_P1.3mm_Open_RoundedPad1.0x1.5mm",
+    JP2="Jumper:SolderJumper-2_P1.3mm_Open_RoundedPad1.0x1.5mm", JP3="Jumper:SolderJumper-3_P1.3mm_Open_RoundedPad1.0x1.5mm", JP3B="Jumper:SolderJumper-3_P1.3mm_Bridged12_RoundedPad1.0x1.5mm",
     USBC="Connector_USB:USB_C_Receptacle_GCT_USB4105-xx-A_16P_TopMnt_Horizontal",
     USBA2="Connector_USB:USB_A_Wuerth_61400826021_Horizontal_Stacked",
     QWIIC="Connector_JST:JST_SH_SM04B-SRSS-TB_1x04-1MP_P1.00mm_Horizontal",

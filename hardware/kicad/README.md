@@ -41,9 +41,10 @@ exports the PDF and BOM. Pin-position maths and power-symbol net naming were
 calibrated against `kicad-cli`'s netlist export before any real sheet was
 built.
 
-Five checks guard every build and all pass: `kicad-cli sch erc
+Five checks guard every build and all pass at zero: `kicad-cli sch erc
 --severity-all`; `gen/check_geom.py`, which finds wire ends and pin ends that
-land on a foreign wire (the shorts a netlist shows only as a merged net);
+land on a foreign wire with no junction (the shorts a netlist shows only as a
+merged net) and any two wires drawn over each other;
 `gen/netcheck.py`, which traces wire-level connectivity in each sheet and
 reports any net carrying two rails; and `gen/check_layout.py`, which reports
 text over outlines, wires or other text, wires through a part body, and power
@@ -57,6 +58,25 @@ build, `git add` the outputs, build again, and `git status` must be empty. The n
 first label-style pass with passive renumbering factored out, so the re-layout
 changed drawing, not connectivity (the JP501 default and the J1 VBUS divider
 tap, which became a local label, are the two intended exceptions).
+
+**Nothing is drawn over anything else.** Routes into a stacked connector
+from one side take staggered columns and rows (the route bound for the
+farthest pin gets the outermost column and the nearest row), a tag before a
+route ends where the route's target lies, several routes into one pin share
+one stub, and a second tap on a wire lands beside the first, never on it.
+The geometry check is at zero on every sheet: no wire end on a foreign wire
+without a junction, no two wires sharing a stretch.
+
+**The FTDI header is an Adafruit FTDI Friend.** J9 is GND, CTS, VCC, TX, RX,
+RTS in that order; VCC is 5 V by default (JP502, bridged A–C) or 3.3 V from
+the FT231X's regulator (B–C); pin 6 is RTS by default (JP501, bridged A–C)
+or DTR. Logic is 3.3 V. The first pass left J9's VCC pin on an open jumper
+only, so it floated by default; the bridged jumpers fix that.
+
+**The DAPLink K20 follows the FRDM-K64F OpenSDA circuit.** DAPLink's k20dx
+port reads SWDIO on PTC7 and drives it on PTC6, so both are on the SWDIO
+net; the FRDM's 33 Ω series resistors on the K20's USB pair are fitted. See
+[reference-design-review.md](../../docs/reference-design-review.md).
 
 **Differential pairs are named for the router.** Every USB 2.0 pair carries
 net names `<base>_P` / `<base>_N`, the suffixes KiCad's PCB editor pairs up:

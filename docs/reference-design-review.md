@@ -24,6 +24,18 @@ schematic was brought in line in commit `reference-design review`.
 | USBLC6-2SC6, PESD5V0S1UL, ESDA25W | Datasheets | Line-side placement next to the connector | As drawn | Matches. |
 | LTV-817, G6K-2F-Y, JW1FSN | Datasheets | 1–10 mA LED current; 5 V coils with flyback diodes; drivers rated for the coil current | 2×1.8 kΩ (1–8 mA over 5–30 V); 1N4148W on every coil; 2N7002 for the 20 mA signal relays, AO3400A for the 106 mA power relay | Matches. |
 
+## FRDM-K64F OpenSDA, revisited for the DAPLink K20 (2026-10-06)
+
+The FRDM-K64F schematic (rev E4, sheet 4 "OpenSDA interface") agrees with
+DAPLink's `k20dx` IO_Config.h: SWCLK PTC5, SWDIO PTC6 driving and PTC7
+reading the same line, nRESET PTB1, LED PTD4, UART1 PTC3/PTC4. Two things
+the first pass missed, both now fitted: PTC7 was unconnected (DAPLink reads
+SWDIO through it, so SWD would never have worked), and the FRDM's 33 Ω
+series resistors on the K20's USB D+/D− (R20/R22). The FRDM's level shifters
+between the K20 and its target are not needed here: the K64 target runs at
+the K20's 3.3 V. PTD6 (POWER_EN) and PTD7 (VTRG_FAULT_B) are left open; the
+firmware drives one and ignores the other.
+
 ## Open items for bring-up
 
 - Crystal load capacitors (24 MHz 33 pF, 25 MHz 22 pF, 8 MHz 18 pF, 32.768 kHz

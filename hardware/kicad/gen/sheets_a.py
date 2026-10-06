@@ -137,7 +137,8 @@ def mcu(project, num, page, sheet_path, plib):
     vx, vy = esd.pin("5")                                               # VBUS pin straight up onto J3's VBUS lane
     vb = (vx, j3.pin("A4")[1])
     s.wire((vx, vy), vb); s.junction(vb)
-    mark_end(s, "j3vbus", vb, -1)                                       # ...where the K64's VREGIN diode lands too
+    tap = (snap(vx + 2.54), vb[1]); s.junction(tap)                      # ...and the K64's VREGIN diode lands beside it, not on its stub
+    mark_end(s, "j3vbus", tap, -1)
     led = lambda: Ser("R", "330", None)
     ends = fan(s, u, {
         # left: USB regulator, USB, clock, reset
