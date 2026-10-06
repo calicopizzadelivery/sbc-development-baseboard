@@ -13,8 +13,8 @@ EDGE_GAP = 1.0             # between neighbouring edge connectors' bodies
 # edge connectors are locked at the positions the first board settled (x, y, rotation); the mating
 # rule that placed them: a horizontal connector's solder pins sit at the rear, so it mates toward the
 # end of its body farthest from the pad rows; a pin header mates where its pins point
-CONNECTORS = {"J1": (3.1, 39.345, -90), "J2": (3.1, 51.035, -90), "J3": (136.9, 19.345, 90), "J4": (19.095, 63.865, 0),
-              "J5": (37.285, 63.865, 0), "J9": (129.435, 45.045, 0), "J10": (20.215, 27.945, 180), "J11": (87.745, 71.475, 0),
+CONNECTORS = {"J1": (3.1, 54.0, -90), "J2": (3.1, 30.0, -90), "J3": (136.9, 19.345, 90), "J4": (19.095, 63.865, 0),
+              "J5": (37.285, 63.865, 0), "J9": (129.435, 45.045, 0), "J10": (19.08, 20.23, 90), "J11": (87.745, 71.475, 0),
               "J12": (101.805, 71.475, 0), "J13": (131.475, 39.165, 90), "J14": (116.845, 69.475, 0), "J18": (54.445, 69.475, 0),
               "J19": (68.665, 69.475, 0)}
 EDGE_ZONE = 3.0            # no part other than an edge connector nearer the edge than this (ECSS 14.3.2 c, tailored)
@@ -22,10 +22,10 @@ EDGE_ZONE = 3.0            # no part other than an edge connector nearer the edg
 # the ICs and inboard headers, placed by the flow in the directives (x, y, rotation of the footprint origin):
 # power enters at J2 and moves right through the bucks; each block sits behind the connector it serves
 ANCHORS = {
-    "U301": (30.0, 24.0, 0),       # PHY behind J10, TX/RX pins toward the jack
-    "U101": (24.0, 52.0, 0),       # PD controller at J2
-    "U102": (31.0, 46.0, 0),       # PD bus buffer
-    "J17":  (26.0, 37.5, 0),       # Qwiic programming, top entry, beside the PD controller
+    "U301": (23.5, 27.0, 270),     # PHY below J10 on the back edge, TX/RX pins up toward the jack
+    "U101": (15.0, 36.0, 0),       # PD controller at J2
+    "U102": (26.0, 40.0, 0),       # PD bus buffer
+    "J17":  (14.0, 44.0, 0),       # Qwiic programming, top entry, beside the PD controller
     "U103": (56.0, 11.0, 0),       # buck 1 (+5V_PORTS): SW on its right, the loop flows right
     "U104": (56.0, 27.0, 0),       # buck 2 (+5V_TGT)
     "U105": (70.0, 33.0, 0),       # +3V3 buck

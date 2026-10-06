@@ -27,20 +27,24 @@ where they are (their positions are locked in `gen/layout.py`).
 
 The user sits at the **left** edge; the target is at the **right** edge; the
 **front** long edge takes the overflow, each end matching its direction; the
-**back** edge carries nothing, so the board can sit against a wall or a DIN
-rail.
+**back** edge carries the RJ45 alone (2026-10-06: moved there from the left
+edge so the two USB-C inlets could spread out around the middle of the left
+edge and the lower-left corner stopped crowding; the board no longer lies
+flat against a wall or a DIN rail, which the spec accepted).
 
 | Edge | Connectors, in order from the back corner to the front | Faces | Bodies (measured) |
 |---|---|---|---|
-| Left (x = 0), 54 mm usable | J10 RJ45 · J1 USB-C upstream · J2 USB-C PD in | workstation / charger | 22.4 + 10.6 + 10.6 = 43.6 mm |
+| Left (x = 0), 54 mm usable | J2 USB-C PD in (centred y = 30) · J1 USB-C upstream (centred y = 54), split around the middle | charger / workstation | 10.6 + 10.6 = 21.2 mm |
+| Back (y = 0), 114 mm usable | J10 RJ45, from x = 14 | workstation | 19.0 mm wide, 22.4 mm deep |
 | Right (x = 140), 54 mm usable | J3 USB-C HID · J13 console · J9 FTDI right-angle | target | 10.6 + 16.5 + 16.3 = 43.4 mm |
 | Front (y = 80), left end | J4, J5 USB-A stacks · J18 PSU in · J19 PSU out | bench / PSU | 17.2 + 17.2 + 13.2 + 13.2 = 60.8 mm |
 | Front (y = 80), right end | J14 +5V_TGT · J12, J11 relays | target | 13.2 + 13.05 + 13.05 = 39.3 mm |
 | Inboard | J16 Cortex debug · J15 GPIO header · **J17 programming, top entry** (BM04B-SRSS-TB) | any | — |
 
-Three things moved from the spec's first table once the footprints were
+Four things moved from the spec's first table once the footprints were
 measured (2026-10-06): the RJ45 is 22 mm wide, not 16, so the left edge
-could not also take J17, which is now a top-entry part inboard beside J2;
+could not also take J17, which is now a top-entry part inboard beside the
+PD controller; the RJ45 then went to the back edge so J1 and J2 could spread;
 **J19 sits beside J18** so the PSU passthrough is one compact isolated
 region behind the two of them instead of a strip across the board; and J9
 takes J19's place on the right edge, where an FTDI header facing the
@@ -72,7 +76,6 @@ along it); a pin header mates where its pins point. Checked in the 3D view.
 - **Lanes** (below): no part on either side inside a lane's corridor.
 - Under the Ethernet magnetics (inside J10): no copper on any layer under
   the magnetics side of the jack.
-- The back edge: nothing within 5 mm, so it can lie flat against a rail.
 - No part other than an edge connector within 3 mm of any edge (a
   tailoring of ECSS-Q-ST-70-12C 14.3.2 c, whose 5 mm is for the assembler's
   conveyor; the assembler is consulted).
@@ -133,14 +136,16 @@ things to refine by hand. The anchors are the second: they are the knobs.
 |---|---|---|
 | K803 | (56, 53, 0) | straddles the isolation barrier |
 | U801 | (66, 60.5, 180) | straddles the isolation barrier |
-| U301 | (30, 24, 0) | PHY behind J10, TX/RX pins toward the jack |
-| U101 | (24, 52, 0) | PD controller at J2 |
-| U102 | (31, 46, 0) | PD bus buffer |
+| U301 | (23.5, 27, 270) | PHY below J10 on the back edge, TX/RX pins up toward the jack |
+| U101 | (15, 36, 0) | PD controller at J2 |
+| U102 | (26, 40, 0) | PD bus buffer |
+| J17 | (14, 44, 0) | Qwiic programming, top entry, beside the PD controller |
 | U103 | (56, 11, 0) | buck 1 (+5V_PORTS): SW on its right, the loop flows right |
 | U104 | (56, 27, 0) | buck 2 (+5V_TGT) |
 | U105 | (70, 33, 0) | +3V3 buck |
 | U402 | (44, 40, 90) | hub: downstream pins toward J4/J5, upstream and crystal toward J1 |
 | U201 | (96, 22, 270) | K64: RMII toward the PHY, port/FAULT/UART pins toward the hub and FTDI, GPIO toward J15 |
+| J16 | (83, 10, 0) | SWD to the K64 |
 | U601 | (95, 47, 0) | DAPLink K20 |
 | J601 | (88.5, 46, 0) | SWD to the K20 |
 | U501 | (117, 51, 0) | FT231X behind J9 |
@@ -150,6 +155,7 @@ things to refine by hand. The anchors are the second: they are the knobs.
 | U704 | (118, 30, 0) | GPIO level shifter near J15 |
 | U702 | (112, 37, 0) | console UART shifter near J13 |
 | U703 | (123, 37, 0) | I2C shifter |
+| J15 | (117, 10, 0) | GPIO header, inboard |
 
 The LEDs and their resistors are not anchored: the generator puts them at
 the nearest free spot to the pin that drives them, and they are moved by

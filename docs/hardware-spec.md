@@ -208,20 +208,24 @@ come to **73 mm**. They do not fit on an 80 mm edge, in any order.
 
 So the short edges carry the primary cable connectors, and the rest go on the
 **front** long edge at the end that matches their direction — your things at
-the left end, the target's at the right. The back edge carries nothing, so the
-board can sit against a wall or a DIN rail.
+the left end, the target's at the right. The back edge was to carry nothing,
+so the board could sit against a wall or a DIN rail; at layout (2026-10-06)
+the RJ45 moved there, alone, so the two USB-C inlets could spread along the
+left edge. The wall and the rail are given up.
 
 | Edge | Connectors | Bodies |
 |---|---|---|
-| Left, 54 mm usable | J10 RJ45 · J1 upstream · J2 PD in · J17 programming | 41 mm |
+| Left, 54 mm usable | J2 PD in · J1 upstream, split around the middle (J17 programming inboard) | 21 mm |
+| Back, 114 mm usable | J10 RJ45 | 19 mm |
 | Right, 54 mm usable | J3 HID · J13 console · J19 PSU out | 37 mm |
 | Front, left end | J4, J5 USB-A stacks · J18 PSU in | 39 mm |
 | Front, right end | J9 FTDI (right-angle) · J11, J12 relays · J14 +5V_TGT | 52 mm |
 | Inboard, vertical | J16 Cortex debug · J15 GPIO header | — |
 
 Revised at layout (2026-10-06), see [layout-directives.md](layout-directives.md):
-the RJ45 measures 22 mm, so J17 became a top-entry part inboard; J19 moved
-beside J18 so the isolated passthrough is one region; J9 took the right edge.
+the RJ45 measures 22 mm, so J17 became a top-entry part inboard, and the RJ45
+itself went to the back edge; J19 moved beside J18 so the isolated
+passthrough is one region; J9 took the right edge.
 
 J16 and J15 are pin headers that take a ribbon or jumpers from any direction,
 so they earn no edge. J9 is right-angle because that is what an FTDI header is.
