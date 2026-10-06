@@ -4,15 +4,39 @@ A Schematic collects symbol instances, wires, labels and sheets, and emits a
 .kicad_sch with every used library symbol embedded. Pin positions are computed
 from the library geometry so wires and labels can be attached exactly.
 """
+import os
 import uuid as _uuid
 from kisym import (get_symbol, pins_of, transform, pin_direction, dump, find,
                    find_all, prop, Sym)
 
 FONT = lambda size=1.27: [Sym("font"), [Sym("size"), size, size]]
+DATE = "2026-10-03"                          # title-block date; the ERC report header is pinned to it too
+
+# UUIDs are derived, not drawn: a UUID5 in a namespace made from the project name,
+# keyed by what the element is (a symbol by its reference and unit, a pin by its
+# symbol, a wire by its ends, a label by its net and position, a sheet by its file
+# name). A rebuild then changes only the sheets whose design changed, and a board's
+# footprints, which link to symbols by UUID path, survive regeneration. Identical
+# keys get a counter in draw order so nothing collides.
+_ns, _seen = None, {}
 
 
-def uid():
-    return str(_uuid.uuid4())
+def set_project(name):
+    global _ns, _seen
+    _ns, _seen = _uuid.uuid5(_uuid.NAMESPACE_DNS, name), {}
+
+
+def uid(*parts):
+    if _ns is None:
+        raise RuntimeError("sch.set_project(name) before deriving UUIDs")
+    key = "|".join(str(p) for p in parts)
+    n = _seen.get(key, 0)
+    _seen[key] = n + 1
+    return str(_uuid.uuid5(_ns, key if n == 0 else f"{key}#{n}"))
+
+
+def _xy(pt):
+    return f"{pt[0]:.4f},{pt[1]:.4f}"
 
 
 G = 1.27                                     # KiCad connection grid, mm
@@ -45,7 +69,7 @@ class Instance:
         self.footprint = ""
         self.datasheet = "~"
         self.dnp = False
-        self.uuid = uid()
+        self.uuid = uid("symbol", ref, unit)
         self.ref_at = None
         self.val_at = None
         self.ref_just = None
@@ -87,11 +111,11 @@ class Instance:
 
 
 class Schematic:
-    def __init__(self, project, title, paper="A3", page=1, sheet_path="/"):
+    def __init__(self, project, title, paper="A3", page=1, sheet_path="/", file=None):
         self.project = project
         self.title = title
         self.paper = paper
-        self.uuid = uid()
+        self.uuid = uid("file", file) if file else None      # else derived from the file name at emit()
         self.page = page
         self.sheet_path = sheet_path       # instance path prefix for symbols on this sheet
         self.lib_symbols = {}
@@ -194,10 +218,13 @@ class Schematic:
 
     # --- emit --------------------------------------------------------------
     def emit(self, path, root_uuid, title_block=True):
+        fname = os.path.basename(path)
+        if self.uuid is None:
+            self.uuid = uid("file", fname)
         out = [Sym("kicad_sch"), [Sym("version"), 20260306], [Sym("generator"), "eeschema"],
                [Sym("generator_version"), "10.0"], [Sym("uuid"), self.uuid], [Sym("paper"), self.paper]]
         if title_block:
-            tb = [Sym("title_block"), [Sym("title"), self.title], [Sym("date"), "2026-10-03"],
+            tb = [Sym("title_block"), [Sym("title"), self.title], [Sym("date"), DATE],
                   [Sym("rev"), "0.1"], [Sym("company"), "sbc-development-baseboard"]]
             for i, c in enumerate(self.comments[:4]):
                 tb.append([Sym("comment"), i + 1, c])
@@ -210,29 +237,29 @@ class Schematic:
             elif kind == "wire":
                 (a, b) = it
                 out.append([Sym("wire"), [Sym("pts"), [Sym("xy"), a[0], a[1]], [Sym("xy"), b[0], b[1]]],
-                            [Sym("stroke"), [Sym("width"), 0], [Sym("type"), Sym("default")]], [Sym("uuid"), uid()]])
+                            [Sym("stroke"), [Sym("width"), 0], [Sym("type"), Sym("default")]], [Sym("uuid"), uid("wire", fname, _xy(a), _xy(b))]])
             elif kind == "junction":
                 out.append([Sym("junction"), [Sym("at"), it[0], it[1]], [Sym("diameter"), 0],
-                            [Sym("color"), 0, 0, 0, 0], [Sym("uuid"), uid()]])
+                            [Sym("color"), 0, 0, 0, 0], [Sym("uuid"), uid("junction", fname, _xy(it))]])
             elif kind == "nc":
-                out.append([Sym("no_connect"), [Sym("at"), it[0], it[1]], [Sym("uuid"), uid()]])
+                out.append([Sym("no_connect"), [Sym("at"), it[0], it[1]], [Sym("uuid"), uid("nc", fname, _xy(it))]])
             elif kind == "label":
                 net, at, rot, glob, shape = it
                 just = "left" if rot in (0, 90) else "right"
                 if glob:
                     out.append([Sym("global_label"), net, [Sym("shape"), Sym(shape)], [Sym("at"), at[0], at[1], rot],
-                                [Sym("fields_autoplaced"), Sym("yes")], effects(1.27, just), [Sym("uuid"), uid()],
+                                [Sym("fields_autoplaced"), Sym("yes")], effects(1.27, just), [Sym("uuid"), uid("global_label", fname, net, _xy(at), rot)],
                                 [Sym("property"), "Intersheetrefs", "${INTERSHEET_REFS}", [Sym("at"), at[0], at[1], 0],
                                  [Sym("hide"), Sym("yes")], [Sym("show_name"), Sym("no")], [Sym("do_not_autoplace"), Sym("no")],
                                  effects(1.27, just)]])
                 else:
                     out.append([Sym("label"), net, [Sym("at"), at[0], at[1], rot], [Sym("fields_autoplaced"), Sym("yes")],
-                                effects(1.27, just + " bottom"), [Sym("uuid"), uid()]])
+                                effects(1.27, just + " bottom"), [Sym("uuid"), uid("label", fname, net, _xy(at), rot)]])
             elif kind == "text":
                 s, at, size, bold = it
                 e = [Sym("effects"), [Sym("font"), [Sym("size"), size, size]] + ([[Sym("bold"), Sym("yes")]] if bold else []),
                      [Sym("justify"), Sym("left"), Sym("bottom")]]
-                out.append([Sym("text"), s, [Sym("exclude_from_sim"), Sym("no")], [Sym("at"), at[0], at[1], 0], e, [Sym("uuid"), uid()]])
+                out.append([Sym("text"), s, [Sym("exclude_from_sim"), Sym("no")], [Sym("at"), at[0], at[1], 0], e, [Sym("uuid"), uid("text", fname, _xy(at), s)]])
             elif kind == "sheet":
                 name, file, at, size, suuid, page = it
                 out.append([Sym("sheet"), [Sym("at"), at[0], at[1]], [Sym("size"), size[0], size[1]],
@@ -339,7 +366,7 @@ class Schematic:
         for k, v in inst.fields.items():
             node.append(P(k, v, (X, Y), hide=True))
         for pn in inst.pins:
-            node.append([Sym("pin"), pn, [Sym("uuid"), uid()]])
+            node.append([Sym("pin"), pn, [Sym("uuid"), uid("pin", inst.ref, inst.unit, pn)]])
         path = "/" + root_uuid + ("" if self.sheet_path == "/" else self.sheet_path)
         node.append([Sym("instances"), [Sym("project"), self.project, [Sym("path"), path, [Sym("reference"), inst.ref], [Sym("unit"), inst.unit]]]])
         return node

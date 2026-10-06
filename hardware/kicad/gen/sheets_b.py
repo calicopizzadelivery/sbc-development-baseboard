@@ -46,7 +46,7 @@ def hub(project, num, page, sheet_path, plib):
     s = Sheet(project, "USB hub: USB2517, upstream J1, four switched USB-A ports, FT231X switch", num, page, sheet_path)
     s.project_lib = plib
     s.note(["USB HUB", "USB2517 strap-configured (CFG_SEL=000), no firmware needed for the USB tree to come up.",
-            "Port map: 1 = DAPLink, 2 = FT231X, 3 = disabled (DN3 pulled up), 4..7 = USB-A PORT1..PORT4 (J4: ports 4,5; J5: ports 6,7).",
+            "Port map: 1 = DAPLink, 2 = FT231X, 3 = disabled (DN3 pulled up), 4..7 = USB-A PORT1..PORT4 (J4A/J4B = PORT1/PORT2 on hub ports 4,5; J5A/J5B = PORT3/PORT4 on ports 6,7).",
             "NON_REM=11 (pin 40 up, pin 45 up) marks ports 1-3 non-removable and LOCAL_PWR high reports self-powered.",
             "LED_A/B pins pulled down: PRT_SWP normal polarity, BOOST=00, GANG_EN=0 (individual over-current).",
             "Port power is switched by TPS2553 under K64 GPIO (boot ON via pull-ups); PRTPWR outputs unused; /FAULT feeds OCSx_N."], (16, 17), 1.5)
@@ -59,7 +59,7 @@ def hub(project, num, page, sheet_path, plib):
     for n in range(1, 5):
         Y = 45.72 + (n - 1) * 50.8                                    # D- row of this port
         ref, unit = [("J4", 1), ("J4", 2), ("J5", 1), ("J5", 2)][n - 1]
-        j = s.add("calico-electromechanical", "USB_A_Stacked2", ref, f"USB-A PORT{n}", (394.97, Y + 6.35), unit=unit, footprint=FP["USBA2"])   # D-/D+ rows on the ESD's I/O rows
+        j = s.add("calico-electromechanical", "USB_A_Stacked2", ref, "USB-A x2", (394.97, Y + 6.35), unit=unit, footprint=FP["USBA2"])   # one value for both units: KiCad treats differing unit values as an annotation error   # D-/D+ rows on the ESD's I/O rows
         esd = s.add("Power_Protection", "USBLC6-2SC6", f"U4{7+n:02d}", "USBLC6-2SC6", (369.57, Y), footprint=FP["SOT236"])
         tps = s.add("calico-ic", "TPS2553DBV", f"U40{2+n}", "TPS2553DBV", (327.66, Y + 13.97), footprint=FP["SOT236"])   # OUT (its third right-hand row) on the VBUS row
         ports.append((esd, tps, j, unit))

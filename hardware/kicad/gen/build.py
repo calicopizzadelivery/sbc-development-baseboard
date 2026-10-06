@@ -6,10 +6,10 @@
 The generated files are a first pass. Once they are edited by hand in KiCad,
 the KiCad files are the source of truth and this generator is retired.
 """
-import os, sys, json, subprocess, shutil, glob
+import os, re, sys, json, subprocess, shutil, glob
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 import kisym
-from sch import Schematic, uid
+from sch import Schematic, uid, set_project, DATE
 from kit import Sheet, FP
 import sheets_a, sheets_b, sheets_c
 
@@ -23,8 +23,9 @@ kisym.EXTRA_LIBS = {os.path.splitext(os.path.basename(f))[0]: f for f in glob.gl
 
 def main():
     os.makedirs(OUT, exist_ok=True)
+    set_project(PROJECT)                          # UUIDs are derived in this project's namespace (see sch.py)
     plib = None                                   # every symbol comes from KiCad's libraries or the house submodule
-    root = Schematic(PROJECT, "SBC development baseboard", "A3", 1, "/")
+    root = Schematic(PROJECT, "SBC development baseboard", "A3", 1, "/", file=f"{PROJECT}.kicad_sch")
     root.comments = ["140 x 80 mm, four M3. Spec: docs/hardware-spec.md"]
     defs = [("Power", "power.kicad_sch", sheets_a.power, 1), ("MCU", "mcu.kicad_sch", sheets_a.mcu, 2),
             ("Ethernet", "ethernet.kicad_sch", sheets_b.ethernet, 3), ("USB hub", "hub.kicad_sch", sheets_b.hub, 4),
@@ -32,7 +33,7 @@ def main():
             ("Target I/O", "target.kicad_sch", sheets_c.target, 7), ("Relays", "relays.kicad_sch", sheets_c.relays, 8)]
     x, y = 30, 40
     for i, (name, file, fn, num) in enumerate(defs):
-        suuid = uid()
+        suuid = uid("sheet", file)                # the (sheet ...) element in the root; the file has its own
         sh = fn(PROJECT, num, i + 2, "/" + suuid, plib)
         sh.emit(os.path.join(OUT, file), root.uuid)
         root.sheet(name, file, (x + (i % 4) * 60, y + (i // 4) * 40), (50, 25), suuid, i + 2)
@@ -72,8 +73,26 @@ def main():
     r = subprocess.run(["kicad-cli", "sch", "erc", "--severity-all", "--format", "report", "-o", os.path.join(OUT, "erc.txt"), sch],
                        capture_output=True, text=True)
     print((r.stdout + r.stderr).strip()[-300:])
-    r = subprocess.run(["kicad-cli", "sch", "export", "pdf", "-o", os.path.join(OUT, f"{PROJECT}.pdf"), sch], capture_output=True, text=True)
+    # the report header carries the export time: pin it to the title-block date so two builds of one design match
+    erc = os.path.join(OUT, "erc.txt")
+    lines = open(erc, encoding="utf-8").read().split("\n")
+    lines[0] = re.sub(r"\(\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}", f"({DATE}T00:00:00", lines[0])
+    open(erc, "w", encoding="utf-8").write("\n".join(lines))
+    # BOM: grouped by value and footprint, full reference lists (no ranges), as the README documents
+    r = subprocess.run(["kicad-cli", "sch", "export", "bom", "--fields", "Reference,Value,Footprint,${QUANTITY}",
+                        "--labels", "Reference,Value,Footprint,QUANTITY", "--group-by", "Value,Footprint",
+                        "--ref-range-delimiter", "", "-o", os.path.join(OUT, "bom.csv"), sch], capture_output=True, text=True)
     print((r.stdout + r.stderr).strip()[-200:])
+    pdf = os.path.join(OUT, f"{PROJECT}.pdf")
+    r = subprocess.run(["kicad-cli", "sch", "export", "pdf", "-o", pdf, sch], capture_output=True, text=True)
+    print((r.stdout + r.stderr).strip()[-200:])
+    # the PDF's creation date is the only thing that differs between two exports of one design: pin it too
+    # (same length as what KiCad wrote, so the file's offsets stay valid)
+    raw = open(pdf, "rb").read()
+    stamp = DATE.replace("-", ":").encode() + b":00:00:00"
+    raw2 = re.sub(rb"/CreationDate \(D:\d{4}:\d{2}:\d{2}:\d{2}:\d{2}:\d{2}\)", b"/CreationDate (D:" + stamp + b")", raw)
+    if raw2 != raw:
+        open(pdf, "wb").write(raw2)
 
 
 if __name__ == "__main__":

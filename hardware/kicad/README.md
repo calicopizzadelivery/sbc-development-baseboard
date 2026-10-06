@@ -57,6 +57,21 @@ first label-style pass with passive renumbering factored out, so the re-layout
 changed drawing, not connectivity (the JP501 default and the J1 VBUS divider
 tap, which became a local label, are the two intended exceptions).
 
+**Builds are reproducible.** Every UUID in the generated files is derived,
+not drawn: a UUID5 in a namespace made from the project name, keyed by what
+the element is (a symbol by its reference and unit, a pin by its symbol, a
+wire by its sheet and ends, a label by its sheet, net and position, a sheet by
+its file name; identical keys get a counter in draw order). The ERC report
+header and the PDF's creation date are pinned to the title-block date. So two
+builds of one design give byte-identical files, a commit touches only the
+sheets whose design changed, and once layout starts a regenerated sheet keeps
+its footprints linked, since the board links footprints to symbols by UUID
+path. The costs are the ones KiCad itself has: renaming a reference is a new
+symbol, moving a wire or label is a new UUID (nothing outside the sheet refers
+to those), and the power symbols, numbered in draw order per sheet, renumber
+when one is inserted before them. Keep it that way: never write a random UUID
+into the output, and never let an export's timestamp into a tracked file.
+
 **The generator is bring-up tooling, not the source of truth.** The moment
 anyone edits the schematic in KiCad, the KiCad files are the design and
 `gen/` is history: re-running `build.py` would overwrite the edits. The honest
