@@ -74,7 +74,7 @@ def main():
     notes = ["SBC DEVELOPMENT BASEBOARD - schematic first pass, generated 2026-10-04",
              "One board for remote development on an attached SBC: K64 as USB HID to the target and Ethernet to the workstation,",
              "four switched USB-A ports, FT231X FTDI header, two isolated SPDT signal relays, level-shifted console and GPIO/I2C,",
-             "switched +5V_TGT eFuse, and an isolated PSU passthrough on a 5 A relay. 140 x 80 mm, four M3 at 10 mm from each corner.",
+             "switched +5V_TGT eFuse, and an isolated PSU passthrough on a 5 A relay. 140 x 80 mm, four M3 at 7 mm from each corner.",
              "",
              "VERIFY BEFORE FAB (also in docs/hardware-spec.md section 8):",
              "  - K803 JW1FSN contact pad mapping (COM 6 / NO 4 / NC 2) against the Panasonic drawing",

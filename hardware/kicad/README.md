@@ -121,30 +121,47 @@ on KiCad's `pcbnew` Python module, from the schematic's netlist, the project
 file and the directives in `gen/layout.py`, which are
 [docs/layout-directives.md](../../docs/layout-directives.md) as data. It
 carries the 140 × 80 mm outline with 2 mm corners, the four M3 holes on GND
-with their corner keep-outs, Advanced Circuits' 4-layer stackup, every
-footprint with its nets, the edge connectors on their edges facing outward,
-the interior parts packed by function next to the connector they serve, the
-L2 ground plane with the isolated PSU_GND island, and `sbc-baseboard.kicad_dru`
-with the passthrough's isolation rules. `gen/pcb.py` also runs
-`kicad-cli pcb drc`; its report is `drc.txt`.
+7 mm from the corners with their corner keep-outs, Advanced Circuits' 4-layer
+stackup, every footprint with its nets, the L2 ground plane with the isolated
+PSU_GND island, and `sbc-baseboard.kicad_dru` with the passthrough's
+isolation rules.
 
-The generated board is a starting placement, not a layout: DRC reports no
+The placement follows
+[ecad-standards/layout.md](https://github.com/calicopizzadelivery/ecad-standards/blob/main/layout.md)
+section 3: the edge connectors are locked at the directives' positions,
+facing outward; the ICs are anchored by flow (the table in the directives);
+the two parts that straddle the isolation barrier are fixed; every other
+part is placed at the pin it serves, by the generator, in five passes (small
+decoupling capacitors at their pins, the large parts on an IC's own pins,
+bulk capacitors, the small parts on those pins, then parts hosted by other
+passives), each on its host's nearest side with the pad on the host's net
+facing it, packed outward in rings. `placement.txt` records every part's host
+and ring; the generator prints the parts it could not keep within 8 mm of
+their pin. The silkscreen pass places each reference designator where it
+overlaps nothing (1.0 mm, then 0.8 mm text) and omits it otherwise, per the
+standard's section 6; ICs and connectors are never omitted, their designator
+steps out to the nearest pocket instead, and the generator lists those too.
+The fabrication layer keeps every designator.
+
+`gen/pcb.py` also runs `kicad-cli pcb drc --severity-all`; its report is
+`drc.txt`. The generated board is a placement, not a layout: DRC reports no
 errors other than the 499 unrouted connections and twelve inside the GCT
 USB-C footprints, whose mounting holes sit 0.19 mm from their own shield pads
 against the 0.25 mm hole clearance set for the fab (confirm with Advanced
-Circuits or trim the footprint), and leaves the silkscreen warnings
-(reference designators over pads and each other) for the layout work. From here the board file is the source of truth and is edited in
-KiCad; `gen/pcb.py` is not run again over it. The schematic generator stays
-usable: its derived UUIDs keep the footprints linked.
+Circuits or trim the footprint), and no warnings. From here the board file is
+the source of truth and is edited in KiCad; `gen/pcb.py` is not run again
+over it. The schematic generator stays usable: its derived UUIDs keep the
+footprints linked.
 
 The ICs' own layout rules, with sources, are in
 [docs/layout-guidelines.md](../../docs/layout-guidelines.md).
 
-Layout order, per [ecad-standards/layout.md](https://github.com/calicopizzadelivery/ecad-standards/blob/main/layout.md):
-check the edge connectors against the mechanical drawing (the terminal
-blocks' orientation in the 3D view first), settle the isolated passthrough
-block, then the USB 2.0 pairs from each receptacle through its ESD array to
-the hub, the bucks' switching loops and the PWR_6A pours, and the rest.
+Layout order, per the standard's section 8: the edge connectors against the
+mechanical drawing (done: they are locked), the isolated passthrough block
+(done: fixed parts, island, rules), then by hand the far-placed parts and
+the indicator LEDs, the USB 2.0 pairs from each receptacle through its ESD
+array to the hub, the bucks' switching loops and the PWR_6A pours, and the
+rest.
 
 ## Design decisions that were made during capture
 

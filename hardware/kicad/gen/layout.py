@@ -5,53 +5,65 @@ is placement intent; pcb.py turns it into the first board file.
 """
 BOARD = (140.0, 80.0)
 RADIUS = 2.0
-HOLES = {"H1": (10.0, 10.0), "H2": (130.0, 10.0), "H3": (10.0, 70.0), "H4": (130.0, 70.0)}
-HOLE_KEEPOUT = 13.0        # the square at each corner no connector or tall part may enter
+HOLES = {"H1": (7.0, 7.0), "H2": (133.0, 7.0), "H3": (7.0, 73.0), "H4": (133.0, 73.0)}   # 7 mm in from each corner
+HOLE_KEEPOUT = 10.5        # the square at each corner no connector or tall part may enter (a 6 mm standoff on a 7 mm hole)
 HOLE_CLEAR_R = 4.0         # ...except the hole's own pad
 EDGE_GAP = 1.0             # between neighbouring edge connectors' bodies
 
-# which way a connector footprint mates at rotation 0, in board coordinates, by footprint name.
-# The rule that holds across the KiCad library: the solder pins sit at the REAR of a horizontal
-# connector, so the mating face is the end of the body farthest from the pad rows. USB-C (GCT):
-# a "PCB Edge" text marks the edge on the mating side. USB-A (Wuerth): body runs to +Y past the
-# pads. RJ45 (Kycon): the body is long along X, pins near -X, so it mates toward +X. Phoenix
-# headers: pins at the rear, plug face at +Y. Pin headers: the pins point +X.
-MATES = [("USB_C_Receptacle", (0, 1)), ("USB_A_", (0, 1)), ("RJ45", (1, 0)), ("PhoenixContact", (0, 1)), ("PinHeader", (1, 0))]
-EDGE_START = HOLE_KEEPOUT + 1.0     # first connector body after the corner square (courtyards reach a little further)
+# edge connectors are locked at the positions the first board settled (x, y, rotation); the mating
+# rule that placed them: a horizontal connector's solder pins sit at the rear, so it mates toward the
+# end of its body farthest from the pad rows; a pin header mates where its pins point
+CONNECTORS = {"J1": (3.1, 39.345, -90), "J2": (3.1, 51.035, -90), "J3": (136.9, 19.345, 90), "J4": (19.095, 63.865, 0),
+              "J5": (37.285, 63.865, 0), "J9": (129.435, 45.045, 0), "J10": (20.215, 27.945, 180), "J11": (87.745, 71.475, 0),
+              "J12": (101.805, 71.475, 0), "J13": (131.475, 39.165, 90), "J14": (116.845, 69.475, 0), "J18": (54.445, 69.475, 0),
+              "J19": (68.665, 69.475, 0)}
+EDGE_ZONE = 3.0            # no part other than an edge connector nearer the edge than this (ECSS 14.3.2 c, tailored)
 
-# edge connectors in order from the back corner (left/right edges: top to bottom; front edge: left end
-# rightward and right end leftward). "L" x=0, "R" x=140, "F" y=80.
-EDGES = {
-    "L": ["J10", "J1", "J2"],                   # J17 is top-entry and inboard: the edge is full at the measured widths
-    "R": ["J3", "J13", "J9"],                   # J9 (right-angle FTDI header) faces the target from the right edge
-    "F_left": ["J4", "J5", "J18", "J19"],       # PSU in and out side by side: one compact isolated region, no strip across the board
-    "F_right": ["J14", "J12", "J11"],           # from the right corner leftward
+# the ICs and inboard headers, placed by the flow in the directives (x, y, rotation of the footprint origin):
+# power enters at J2 and moves right through the bucks; each block sits behind the connector it serves
+ANCHORS = {
+    "U301": (30.0, 24.0, 0),       # PHY behind J10, TX/RX pins toward the jack
+    "U101": (24.0, 52.0, 0),       # PD controller at J2
+    "U102": (31.0, 46.0, 0),       # PD bus buffer
+    "J17":  (26.0, 37.5, 0),       # Qwiic programming, top entry, beside the PD controller
+    "U103": (56.0, 11.0, 0),       # buck 1 (+5V_PORTS): SW on its right, the loop flows right
+    "U104": (56.0, 27.0, 0),       # buck 2 (+5V_TGT)
+    "U105": (70.0, 33.0, 0),       # +3V3 buck
+    "U402": (44.0, 40.0, 90),      # hub: downstream pins toward J4/J5, upstream and crystal toward J1
+    "U201": (96.0, 22.0, 270),     # K64: RMII toward the PHY, port/FAULT/UART pins toward the hub and FTDI, GPIO toward J15
+    "J16":  (83.0, 10.0, 0),       # SWD to the K64
+    "U601": (95.0, 47.0, 0),       # DAPLink K20
+    "J601": (88.5, 46.0, 0),      # SWD to the K20
+    "U501": (117.0, 51.0, 0),      # FT231X behind J9
+    "K801": (91.0, 60.0, 0),       # relays behind J11 / J12
+    "K802": (105.0, 60.0, 0),
+    "U701": (119.0, 61.0, 0),      # +5V_TGT eFuse behind J14
+    "U704": (118.0, 30.0, 0),      # GPIO level shifter near J15
+    "U702": (112.0, 37.0, 0),      # console UART shifter near J13
+    "U703": (123.0, 37.0, 0),      # I2C shifter
+    "J15":  (117.0, 10.0, 0),      # GPIO header, inboard
 }
-
-# interior placement groups: rectangle (x0, y0, x1, y1) and the parts that anchor them;
-# passives join the group of the IC they share the most signal nets with
-GROUPS = {   # no part other than an edge connector within 3 mm of an edge (directives; ECSS 14.3.2 c tailored)
-    "eth":      ([(23, 3, 52, 12)],                   ["U301", "Y301", "J10"]),
-    "pwr_in":   ([(23, 12, 52, 25)],                  ["U101", "U102", "Q101", "Q102", "U401", "J17"]),
-    "hub":      ([(23, 25, 52, 56), (10, 37, 22, 58)], ["U402", "Y401", "U403", "U404", "U405", "U406", "U408", "U409", "U410", "U411", "U407", "U105", "L103"]),
-    "bucks":    ([(52, 3, 85, 36), (70, 36, 85, 42)],  ["U103", "U104", "L101", "L102"]),   # the pocket right of the coil driver
-    "pass_drv": ([(52, 36, 70, 42)],                  ["Q803"]),                      # the coil driver, board side of the barrier
-    "pass":     ([(68, 56, 84, 66)],                  ["D807", "R810", "R811"]),       # the opto's LED network, PSU side
-    "mcu":      ([(85, 3, 112, 39)],                  ["U201", "Y201", "J16", "SW201", "D202"]),
-    "dap":      ([(86, 39, 100, 66)],                 ["U601", "Y601", "J601", "SW601"]),    # 2 mm creepage from the isolated region (x = 84)
-    "ftdi":     ([(100, 39, 110, 66)],                ["U501", "JP501", "JP502"]),
-    "target":   ([(112, 3, 127, 38)],                 ["U701", "U702", "U703", "U704", "J15", "U202"]),
-    "relays":   ([(110, 38, 128.5, 65.5)],            ["K801", "K802", "Q801", "Q802"]),
-}
+SPARE = (72.0, 6.0)     # parts the engine cannot attach anywhere are parked here and reported
+RING_GAP = 0.3
+RINGS = 8
+BIG_AREA = 20.0              # courtyard mm2 from which a part on an IC's pins goes down before the bulk capacitors (inductors, diodes)
+SMALL_AREA = 5.0             # courtyard mm2 below which a decoupling capacitor is placed before anything else (0402, 0603)                    # rings tried along a host's side before the nearest free spot is taken
+RING_REACH = 8.0             # how far past a host's side a ring may extend, mm
+RING_SLIDES = (2.0, 5.0, 12.0, 40.0)   # how far along the side from its pin a part slides before it tries the next ring out
+SEARCH_RADIUS = 40.0         # the nearest-free-spot search gives up beyond this, mm (the part is parked)             # courtyard to courtyard between a part and the pin it serves (courtyards carry 0.25 each)
 # parts placed by hand across the isolation barrier: (x, y, rotation) of the footprint origin
 FIXED = {"K803": (56.0, 53.0, 0),          # coil pads (1, 8) at x = 56 outside the region, contacts (2, 4, 6) inside
          "U801": (66.0, 60.5, 180)}        # below the relay: LED pins (1, 2) at x = 66 inside the region, transistor pins (3, 4) at 58.4 outside
-PACK_MARGIN = 0.1          # courtyard to courtyard: with KiCad's 0.25 mm courtyards that is ECSS Table 14-2's 0.6 mm between bodies
+PACK_MARGIN = 0.25          # courtyard to courtyard: with KiCad's 0.25 mm courtyards that is ECSS Table 14-2's 0.6 mm between bodies
 
 # the isolated PSU region: the passthrough block behind J18, a strip along the front and a riser to J19
 ISOLATION = [(64, 42), (84, 42), (84, 80), (48, 80), (48, 62), (64, 62)]   # behind J18/J19; x = 64 runs through K803 between coil and contacts
 ISOLATION_PLANE_HOLE = [(62, 40), (86, 40), (86, 80), (46, 80), (46, 60), (62, 60)]   # the same, grown by ISO_GAP: the ground plane stops here
-ISO_GAP = 2.0              # creepage between PSU_3A nets and board nets
+ISO_GAP = 2.0
+CURRENT_CLASSES = {"USB_VBUS_3A", "PWR_6A", "PSU_3A", "PSU_ISO"}   # a part on these nets belongs at the connector or IC that carries them
+PAIR_CLASSES = {"USB"}
+ISOLATION_RECTS = [(64, 42, 84, 80), (48, 62, 64, 80)]           # ISOLATION as rectangles, for the placer
+ISOLATION_GROWN_RECTS = [(62, 40, 86, 80), (46, 60, 62, 80)]     # ISOLATION_PLANE_HOLE likewise: board-net parts stay out              # creepage between PSU_3A nets and board nets
 
 STACKUP = [  # Advanced Circuits standard 4-layer 0.062"
     ("F.Cu", "copper", 0.035), ("dielectric 1", "prepreg", 0.3048, 4.6), ("In1.Cu", "copper", 0.035),

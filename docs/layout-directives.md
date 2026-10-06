@@ -16,10 +16,12 @@ top-left corner, X to the right, Y down, in millimetres, as KiCad draws it.
 
 ## Mounting holes
 
-Four M3, plated, on GND, centred **10 mm in from each corner**: (10, 10),
-(130, 10), (10, 70), (130, 70). A 6 mm standoff pad on each, so the first
-13 mm of every edge from each corner carries no connector. Each short edge
-has about 54 mm usable, each long edge about 114 mm.
+Four M3, plated, on GND, centred **7 mm in from each corner**: (7, 7),
+(133, 7), (7, 73), (133, 73), moved out from 10 mm on 2026-10-06 for 3 mm
+more room inboard. A 6 mm standoff pad on each; the corner square of
+10.5 mm around each hole carries nothing else. The edge connectors were
+packed from 14 mm after each corner while the holes were at 10 mm and stay
+where they are (their positions are locked in `gen/layout.py`).
 
 ## Edges and what faces where
 
@@ -52,8 +54,8 @@ along it); a pin header mates where its pins point. Checked in the 3D view.
 
 ## Keep-outs
 
-- The 13 mm from each corner along every edge (standoff pads and screw
-  heads): no connectors, no tall parts.
+- The 10.5 mm square at each corner (standoff pad and screw head): nothing
+  but the hole, enforced as rule areas.
 - **Isolation**: the PSU passthrough (J18, J19, K803's contact side, the
   opto-coupler's LED side, D807, R810, R811) sits in its own region behind
   J18/J19 at the front, x 48–84, y 42–80, with the barrier running through
@@ -71,29 +73,46 @@ along it); a pin header mates where its pins point. Checked in the 3D view.
 - Parent standard for everything not stated here: ECSS-Q-ST-70-12C Rev.1,
   with the tailorings listed in ecad-standards/layout.md section 0.
 
-## Placement groups
+## Placement
 
-Parts go next to the connector they serve; the groups below are the
-starting placement the generator uses, refined by hand afterwards.
+The connectors are locked where the table above puts them (`CONNECTORS` in
+`gen/layout.py`). The ICs are anchored by flow, below; the two parts that
+straddle the isolation barrier are fixed; **every other part is placed by the
+generator at the pin it serves** (ecad-standards/layout.md section 2): its
+host is the placed part it shares the most specific nets with, a decoupling
+capacitor's host is the IC the schematic draws it beside, it sits on the
+host's side nearest that pin, turned so the pad on the host's net faces it,
+and the parts along a side pack outward in rings. `placement.txt` beside the
+board file records every part's host and ring (or the distance to its pin
+where no ring had room). The generator lists the parts it could not keep
+within 8 mm of their pin; those, and the indicator LEDs, are the first
+things to refine by hand. The anchors are the second: they are the knobs.
 
-| Group | Rectangle (x0, y0, x1, y1) | Anchors |
+| Part | (x, y, rot) | Why there |
 |---|---|---|
-| Ethernet | 22, 1, 52, 11 | U301, Y301 (behind J10) |
-| Hub and port switches | 22, 11, 52, 56 | U402, Y401, U403–U406, U408–U411, U407, U105 (behind J4/J5) |
-| Power in | 5, 37, 22, 58 | U101, U102, Q101, Q102, U401, J17 (beside J1/J2) |
-| Bucks | 52, 1, 85, 36 | U103, U104, L101, L102 |
-| Passthrough driver | 48, 36, 70, 42 | Q803 (board side of the barrier) |
-| Passthrough, isolated | 64, 56, 84, 66 | D807, R810, R811; K803 and U801 fixed across the barrier |
-| MCU | 85, 1, 113, 38 | U201, Y201, J16, SW201, D202 |
-| DAPLink | 84, 42, 100, 66 | U601, Y601, J601, SW601 |
-| FTDI | 100, 38, 113, 66 | U501, JP501, JP502 (behind J9) |
-| Target I/O | 113, 1, 127, 38 | U701–U704, J15, U202 (behind J3/J13) |
-| Signal relays | 113, 38, 128.5, 64 | K801, K802, Q801, Q802 (behind J11/J12/J14) |
+| K803 | (56, 53, 0) | straddles the isolation barrier |
+| U801 | (66, 60.5, 180) | straddles the isolation barrier |
+| U301 | (30, 24, 0) | PHY behind J10, TX/RX pins toward the jack |
+| U101 | (24, 52, 0) | PD controller at J2 |
+| U102 | (31, 46, 0) | PD bus buffer |
+| U103 | (56, 11, 0) | buck 1 (+5V_PORTS): SW on its right, the loop flows right |
+| U104 | (56, 27, 0) | buck 2 (+5V_TGT) |
+| U105 | (70, 33, 0) | +3V3 buck |
+| U402 | (44, 40, 90) | hub: downstream pins toward J4/J5, upstream and crystal toward J1 |
+| U201 | (96, 22, 270) | K64: RMII toward the PHY, port/FAULT/UART pins toward the hub and FTDI, GPIO toward J15 |
+| U601 | (95, 47, 0) | DAPLink K20 |
+| J601 | (88.5, 46, 0) | SWD to the K20 |
+| U501 | (117, 51, 0) | FT231X behind J9 |
+| K801 | (91, 60, 0) | relays behind J11 / J12 |
+| K802 | (105, 60, 0) |  |
+| U701 | (119, 61, 0) | +5V_TGT eFuse behind J14 |
+| U704 | (118, 30, 0) | GPIO level shifter near J15 |
+| U702 | (112, 37, 0) | console UART shifter near J13 |
+| U703 | (123, 37, 0) | I2C shifter |
 
-Every other part joins the group of the IC it shares the most signal nets
-with. The rectangles are the generator's starting placement (`gen/layout.py`);
-they are sized from the parts' courtyards and are the first thing to adjust
-by hand.
+The LEDs and their resistors are not anchored: the generator puts them at
+the nearest free spot to the pin that drives them, and they are moved by
+hand to where they can be seen.
 
 ## Flow
 
