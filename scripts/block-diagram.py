@@ -235,12 +235,12 @@ def conn(edge, a, L, label, depth=DEPTH):
         e(f'<rect x="{x}" y="{y}" width="{L*S}" height="{DEPTH*S}" fill="{C["conn"]}" stroke="{C["conn_edge"]}"/>')
         e(f'<text x="{x+L*S/2}" y="{y-6}" text-anchor="middle" font-size="11" fill="{C["ink"]}">{label}</text>')
 # the edge table of docs/layout-directives.md (gen/layout.py CONNECTORS, body widths measured from the footprints)
-conn("T", 14, 19, "J10 RJ45", depth=22.4)
+conn("T", 56.6, 19, "J10 RJ45", depth=22.4)
 conn("L", 24.7, 10.6, "J2 PD in"); conn("L", 68.7, 10.6, "J1 upstream")
 conn("R", 14, 10.6, "J3 HID"); conn("R", 26, 16.5, "J13 console"); conn("R", 44, 16.3, "J9 FTDI")
 conn("B", 10.5, 17.2, "J5"); conn("B", 28.7, 17.2, "J4"); conn("B", 47.8, 13.2, "J18"); conn("B", 62.1, 13.2, "J19")
 conn("B", 81.2, 13.05, "J11"); conn("B", 95.3, 13.05, "J12"); conn("B", 110.2, 13.2, "J14")
-for (hx, hy, hw, hh, lab) in [(83, 10, 8, 5, "J16 SWD"), (117, 10, 15.2, 5, "J15 GPIO"), (31, 49, 6.5, 4, "J17 prog")]:
+for (hx, hy, hw, hh, lab) in [(84.7, 4.7, 4, 6.6, "J16 SWD"), (117, 10, 15.2, 5, "J15 GPIO"), (32, 43, 7.5, 4.2, "J17 prog")]:
     x, y = mm(hx, hy)
     e(f'<rect x="{x}" y="{y}" width="{hw*S}" height="{hh*S}" fill="{C["dev"]}" stroke="{C["dev_edge"]}"/>')
     if hx + hw > 110:                                                 # near the right edge: the label on the left, clear of J3

@@ -175,7 +175,13 @@ and does not credit the planes); its report is `drc.txt`.
 
 The board as committed (2026-10-07) is the engine's placement on the
 140 × 100 mm outline, unrouted: the lanes and pairs laid and locked, the
-planes drawn, every connection otherwise open (499 in the ratsnest). It
+planes drawn, every connection otherwise open (499 in the ratsnest). It is
+placed by the standard's city rule: each schematic island packed as one
+group with a 2 mm void to every other, the two 5 V bucks as cities in the
+inlet corner beside J2 with their datasheet circuits around them, the RJ45
+and PHY moved right along the back edge to make the room (the placement
+report lists every city, the parts placed apart from theirs, and any void
+narrower than 2 mm: none). It
 replaced the routed 140 × 80 board, which stays in history at a94a986: that
 board had been bulk-routed by FreeRouting and given the standard's copper
 pass (3 067 tracks, 594 vias, floods over 47 % of the top and 56 % of the

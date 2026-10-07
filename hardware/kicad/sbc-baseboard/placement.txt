@@ -13,337 +13,311 @@ D701   J13    F     L1
 D702   J13    F     L1
 D106   J17    F     B0
 D107   J17    F     B0
+L101   U103   F     R0
+L102   U104   F     R0
+D110   U103   F     R0
+D112   U104   F     R0
+L103   U105   F     R0
+C116   U103   F     T0
+C125   U104   F     T0
+C111   U103   F     L0
+C120   U104   F     L0
+C129   U105   F     T0
+C112   U103   F     L1
+C113   U103   F     L2
+C121   U104   F     L1
+C122   U104   F     L1
+C130   L103   F     R0
+C131   L103   F     R1
+C126   L102   F     R0
+C127   L102   F     R1
+C117   L101   F     R0
+C118   L101   F     R1
+C128   L102   F     R2
+C119   L101   F     R2
+R116   U103   B     B0
+R121   U104   B     B0
+C114   U103   B     R0
+C123   U104   B     R0
+R118   U103   B     B1
+R123   U104   B     B1
+R117   U103   B     R0
+C115   R117   B     R0
+R119   U103   F     B0
+R122   U104   B     R0
+C124   R122   B     R0
+R124   U104   F     B0
+R127   U105   B     L0
+C132   U105   F     L0
+R128   U105   F     L1
 C708   U704   F     L0
 C602   U601   F     L0
 C603   U601   F     L0
 C604   U601   F     L1
-C111   U103   F     L0
-C120   U104   F     L0
+C605   U601   F     L0
 C702   U701   F     T0
 C704   U702   F     B0
-C706   U703   F     L0
+C706   U703   F     B0
 C701   J13    F     L1
 R701   J13    F     L1
 C206   U201   F     L0
-C605   U601   F     L0
-C403   U402   F     B0
-C404   U402   F     R0
-C407   U402   F     T0
-C408   U402   F     B1
 C207   U201   F     L0
 C208   U201   F     L0
 C209   U201   F     B0
 C210   U201   F     B0
 C211   U201   F     T0
+C403   U402   F     B0
+C404   U402   F     B1
+C405   U402   F     T0
+C406   U402   F     B2
+C407   U402   F     L0
+C408   U402   F     L1
+C409   U402   F     L2
 C108   U102   F     T0
-C109   C108   F     B0
-C405   U402   F     L0
-C406   U402   F     L1
-C409   U402   F     L1
+C109   C108   F     L0
 C703   U701   F     T0
-C705   U702   F     R0
+C705   U702   F     T0
 C707   U703   F     R0
 C310   U301   F     B0
 C110   U102   F     T0
-L101   U103   F     R0
-L102   U104   F     T0
-SW601  J601   F     T0
-SW201  J16    F     R0
-D110   U103   F     R1
-D112   U104   F     T0
-C128   L102   F     L0
-C119   L101   F     R0
+SW601  J601   F     free@11
+SW201  J16    F     free@18
 D102   J2     F     R1
-C101   J2     F     R0
+C101   J2     F     R1
 C103   C101   F     L0
-C126   L102   F     L2
-C127   L102   F     L2
-C102   C103   F     R0
-C112   U103   F     L2
-C113   U103   F     L3
-C121   U104   F     L2
-C122   U104   F     L3
-C117   L101   F     R0
-C118   L101   F     R1
-C709   U704   F     L0
-C129   U105   F     T0
-C104   C103   F     R0
-C410   U402   F     B2
+C102   C103   F     B0
+C709   U704   F     L2
+C104   C103   F     B1
 C212   U201   F     R0
-C130   U105   F     L0
-C131   C130   F     L0
-L103   U105   F     R0
 U403   J4     F     T1
 C417   U403   F     T0
+C410   U402   F     B4
 U405   J5     F     T1
 C421   U405   F     B0
 U404   J4     F     T1
 C419   U404   F     R0
-U406   J5     F     T1
-C423   U406   F     B0
-U407   U501   F     R0
+U406   J5     F     free@11
+C423   U406   F     R0
+U407   U501   F     B2
 C425   U407   F     L0
-Q102   U102   F     R0
-Q101   U103   F     L4
-D101   J17    F     B1
+Q102   U102   F     B0
 Q801   K801   F     T0
 Q802   K802   F     L0
 Q803   K803   F     T0
-JP501  U501   F     L0
+Q101   U103   F     L4
+D101   J17    F     T0
 JP502  U501   F     R0
+JP501  U501   F     L0
 D807   U801   F     R0
+D201   J3     F     L1
 D801   K801   F     T1
-D803   K802   F     L0
+D803   K802   F     T0
 D805   K803   F     T2
-D108   U101   F     T0
+D108   U101   F     R0
 C418   J4     F     T2
-C422   J5     F     T2
-C420   U404   F     R0
+C422   J5     F     T0
+C420   U404   F     T0
 C424   U406   F     B0
-C710   U704   F     R0
+C710   U704   F     T6
 R811   J18    F     free@17
-R108   U101   F     T0
-C426   U407   F     L2
+R108   U101   F     B0
 C504   U501   F     R0
+C426   U407   F     R0
 C214   U201   F     T0
 C308   U301   F     R0
-R426   J4     F     T4
-R432   J5     F     T3
-R429   U404   F     L0
-R435   U406   F     B1
-R201   J3     B     L0
-R202   J3     B     L0
-R422   J1     B     R0
-R423   J1     B     R0
+R426   J4     F     T3
+R432   J5     F     T2
+R402   J1     B     R0
+R216   J3     B     L0
+R429   U404   F     T2
+R435   U406   F     L0
+R201   J3     B     L1
+R202   J3     B     L1
+R422   J1     B     R1
+R423   J1     B     R1
 C301   J10    B     B6
 C302   J10    B     B6
 R301   J10    F     R1
 R302   J10    F     L1
-R303   J10    B     B6
-R304   J10    B     B7
-R305   J10    B     B6
+R303   J10    B     B7
+R304   J10    B     B0
+R305   J10    B     B0
 R306   J10    B     L0
 R506   U501   B     R0
-C116   U103   F     T0
-C125   U104   F     L0
-R438   U407   F     L5
+C505   U501   F     T0
+R438   U407   F     R2
+R501   J9     B     L0
+R507   J9     B     L0
 R601   U601   B     R6
-R103   U101   F     T0
-R204   U201   F     L1
+R103   U101   F     R0
+R703   U704   F     L0
+R204   U201   F     L0
 R408   U402   F     T0
+R409   U402   F     T0
+R410   U402   F     B5
+R411   U402   F     B2
 C202   U201   B     T0
 C712   U704   B     B7
-R708   U704   B     B7
+R708   U704   B     B0
 C105   U101   B     T7
-C106   U101   B     T0
+C106   U101   B     L2
 R102   U101   B     L0
-R116   U103   B     B0
-R121   U104   B     B0
 R311   U301   B     L7
-R412   U402   B     L5
-R413   U402   B     L0
-R414   U402   B     T5
-R415   U402   B     T0
+R404   U402   B     L0
+R405   U402   B     B0
+R406   U402   B     T5
+R407   U402   B     T5
+R412   U402   B     L1
+R413   U402   B     L1
+R414   U402   B     T6
+R415   U402   B     T5
 R416   U402   B     R0
-R417   U402   B     R7
-R418   U402   B     B0
+R417   U402   B     B1
+R418   U402   B     B1
 R419   U402   B     L1
-R420   U402   B     T1
-R421   U402   B     T1
-R425   U403   B     L0
+R420   U402   B     T6
+R421   U402   B     T7
+R425   U403   B     T0
 R428   U404   B     L0
 R431   U405   B     L0
-R434   U406   B     L0
-R437   U407   B     T0
-D504   U501   F     R0
-R501   U501   B     R1
-D601   U601   F     T0
-FB201  U201   F     T0
-R705   U704   B     R0
-R110   U102   F     R0
-R309   U301   F     B0
-C114   U103   B     R0
-C123   U104   B     R0
-R118   U103   B     B1
-R123   U104   B     B1
-C304   U301   B     T0
-C305   U301   B     T0
-C411   U402   B     R1
-C412   U402   B     R1
-C413   U402   B     L2
-C414   U402   B     L3
-R109   U101   B     B0
-R117   U103   B     R0
-R119   U103   F     R0
-R122   U104   B     R0
-R124   U104   F     B0
-R424   U403   F     T0
-R427   U404   F     T6
-R430   U405   F     T0
-R433   U406   F     B1
-R436   U407   F     L6
-R704   U704   F     R0
-R706   U704   F     R0
-R812   U801   F     L0
-R409   U402   F     T1
-R410   U402   F     B3
-R411   U402   F     B4
-R404   U402   B     L2
-R405   U402   B     B0
+R434   U406   B     B0
+R437   U407   B     R0
 R205   U201   B     B0
 R206   U201   B     B0
 R207   U201   B     B1
 R307   U301   B     B7
-D505   U501   F     L1
-R127   U105   B     L0
-C401   U402   B     T1
-R401   U402   B     T2
-C132   U105   F     L1
-R128   U105   F     L5
-R402   U402   B     T2
-D802   K801   F     T3
-D804   K802   F     L0
-D806   K803   F     T3
+D504   U501   F     free@6
+D505   U501   F     free@5
+D601   U601   F     T0
+FB201  U201   F     T0
+R604   J601   B     R0
 C213   U201   B     T0
-R217   U201   F     L2
-R218   U201   F     L1
+R705   U704   B     R0
+C601   J601   B     L0
+R217   U201   F     L0
+R218   U201   F     L0
+R212   U201   F     R0
+R213   U201   F     R0
 C201   U201   B     T2
+C204   U201   B     L0
+C205   U201   B     L0
 R215   U201   B     R0
-R702   U704   B     L2
-R310   U301   F     R1
+R702   U704   B     L7
+R110   U102   F     R0
+R309   U301   F     L0
+R310   U301   F     B0
+C606   U601   B     R6
+C607   U601   B     R6
+C304   U301   B     T0
+C305   U301   B     R2
+C306   U301   B     L0
+C307   U301   B     L2
 R308   U301   B     B0
-R105   U101   B     B1
-R106   U101   B     T0
-R115   U201   B     B0
+C411   U402   B     T0
+C412   U402   B     T0
+C413   U402   B     L2
+C414   U402   B     L3
+C415   U402   B     L3
+C416   U402   B     L1
+R106   U101   B     R7
+R109   U101   B     B0
+R424   U403   F     T0
+R427   U404   F     T0
+R430   U405   F     T0
+R433   U406   F     L0
+R436   U407   F     B0
+R704   U704   F     B0
+R706   U704   F     R0
+R812   U801   F     L0
 C501   U501   B     L0
-C107   J17    B     B0
-R208   U201   F     R0
+R107   U101   F     B1
+R203   J16    F     B0
+C203   J16    B     B0
+R208   U201   F     R2
+R209   U201   F     R3
+R210   U201   F     R0
+R211   U201   F     R0
+R214   U201   F     R1
+R403   U402   F     T0
 C711   U704   B     R1
+R707   U704   B     R3
+C401   U402   B     T1
+C402   U402   B     T1
+R401   U402   B     L1
+D802   K801   F     T3
+D804   K802   F     L2
+D806   K803   F     T0
+R104   U101   B     B1
+R105   U101   B     B1
+R115   U201   B     B0
+C107   J17    B     free@12
 FB301  U301   F     T0
-C402   U402   B     T3
 R810   R811   F     free@11
-C505   C504   F     L0
-C502   R504   F     L0
-C503   R505   F     R0
-C115   R117   B     R0
-C124   R122   B     R0
+C502   R504   F     free@12
+C503   R505   F     free@10
+D202   R205   F     B0
 D401   R426   F     T0
-D402   R429   F     B0
+D402   R429   F     T0
 D403   R432   F     T0
-D404   R435   F     B0
-D405   R438   F     T0
-R502   D504   B     R0
+D404   R435   F     free@4
+D405   R438   F     R0
+R502   D504   B     L0
 R503   D505   B     L0
 R605   D601   B     T0
-D703   R705   F     R0
+D703   R705   F     B0
 R801   D802   F     T0
-R804   D804   F     L0
+R804   D804   F     B0
 R807   D806   F     T0
-C306   Y301   F     T0
-C307   Y301   F     T1
-C415   Y401   F     B0
-C416   Y401   F     B1
-C606   Y601   F     B0
-C607   Y601   F     R0
-R111   Q102   B     R0
+R111   Q102   B     B0
 R802   Q801   B     R0
 R805   Q802   B     T0
 R808   Q803   B     R0
-R112   Q102   B     R0
-C204   Y201   F     L0
-C205   Y201   F     L1
-D201   C201   F     L0
-R216   R215   B     L0
-R507   D506   B     L0
-R703   R702   F     R0
+R112   Q102   B     B0
 R803   Q801   B     R0
 R806   Q802   B     T0
 R809   Q803   B     R0
-D202   R205   F     free@6
 C309   C308   B     L0
-R707   C711   B     L0
-R107   D108   F     B0
-R403   C402   F     B7
-C601   SW601  B     L0
-R104   D106   B     L0
-C303   R303   F     B0
-R604   C601   B     R0
-R113   C107   B     T0
-C203   SW201  B     L0
-R203   C203   F     T0
-R120   U105   F     R2
-D111   R120   F     R0
-R125   L102   F     L4
-D113   R125   F     L0
-R101   U101   F     free@8
+C303   R303   F     free@10
+R113   C107   B     R0
+R125   L102   F     R0
+D113   R125   F     R0
+R101   U101   F     L0
 D105   R101   F     L0
-R114   U102   B     T0
-D109   R114   F     T0
+R120   L101   F     R0
+D111   R120   F     R0
+R114   U102   F     free@15
+D109   R114   F     B0
 R126   L103   F     R0
 D114   R126   F     R0
-R209   R208   F     R0
-R210   R209   F     L0
-R211   R210   F     R0
-R212   R211   F     L0
-R213   R212   F     R0
-R214   R213   F     L1
-R406   R405   B     B0
-R407   R406   B     T0
 
-islands (layout.md 3.1): the schematic's islands with two or more parts, connectors and holes aside; the spread is the
-farthest member from the island's centre on the board, and members more than 15 mm out are listed
-daplink/C601                 3 parts  spread   4.6 mm
-daplink/C602                 9 parts  spread  10.1 mm
-daplink/C606                 3 parts  spread   3.8 mm
-ethernet/C301                9 parts  spread  21.3 mm  apart: R301@16 R302@21
-ethernet/C304                5 parts  spread   8.1 mm
-ethernet/C306                3 parts  spread   5.8 mm
-ethernet/C308                2 parts  spread   7.0 mm
-ftdi/C502                    9 parts  spread  10.8 mm
-ftdi/C504                    2 parts  spread   3.4 mm
-ftdi/D505                    2 parts  spread   2.0 mm
-hub/C401                    24 parts  spread  18.4 mm  apart: C403@16 C408@16 C410@18 C414@17 R417@16
-hub/C402                     2 parts  spread   4.4 mm
-hub/C415                     3 parts  spread   3.5 mm
-hub/C417                     8 parts  spread   8.6 mm
-hub/C419                     7 parts  spread   8.7 mm
-hub/C421                     8 parts  spread  11.2 mm
-hub/C423                     7 parts  spread   7.2 mm
-hub/C425                     7 parts  spread  10.0 mm
-hub/J1                       3 parts  spread   2.6 mm
-hub/R405                     3 parts  spread   3.2 mm
-mcu/C201                     2 parts  spread   6.6 mm
-mcu/C202                     6 parts  spread  14.8 mm
-mcu/C203                     3 parts  spread   6.7 mm
-mcu/C204                     3 parts  spread   6.6 mm
-mcu/J3                       3 parts  spread   2.6 mm
-mcu/R206                     2 parts  spread   3.3 mm
-mcu/R208                     7 parts  spread   4.0 mm
-mcu/R215                     2 parts  spread   3.2 mm
-power/C101                   4 parts  spread   4.0 mm
-power/C105                   8 parts  spread   5.9 mm
-power/C107                   2 parts  spread   3.2 mm
-power/C108                   2 parts  spread   3.2 mm
-power/C111                  12 parts  spread  13.2 mm
-power/C120                  12 parts  spread  22.0 mm  apart: C126@22
-power/C129                  10 parts  spread  11.9 mm
-power/D105                   2 parts  spread   2.5 mm
-power/D108                   2 parts  spread   4.1 mm
-power/D109                   2 parts  spread   5.5 mm
-power/D111                   2 parts  spread   3.2 mm
-power/D113                   2 parts  spread   6.5 mm
-power/Q102                   5 parts  spread   7.3 mm
-relays/D801                  4 parts  spread  12.5 mm
-relays/D803                  4 parts  spread   7.4 mm
-relays/D805                  4 parts  spread  17.3 mm  apart: K803@17
-relays/D807                  5 parts  spread  14.1 mm
-relays/Q801                  3 parts  spread   1.5 mm
-relays/Q802                  3 parts  spread   1.5 mm
-relays/Q803                  3 parts  spread   1.5 mm
-target/C701                  2 parts  spread   2.0 mm
-target/C702                  3 parts  spread   4.5 mm
-target/C704                  3 parts  spread   6.0 mm
-target/C706                  3 parts  spread   4.0 mm
-target/C708                 10 parts  spread   7.1 mm
-target/C711                  2 parts  spread   5.0 mm
-target/R702                  2 parts  spread   7.2 mm
+cities (layout.md 3.1): the schematic's islands with two or more parts, connectors, holes and ESD aside: each one's extent on
+the board, and the members more than 10 mm from every other member (placed apart from their city)
+daplink/C601                16 parts   18.1 x  22.3 mm
+ethernet/C301               20 parts   22.7 x  25.6 mm  apart: R301@16
+ethernet/C308                2 parts    1.5 x   7.0 mm
+ftdi/C501                   17 parts   24.3 x  22.1 mm
+hub/C401                    60 parts   48.6 x  40.9 mm
+hub/C419                     7 parts    5.6 x  11.6 mm
+hub/C423                     7 parts    7.4 x   7.8 mm
+hub/C425                     7 parts   14.5 x   9.5 mm
+mcu/C201                    39 parts   51.9 x  25.1 mm
+power/C101                   4 parts    4.0 x   9.0 mm
+power/C105                  12 parts    8.0 x  12.7 mm
+power/C107                   2 parts    3.2 x   2.0 mm
+power/C108                   2 parts    2.5 x   0.2 mm
+power/C111                  18 parts   42.8 x  10.1 mm
+power/C120                  18 parts   38.0 x  10.2 mm
+power/C129                  10 parts   18.1 x   7.2 mm
+power/D105                   2 parts    3.2 x   0.0 mm
+power/D109                   2 parts    0.8 x   2.5 mm
+power/Q102                   5 parts    5.6 x  10.7 mm
+relays/D801                  7 parts    3.5 x  19.4 mm
+relays/D803                  7 parts   10.6 x  10.8 mm
+relays/D805                 12 parts   26.7 x  26.5 mm  apart: R810@12
+target/C701                  5 parts   11.2 x  52.8 mm
+target/C704                  3 parts    3.2 x  10.5 mm
+target/C706                  3 parts    5.4 x   3.2 mm
+target/C708                 14 parts   16.9 x  10.8 mm
+
+voids (layout.md 3.1): every two parts of different cities keep 2 mm, both sides; narrower gaps:
+  none

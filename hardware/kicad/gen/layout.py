@@ -14,33 +14,36 @@ EDGE_GAP = 1.0             # between neighbouring edge connectors' bodies
 # rule that placed them: a horizontal connector's solder pins sit at the rear, so it mates toward the
 # end of its body farthest from the pad rows; a pin header mates where its pins point
 CONNECTORS = {"J1": (3.1, 74.0, -90), "J2": (3.1, 30.0, -90), "J3": (136.9, 19.345, 90), "J4": (37.285, 83.865, 0),
-              "J5": (19.095, 83.865, 0), "J9": (129.435, 45.045, 0), "J10": (19.08, 20.23, 90), "J11": (87.745, 91.475, 0),
+              "J5": (19.095, 83.865, 0), "J9": (129.435, 45.045, 0), "J10": (66.08, 20.23, 90), "J11": (87.745, 91.475, 0),
               "J12": (101.805, 91.475, 0), "J13": (131.475, 39.165, 90), "J14": (116.845, 89.475, 0), "J18": (54.445, 89.475, 0),
               "J19": (68.665, 89.475, 0)}
 EDGE_ZONE = 3.0            # no part other than an edge connector nearer the edge than this (ECSS 14.3.2 c, tailored)
 
 # the ICs and inboard headers, placed by the flow in the directives (x, y, rotation of the footprint origin):
-# power enters at J2 and moves right through the bucks; each block sits behind the connector it serves
+# power enters at J2 and moves right through the bucks; each block sits behind the connector it serves.
+# 2026-10-07: the regulators are cities at the inlet (standard 3.1): the two 5 V bucks stacked in the corner
+# beside J2, the 3V3 buck below them at buck 1's output, the RJ45 and PHY moved right along the back edge to
+# make the room, the hub down into the band the taller board gained
 ANCHORS = {
-    "U301": (23.5, 29.0, 270),     # PHY below J10 on the back edge, TX/RX pins up toward the jack
-    "U101": (15.0, 36.0, 0),       # PD controller at J2
-    "U102": (26.0, 35.0, 0),       # PD bus buffer
-    "J17":  (31.0, 49.0, 0),       # Qwiic programming, top entry, beside the PD controller
-    "U103": (56.0, 11.0, 0),       # buck 1 (+5V_PORTS): SW on its right, the loop flows right
-    "U104": (56.0, 27.0, 0),       # buck 2 (+5V_TGT)
-    "U105": (70.0, 33.0, 0),       # +3V3 buck
-    "U402": (44.0, 40.0, 90),      # hub: downstream pins toward J4/J5, upstream and crystal toward J1
+    "U301": (70.5, 29.0, 270),     # PHY below J10 on the back edge, TX/RX pins up toward the jack (J10 + (4.42, 8.77), the ETH lanes' geometry)
+    "U101": (16.0, 43.0, 0),       # PD controller at J2, below the bucks' cities
+    "U102": (27.0, 43.0, 0),       # PD bus buffer
+    "J17":  (35.5, 45.0, 0),       # Qwiic programming, top entry, beside the PD controller
+    "U103": (24.0, 11.0, 0),       # buck 1 (+5V_PORTS) in the corner beside J2: SW on its right, the loop flows right
+    "U104": (24.0, 27.0, 0),       # buck 2 (+5V_TGT) below it, beside J2
+    "U105": (44.0, 41.0, 0),       # +3V3 buck below the bucks' outputs, above the hub
+    "U402": (44.0, 54.0, 90),      # hub: downstream pins toward J4/J5, upstream and crystal toward J1
     "U201": (96.0, 22.0, 270),     # K64: RMII toward the PHY, port/FAULT/UART pins toward the hub and FTDI, GPIO toward J15
-    "J16":  (83.0, 10.0, 0),       # SWD to the K64
+    "J16":  (86.0, 6.0, 0),        # SWD to the K64, between the jack and the K64 at the back edge
     "U601": (97.0, 47.0, 0),       # DAPLink K20
     "J601": (104.0, 44.0, 0),      # SWD to the K20
     "U501": (117.0, 51.0, 0),      # FT231X behind J9
     "K801": (91.0, 80.0, 0),       # relays behind J11 / J12
     "K802": (105.0, 80.0, 0),
     "U701": (119.0, 81.0, 0),      # +5V_TGT eFuse behind J14
-    "U704": (118.0, 30.0, 0),      # GPIO level shifter near J15
-    "U702": (112.0, 37.0, 0),      # console UART shifter near J13
-    "U703": (123.0, 37.0, 0),
+    "U704": (118.0, 29.0, 0),      # GPIO level shifter near J15
+    "U702": (112.0, 38.5, 0),      # console UART shifter near J13 (the three shifters 2 mm apart: the void between cities)
+    "U703": (123.0, 38.5, 0),
     # ESD arrays at their receptacles, in line with the pair, and the series parts of the K20 and FTDI pairs
     "U401": (10.3, 74.0, 0),       # J1 upstream array, pins 1/3 toward J1
     "U202": (129.7, 19.34, 180),   # J3 array
@@ -54,7 +57,14 @@ ANCHORS = {
     "R505": (123.5, 54.5, 0),      # I2C shifter
     "J15":  (117.0, 10.0, 0),      # GPIO header, inboard
 }
-SPARE = (72.0, 6.0)     # parts the engine cannot attach anywhere are parked here and reported
+SPARE = (8.0, 60.0)     # parts the engine cannot attach anywhere are parked here and reported
+# the regulators' cities (standard 3.1 and 3.2): each with its application circuit around it, the inductor and
+# catch diode on the side its SW pin faces, placed before every other satellite; the void between cities below
+REGULATORS = {"U103": {"sw": "R"}, "U104": {"sw": "R"}, "U105": {"sw": "R"}}
+CITY_GAP = 2.0          # the component void between any two islands' parts, both sides of the board (standard 3.1)
+# no plane or pour under the RJ45 on any layer (standard 3.4 and 4: its pins span the body, so the void is the body;
+# the pins' tracks pass)
+COPPER_VOIDS = {"J10_magnetics": (61.0, 1.0, 80.0, 22.5)}
 RING_GAP = 0.15             # a ring's gap to its host and to the ring inside it (courtyards + this: 0.65 mm pad to pad, the standard's spacing)
 RINGS = 8
 BIG_AREA = 20.0              # courtyard mm2 from which a part on an IC's pins goes down before the bulk capacitors (inductors, diodes)
@@ -81,15 +91,15 @@ PLANES = [("GND_L2", "GND", "In1.Cu", GND_PLANE),
           ("3V3_L3_c", "+3V3", "In2.Cu", [(3, 60), (62, 60), (62, 80), (3, 80)], 2),                             # left of the region...
           ("3V3_L3_e", "+3V3", "In2.Cu", [(3, 80), (46, 80), (46, 97), (3, 97)], 15),                            # ...and of its riser
           ("3V3_L3_d", "+3V3", "In2.Cu", [(86, 60), (137, 60), (137, 97), (86, 97)], 3),
-          ("VBUS_IN_L3", "VBUS_IN", "In2.Cu", [(3, 3), (55, 3), (55, 33), (3, 33)], 4),                        # inlet to the bucks' VIN pins
-          ("5V_TGT_L3_top", "+5V_TGT", "In2.Cu", [(55, 3), (137, 3), (137, 8), (55, 8)], 5),                   # L102 along the back edge...
+          ("VBUS_IN_L3", "VBUS_IN", "In2.Cu", [(3, 3), (40, 3), (40, 36), (3, 36)], 4),                        # inlet to the bucks' VIN pins
+          ("5V_TGT_L3_band", "+5V_TGT", "In2.Cu", [(44, 36), (129, 36), (129, 40), (44, 40)], 5),              # L102 across the board below the PHY...
           ("5V_TGT_L3_right", "+5V_TGT", "In2.Cu", [(129, 8), (137, 8), (137, 97), (129, 97)], 6),             # ...and the right edge...
           ("5V_TGT_L3_tab", "+5V_TGT", "In2.Cu", [(110, 26), (129, 26), (129, 33), (110, 33)], 7),             # ...a tab to the level shifter...
           ("5V_TGT_L3_efuse", "+5V_TGT", "In2.Cu", [(108, 77), (137, 77), (137, 97), (108, 97)], 8),           # ...to the eFuse and J14
-          ("5V_TGT_L3_l102", "+5V_TGT", "In2.Cu", [(50, 12), (62, 12), (62, 22), (50, 22)], 9),                # the inductor's output, over VBUS_IN
-          ("5V_PORTS_L3_top", "+5V_PORTS", "In2.Cu", [(62, 8), (86, 8), (86, 30), (62, 30)], 10),               # L101...
-          ("5V_PORTS_L3_u105", "+5V_PORTS", "In2.Cu", [(62, 30), (72, 30), (72, 38), (62, 38)], 11),            # ...to the 3V3 buck's input...
-          ("5V_PORTS_L3_mid", "+5V_PORTS", "In2.Cu", [(50, 38), (62, 38), (62, 80), (50, 80)], 12),             # ...down beside the relay...
+          ("5V_TGT_L3_l102", "+5V_TGT", "In2.Cu", [(40, 20), (54, 20), (54, 36), (40, 36)], 9),                # the inductor's output, over VBUS_IN
+          ("5V_PORTS_L3_l101", "+5V_PORTS", "In2.Cu", [(40, 3), (60, 3), (60, 20), (40, 20)], 10),              # L101's output, left of the jack...
+          ("5V_PORTS_L3_u105", "+5V_PORTS", "In2.Cu", [(36, 40), (62, 40), (62, 48), (36, 48)], 11),            # ...to the 3V3 buck's input...
+          ("5V_PORTS_L3_mid", "+5V_PORTS", "In2.Cu", [(50, 48), (62, 48), (62, 80), (50, 80)], 12),             # ...down beside the relay...
           ("5V_PORTS_L3_band", "+5V_PORTS", "In2.Cu", [(10, 70), (50, 70), (50, 82), (10, 82)], 13),            # ...along the port switches
           ("5V_PORTS_L3_right", "+5V_PORTS", "In2.Cu", [(86, 52), (126, 52), (126, 57), (86, 57)], 14),        # ...to the FTDI switch...
           ("5V_PORTS_L3_relays", "+5V_PORTS", "In2.Cu", [(86, 57), (108, 57), (108, 82), (86, 82)], 16)]       # ...and down to the relays
@@ -107,7 +117,7 @@ LANES = {
     "HUB_UP":  {"pair": "HUB_UP",  "path": [("U401", {"P": "4", "N": "6"}), ("x", 15.0), ("layer", "B.Cu"), ("y", ("U402", {"P": "59", "N": "58"}, (0.0, 0.1))),
                                             ("x", 36.5), ("layer", "F.Cu"), ("U402", {"P": "59", "N": "58"}, (0.0, 0.1))]},
     "PORT1_D": {"pair": "PORT1_D", "path": [("J4", {"P": "3", "N": "2"}), ("U408", {"P": "6", "N": "4"})]},
-    "HUB_DN4": {"pair": "HUB_DN4", "path": [("U408", {"P": "1", "N": "3"}), ("y", 50.0), ("x", ("U402", {"P": "9", "N": "8"})), ("U402", {"P": "9", "N": "8"})]},
+    "HUB_DN4": {"pair": "HUB_DN4", "path": [("U408", {"P": "1", "N": "3"}), ("y", 64.0), ("x", ("U402", {"P": "9", "N": "8"})), ("U402", {"P": "9", "N": "8"})]},
     "HUB_DN5": {"pair": "HUB_DN5", "path": [("U409", {"P": "1", "N": "3"}), ("U402", {"P": "12", "N": "11"})]},
     "PORT3_D": {"pair": "PORT3_D", "path": [("J5", {"P": "3", "N": "2"}), ("U410", {"P": "6", "N": "4"})]},
     # the left row's two port pairs are a pin pitch apart: their centre lines spread 0.2 mm so the members keep clearance
@@ -115,10 +125,10 @@ LANES = {
     "HUB_DN7": {"pair": "HUB_DN7", "path": [("U411", {"P": "1", "N": "3"}), ("y", ("U402", {"P": "56", "N": "55"}, (0.0, 0.15))), ("U402", {"P": "56", "N": "55"}, (0.0, 0.15))]},
     # the two downstream pairs for the K20 and the FTDI leave the hub's bottom row side by side (0.5 mm pins): their centre
     # lines are shifted 0.1 mm apart, the FTDI pair turns first, and each goes under the port pairs on the bottom
-    "HUB_DN1": {"pair": "HUB_DN1", "path": [("U402", {"P": "2", "N": "1"}, (-0.1, 0.0)), ("y", 47.6), ("layer", "B.Cu"), ("y", 49.2), ("x", 50.5), ("y", 47.6), ("layer", "F.Cu"),
+    "HUB_DN1": {"pair": "HUB_DN1", "path": [("U402", {"P": "2", "N": "1"}, (-0.1, 0.0)), ("y", 61.6), ("layer", "B.Cu"), ("y", 63.2), ("x", 50.5), ("y", 61.6), ("layer", "F.Cu"),
                                             ("y", ("pads", {"P": ("R602", "2"), "N": ("R603", "2")})), ("pads", {"P": ("R602", "2"), "N": ("R603", "2")})]},
     "K20_USB": {"pair": "K20_USB", "path": [("pads", {"P": ("R602", "1"), "N": ("R603", "1")}), ("x", 92.0), ("y", ("U601", {"P": "3", "N": "4"})), ("U601", {"P": "3", "N": "4"})]},
-    "HUB_DN2": {"pair": "HUB_DN2", "path": [("U402", {"P": "4", "N": "3"}, (0.1, 0.0)), ("y", 46.6), ("x", 42.8), ("layer", "B.Cu"), ("x", 52.1), ("layer", "F.Cu"), ("y", 41.5),
+    "HUB_DN2": {"pair": "HUB_DN2", "path": [("U402", {"P": "4", "N": "3"}, (0.1, 0.0)), ("y", 60.6), ("x", 42.8), ("layer", "B.Cu"), ("x", 52.1), ("layer", "F.Cu"), ("y", 41.5),
                                             ("x", 86.5), ("y", 51.5), ("x", 112.0), ("y", 57.0), ("x", 126.5),   # over the relay, under the DAPLink and SWD, round the FTDI
                                             ("y", ("pads", {"P": ("R505", "2"), "N": ("R504", "2")})), ("pads", {"P": ("R505", "2"), "N": ("R504", "2")})]},
     "FTDI_USB": {"pair": "FTDI_USB", "path": [("pads", {"P": ("R505", "1"), "N": ("R504", "1")}), ("x", 121.2), ("y", ("U501", {"P": "11", "N": "12"})), ("U501", {"P": "11", "N": "12"})]},
@@ -141,7 +151,7 @@ BOTTOM_MAX_AREA = {"R": 7.0, "C": 7.0, "D": 8.0, "Q": 12.0}   # mm2: up to 1206,
 BOTTOM_NEVER_CLASSES = {"USB_VBUS_3A", "PWR_6A", "PSU_3A", "USB"}   # parts on these nets stay on top (current paths, pairs); PSU_ISO parts may go under
 # ---- ESD protection (ecad-standards/layout.md section 3.8): recognised by value; placed first of all, on top, at the
 # connector's signal pins, a flow-through array turned so its connector-side pins face the connector
-ESD_VALUES = ("USBLC", "PESD", "ESDA", "TPD", "SRV05", "IP42", "TVS")
+ESD_VALUES = ("USBLC", "PESD", "ESDA", "TPD", "SRV05", "IP42", "TVS", "SMAJ", "SMBJ")
 BOTTOM_TUCK = 1.75    # a bottom part's inner edge sits this far inside its host's courtyard edge, under the pin row (reference boards: 1.8)
 THT_MARGIN = 0.5      # bottom parts keep this far from through-hole pads (reference boards: 0.5; wave or selective soldering needs the assembler's figure)
 EP_MARGIN = 0.6       # and from an exposed pad's via field

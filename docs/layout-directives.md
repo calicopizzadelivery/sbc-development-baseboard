@@ -41,7 +41,7 @@ flat against a wall or a DIN rail, which the spec accepted).
 | Edge | Connectors, in order from the back corner to the front | Faces | Bodies (measured) |
 |---|---|---|---|
 | Left (x = 0), 74 mm usable | J2 USB-C PD in (centred y = 30) · J1 USB-C upstream (centred y = 74), split around the middle | charger / workstation | 10.6 + 10.6 = 21.2 mm |
-| Back (y = 0), 114 mm usable | J10 RJ45, from x = 14 | workstation | 19.0 mm wide, 22.4 mm deep |
+| Back (y = 0), 114 mm usable | J10 RJ45, from x = 57 (from x = 14 until 2026-10-07, when the bucks took the inlet corner) | workstation | 19.0 mm wide, 22.4 mm deep |
 | Right (x = 140), 74 mm usable | J3 USB-C HID · J13 console · J9 FTDI right-angle, in the back half as before the board grew | target | 10.6 + 16.5 + 16.3 = 43.4 mm |
 | Front (y = 100), left end | J5, J4 USB-A stacks (J5 at x = 19, J4 at x = 37: swapped on 2026-10-06 so each stack's pairs reach the hub row they are wired to without crossing) · J18 PSU in · J19 PSU out | bench / PSU | 17.2 + 17.2 + 13.2 + 13.2 = 60.8 mm |
 | Front (y = 100), right end | J14 +5V_TGT · J12, J11 relays | target | 13.2 + 13.05 + 13.05 = 39.3 mm |
@@ -80,8 +80,14 @@ along it); a pin header mates where its pins point. Checked in the 3D view.
   notched around the region from the front edge. Only the opto-coupler and
   the relay body cross the gap.
 - **Lanes** (below): no part on either side inside a lane's corridor.
-- Under the Ethernet magnetics (inside J10): no copper on any layer under
-  the magnetics side of the jack.
+- Under J10: no plane or pour on any layer under the jack's body (its pins
+  span the body, so the whole body is the void; the pins' tracks pass),
+  drawn by the generator as the rule area `void_J10_magnetics` from
+  `COPPER_VOIDS`.
+- **Voids between cities** (standard 3.1): every two parts of different
+  schematic islands keep 2 mm apart on both sides of the board; the routing
+  between blocks runs in those voids. Connectors, holes, ESD parts and lone
+  symbols at a connector stand outside the cities.
 - No part other than an edge connector within 3 mm of any edge (a
   tailoring of ECSS-Q-ST-70-12C 14.3.2 c, whose 5 mm is for the assembler's
   conveyor; the assembler is consulted).
@@ -115,11 +121,11 @@ parts are anchored so the lanes can be declared before placement.
 | HUB_UP | U401 | U402 pins 59/58 | right to x = 15, up to the pins' row under the port pairs, right into the hub | 2 (under HUB_DN6/DN7) |
 | PORT1_D, PORT3_D | J4 / J5 front rows | U408 / U410 | direct, straight above their pads | — |
 | PORT2_D, PORT4_D | J4 / J5 back rows | U409 / U411 | single-net lanes on the bottom through the front row's pin gaps, up to the array's pads | 1 each |
-| HUB_DN4, HUB_DN5 | U408, U409 | U402 bottom row | up, right, up (DN4); straight up (DN5) | — |
+| HUB_DN4, HUB_DN5 | U408, U409 | U402 bottom row | up to y = 64, right, up (DN4); straight up (DN5) | — |
 | HUB_DN6, HUB_DN7 | U410, U411 | U402 left row | up the left of the hub, right into the row, nested, 1.2 mm apart | — |
-| HUB_DN1 | U402 pins 2/1 | R602/R603 (hub side) | down, under the port pairs on the bottom, up along x = 50.5, right above the relay at y = 38.75 | 2 |
+| HUB_DN1 | U402 pins 2/1 | R602/R603 (hub side) | down to y = 61.6, under the port pairs on the bottom, up along x = 50.5, right across the band at y = 38.75 | 2 |
 | K20_USB | R602/R603 | U601 pins 3/4 | right, down into the K20's left row | — |
-| HUB_DN2 | U402 pins 4/3 | R505/R504 (hub side) | down, under the port pairs, up along x = 52.1, right above the relay at y = 41.5, down past the DAPLink at x = 86.5, right under it at y = 51.5, down at x = 112, right under the FTDI at y = 57, up at x = 126.5, left into the resistors | 2 |
+| HUB_DN2 | U402 pins 4/3 | R505/R504 (hub side) | down to y = 60.6, under the port pairs, up along x = 52.1, right across the band at y = 41.5, down past the DAPLink at x = 86.5, right under it at y = 51.5, down at x = 112, right under the FTDI at y = 57, up at x = 126.5, left into the resistors | 2 |
 | FTDI_USB | R505/R504 | U501 pins 11/12 | direct | — |
 | J3_D | J3 (A7/A6 middle members; B7/B6 bridged at both ends of the row) | U202 | direct | — |
 | K64_USB | U202 | U201 pins 10/11 | left, up to y = 6 along the back edge, left, down into the K64's top row | — |
@@ -144,12 +150,13 @@ L2 (In1.Cu) is the ground plane, one outline notched around the isolation
 region. L3 (In2.Cu) carries the rails as rectangles (the autorouter's DSN
 reader takes no concave plane), each at its own priority, the +3V3 base
 in five pieces around the region at the lowest priorities and the others
-carving it: VBUS_IN top-left to the
-bucks' VIN pins; +5V_PORTS from L101 along the back, down the middle beside
-the relay and along the band above the USB-A stacks, plus a strip under the
-relays and the FTDI switch; +5V_TGT from L102 along the back and right
-edges to the eFuse and J14, with a tab to the level shifter. The autorouter
-drops vias into them; the regions are adjusted by hand where it could not.
+carving it: VBUS_IN in the inlet corner under the bucks' VIN pins;
++5V_PORTS from L101 down the left of the jack to the 3V3 buck, down the
+middle beside the relay and along the band above the USB-A stacks, plus a
+strip to the FTDI switch and down to the relays; +5V_TGT from L102 across
+the board in the band at y 36–40 below the PHY to the right edge, down it
+to the eFuse and J14, with a tab to the level shifter. The autorouter drops
+vias into them; the regions are adjusted by hand where it could not.
 
 ## Floods and stitching
 
@@ -189,14 +196,15 @@ host is the placed part it shares the most specific nets with, a decoupling
 capacitor's host is the IC the schematic draws it beside, it sits on the
 host's side nearest that pin, turned so the pad on the host's net faces it,
 and the parts along a side pack outward in rings. Since 2026-10-07 the
-board mimics the schematic's islands (standard 3.1): the parts drawn
-together on a sheet (an IC and the parts fanned out from it, a transistor
-with its resistors, a crystal with its load capacitors, a row of straps)
-are placed together, each island's hub first and its members at it, and a
-connector's island comes to the connector (ESD stays at its receptacle).
-`placement.txt` beside the board file records every part's host and ring
-(or the distance to its pin where no ring had room), then each island's
-spread on the board and the members placed more than 15 mm from it. The
+board mimics the schematic's islands as cities (standard 3.1): what a sheet
+joins by wires is one city on the board, packed together, with a 2 mm void
+to every other city on both sides, where the routing between blocks runs;
+each city's hub goes first and its members come to it; a connector's city
+comes to the connector (ESD stays at its receptacle); the regulators' cities
+go before everything else. `placement.txt` beside the board file records
+every part's host and ring (or the distance to its pin where no ring had
+room), then each city's extent and the members placed more than 10 mm from
+every other member, then any gap between cities narrower than the void. The
 generator lists the parts it could not keep within 8 mm of their pin;
 those, the members placed apart from their island, and the indicator LEDs
 are the first things to refine by hand. The anchors are the second: they
@@ -206,25 +214,25 @@ are the knobs.
 |---|---|---|
 | K803 | (56, 73, 0) | straddles the isolation barrier |
 | U801 | (66, 80.5, 180) | straddles the isolation barrier |
-| U301 | (23.5, 29, 270) | PHY below J10 on the back edge, TX/RX pins up toward the jack |
-| U101 | (15, 36, 0) | PD controller at J2 |
-| U102 | (26, 35, 0) | PD bus buffer |
-| J17 | (31, 49, 0) | Qwiic programming, top entry, beside the PD controller |
-| U103 | (56, 11, 0) | buck 1 (+5V_PORTS): SW on its right, the loop flows right |
-| U104 | (56, 27, 0) | buck 2 (+5V_TGT) |
-| U105 | (70, 33, 0) | +3V3 buck |
-| U402 | (44, 40, 90) | hub: downstream pins toward J4/J5, upstream and crystal toward J1 |
+| U301 | (70.5, 29, 270) | PHY below J10 on the back edge, TX/RX pins up toward the jack (J10 + (4.42, 8.77), the ETH lanes' geometry) |
+| U101 | (16, 43, 0) | PD controller at J2, below the bucks' cities |
+| U102 | (27, 43, 0) | PD bus buffer |
+| J17 | (35.5, 45, 0) | Qwiic programming, top entry, beside the PD controller |
+| U103 | (24, 11, 0) | buck 1 (+5V_PORTS) in the inlet corner beside J2: SW on its right, the loop flows right |
+| U104 | (24, 27, 0) | buck 2 (+5V_TGT) below it, beside J2 |
+| U105 | (44, 41, 0) | +3V3 buck below the bucks' outputs, above the hub |
+| U402 | (44, 54, 90) | hub, in the band the taller board gained: downstream pins toward J4/J5, upstream and crystal toward J1 |
 | U201 | (96, 22, 270) | K64: RMII toward the PHY, port/FAULT/UART pins toward the hub and FTDI, GPIO toward J15 |
-| J16 | (83, 10, 0) | SWD to the K64 |
+| J16 | (86, 6, 0) | SWD to the K64, between the jack and the K64 at the back edge |
 | U601 | (97, 47, 0) | DAPLink K20 |
 | J601 | (104, 44, 0) | SWD to the K20 |
 | U501 | (117, 51, 0) | FT231X behind J9 |
 | K801 | (91, 80, 0) | relays behind J11 / J12 |
 | K802 | (105, 80, 0) |  |
 | U701 | (119, 81, 0) | +5V_TGT eFuse behind J14 |
-| U704 | (118, 30, 0) | GPIO level shifter near J15 |
-| U702 | (112, 37, 0) | console UART shifter near J13 |
-| U703 | (123, 37, 0) |  |
+| U704 | (118, 29, 0) | GPIO level shifter near J15 |
+| U702 | (112, 38.5, 0) | console UART shifter near J13 (the three shifters 2 mm apart: the void between cities) |
+| U703 | (123, 38.5, 0) |  |
 | U401 | (10.3, 74, 0) | J1 upstream array at its receptacle, in line with the pair, pins 1/3 toward J1 |
 | U202 | (129.7, 19.34, 180) | J3 array |
 | U408 | (40.78, 79, -90) | J4 front row (port 1) -> hub DN4, straight above its pads |
@@ -244,8 +252,11 @@ hand to where they can be seen.
 ## Flow
 
 Power enters at J2 on the left edge and moves right: the PD controller and
-its parts at the connector, then the eFuse, then the bucks, then the rails
-as polygons to each block. Signals read the same way, from the user's edge
+its parts at the connector, the two 5 V bucks stacked in the corner beside
+it, each a city of its own with its datasheet circuit around it and 2 mm of
+void about it (standard 3.1: `REGULATORS`, the loop flowing right from the
+SW pin), the 3V3 buck below them at buck 1's output, then the rails as
+polygons to each block. Signals read the same way, from the user's edge
 on the left to the target's edge on the right. Each IC's own layout rules
 are in [layout-guidelines.md](layout-guidelines.md).
 
