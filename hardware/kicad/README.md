@@ -171,9 +171,15 @@ the Specctra rules and the fixed lanes, so it stays the bulk router.
 `gen/pcb.py` also runs `kicad-cli pcb drc --severity-all --refill-zones`
 (the planes are filled for the check and not saved, so a plane that fails to
 fill or strays into a keep-out shows; the unconnected count is the ratsnest's
-and does not credit the planes); its report is `drc.txt`. The generated board
-is a placement, not a layout: DRC reports no errors other than the unrouted
-connections and twelve inside the GCT USB-C footprints, whose mounting holes sit 0.19 mm from their own shield pads
+and does not credit the planes); its report is `drc.txt`.
+
+The board as committed is the autorouter's result over the engine's work
+(2026-10-07): 3 067 track segments and 297 vias, with 189 of the 499
+connections left for the hand pass, among them the rail pieces on L3 that
+still want vias (the 20 isolated-copper warnings), the ground stitching and
+the outer-layer ground floods of the standard's sections 4 and 5. DRC reports
+no errors other than those unrouted connections and twelve inside the GCT
+USB-C footprints, whose mounting holes sit 0.19 mm from their own shield pads
 against the 0.25 mm hole clearance set for the fab (confirm with Advanced
 Circuits or trim the footprint), and no warnings. From here the board file is
 the source of truth and is edited in KiCad; `gen/pcb.py` is not run again

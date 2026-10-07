@@ -107,6 +107,12 @@ where it matters:
 | Pair length mismatch, median / 90th percentile | 0.8 / 1.4 mm | within 1 mm |
 | Pairs on a single layer | one in three, 3 vias per pair | one layer, no vias (the parent's rule, kept) |
 
+After the autorouter's pass (2026-10-07) the board measures: 3 067 tracks,
+signal width 0.2 mm, 47 % of the track length on the bottom and none on the
+inner layers, pairs matched to 0.15 mm (median) with no vias on the pairs
+themselves, 0.05 ground vias per cm² and no outer pours yet: the stitching
+and the floods are the hand pass's.
+
 What changed: the default track width went from 0.25 to 0.2 mm; the
 standard gained layer roles, ground stitching at about four vias per
 square centimetre, thermal reliefs at 0.5 mm, ground floods on the outer
