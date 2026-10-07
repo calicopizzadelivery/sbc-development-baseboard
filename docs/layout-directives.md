@@ -126,7 +126,7 @@ parts are anchored so the lanes can be declared before placement.
 | HUB_DN6, HUB_DN7 | U410, U411 | U402 left row | up the left of the hub, right into the row, nested, 1.2 mm apart | — |
 | HUB_DN1 | U402 pins 2/1 | R602/R603 (hub side) | down to y = 66.6, under the port pairs on the bottom, up along x = 50.5, right across the band at y = 38.75 | 2 |
 | K20_USB | R602/R603 | U601 pins 3/4 | right, down into the K20's left row | — |
-| HUB_DN2 | U402 pins 4/3 | R505/R504 (hub side) | down to y = 65.6, under the port pairs, up along x = 52.1, right across the band at y = 41.5, down past the DAPLink at x = 86.5, right under it at y = 51.5, down at x = 112, right under the FTDI at y = 57, up at x = 126.5, left into the resistors | 2 |
+| HUB_DN2 | U402 pins 4/3 | R505/R504 (hub side) | down to y = 65.6, under the port pairs, up along x = 52.1, right across the band at y = 41.5, down past the DAPLink at x = 86.5, right under it at y = 51.5, down at x = 112, right under the FTDI at y = 62, up at x = 126.5, left into the resistors | 2 |
 | FTDI_USB | R505/R504 | U501 pins 11/12 | direct | — |
 | J3_D | J3 (A7/A6 middle members; B7/B6 bridged at both ends of the row) | U202 | direct | — |
 | K64_USB | U202 | U201 pins 10/11 | left, up to y = 6 along the back edge, left, down into the K64's top row | — |
@@ -238,7 +238,7 @@ are the knobs.
 | J16 | (93.5, 5, 0) | SWD to the K64, between the jack and the K64 at the back edge |
 | U601 | (97, 47, 0) | DAPLink K20 |
 | J601 | (104, 44, 0) | SWD to the K20 |
-| U501 | (117, 51, 0) | FT231X behind J9 |
+| U501 | (117, 56, 0) | FT231X behind J9, 5 mm down with its island (2026-10-07) |
 | K801 | (91, 80, 0) | relays behind J11 / J12 |
 | K802 | (105, 80, 0) |  |
 | U701 | (119, 81, 0) | +5V_TGT eFuse behind J14 |
@@ -253,9 +253,11 @@ are the knobs.
 | U411 | (25.2, 79, -90) | J5 back row (port 4) -> hub DN7 |
 | R602 | (88.6, 37.75, 180) | K20 pair series resistors, P above N as the lane arrives from the left |
 | R603 | (88.6, 39.75, 180) |  |
-| R504 | (123.5, 52.6, 0) | FTDI pair series resistors, N above P as the lane arrives from the right |
-| R505 | (123.5, 54.5, 0) | I2C shifter |
+| R504 | (123.5, 57.6, 0) | FTDI pair series resistors, N above P as the lane arrives from the right |
+| R505 | (123.5, 59.5, 0) |  |
 | J15 | (117, 10, 0) | GPIO header, inboard |
+| SW201 | (66, 50, 0) | K64 reset button in the open centre band (2026-10-07), its debounce parts with it |
+| SW601 | (80, 50, 0) | DAPLink reset button beside it, 2 mm of void between the two cities |
 
 The LEDs and their resistors are not anchored: the generator puts them at
 the nearest free spot to the pin that drives them, and they are moved by

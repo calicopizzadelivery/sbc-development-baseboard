@@ -37,7 +37,7 @@ ANCHORS = {
     "J16":  (93.5, 5.0, 0),        # SWD to the K64, between the jack and the K64 at the back edge
     "U601": (97.0, 47.0, 0),       # DAPLink K20
     "J601": (104.0, 44.0, 0),      # SWD to the K20
-    "U501": (117.0, 51.0, 0),      # FT231X behind J9
+    "U501": (117.0, 56.0, 0),     # FT231X behind J9, 5 mm down (2026-10-07) with its island
     "K801": (91.0, 80.0, 0),       # relays behind J11 / J12
     "K802": (105.0, 80.0, 0),
     "U701": (119.0, 81.0, 0),      # +5V_TGT eFuse behind J14
@@ -53,9 +53,12 @@ ANCHORS = {
     "U411": (25.2, 79.0, -90),     # J5 back row (port 4) -> hub DN7
     "R602": (88.6, 37.75, 180),    # K20 pair series resistors, P above N as the lane arrives from the left
     "R603": (88.6, 39.75, 180),
-    "R504": (123.5, 52.6, 0),      # FTDI pair series resistors, N above P as the lane arrives from the right
-    "R505": (123.5, 54.5, 0),      # I2C shifter
+    "R504": (123.5, 57.6, 0),     # FTDI pair series resistors, N above P as the lane arrives from the right
+    "R505": (123.5, 59.5, 0),     # I2C shifter
     "J15":  (117.0, 10.0, 0),      # GPIO header, inboard
+    # the two reset buttons in the open centre band (2026-10-07), their debounce parts with them
+    "SW201": (66.0, 50.0, 0),      # K64 reset
+    "SW601": (80.0, 50.0, 0),      # DAPLink reset (the buttons' courtyards are 10.2 mm wide: 2 mm of void between the two cities)
 }
 SPARE = (8.0, 60.0)     # parts the engine cannot attach anywhere are parked here and reported
 # the regulators' cities (standard 3.1 and 3.2): each with its application circuit around it, the inductor and
@@ -159,7 +162,7 @@ LANES = {
                                             ("y", ("pads", {"P": ("R602", "2"), "N": ("R603", "2")})), ("pads", {"P": ("R602", "2"), "N": ("R603", "2")})]},
     "K20_USB": {"pair": "K20_USB", "path": [("pads", {"P": ("R602", "1"), "N": ("R603", "1")}), ("x", 92.0), ("y", ("U601", {"P": "3", "N": "4"})), ("U601", {"P": "3", "N": "4"})]},
     "HUB_DN2": {"pair": "HUB_DN2", "path": [("U402", {"P": "4", "N": "3"}, (0.1, 0.0)), ("y", 65.6), ("x", 37.8), ("layer", "B.Cu"), ("x", 52.1), ("layer", "F.Cu"), ("y", 41.5),
-                                            ("x", 86.5), ("y", 51.5), ("x", 112.0), ("y", 57.0), ("x", 126.5),   # over the relay, under the DAPLink and SWD, round the FTDI
+                                            ("x", 86.5), ("y", 51.5), ("x", 112.0), ("y", 62.0), ("x", 126.5),   # over the relay, under the DAPLink and SWD, round the FTDI
                                             ("y", ("pads", {"P": ("R505", "2"), "N": ("R504", "2")})), ("pads", {"P": ("R505", "2"), "N": ("R504", "2")})]},
     "FTDI_USB": {"pair": "FTDI_USB", "path": [("pads", {"P": ("R505", "1"), "N": ("R504", "1")}), ("x", 121.2), ("y", ("U501", {"P": "11", "N": "12"})), ("U501", {"P": "11", "N": "12"})]},
     "J3_D":    {"pair": "J3_D",    "path": [("J3", {"P": ["A6", "B6"], "N": ["A7", "B7"]}), ("U202", {"P": "1", "N": "3"})]},
