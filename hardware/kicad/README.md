@@ -198,9 +198,11 @@ bottom, 142 connections left) and was judged too tight, so 20 mm of board
 was added below y = 52 and the front-edge blocks moved with the edge
 (`gen/layout.py`, [docs/layout-directives.md](../../docs/layout-directives.md)).
 DRC on the regenerated board reports no errors other than the unrouted
-connections and twelve inside the GCT USB-C footprints, whose mounting holes
-sit 0.19 mm from their own shield pads against the 0.25 mm hole clearance
-set for the fab (confirm with Advanced Circuits or trim the footprint); the
+connections and twelve inside the GCT USB-C footprints, whose two 0.65 mm board-lock
+peg holes sit 0.19 mm from the outer ground contact pads (A1, A12, B1, B12)
+against the 0.25 mm hole clearance set for the fab, exactly as GCT's own
+recommended layout draws them (confirm with Advanced Circuits, or trim
+those four pads by 0.1 mm in a house copy of the footprint); the
 34 isolated-copper warnings are the L3 rail pieces that have no vias yet.
 Next: `gen/pcb.py --route` (FreeRouting over the locked lanes), then
 `--copper` (the floods and the stitching), then the hand pass. From the
