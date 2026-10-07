@@ -208,10 +208,15 @@ joins by wires is one city on the board, packed together, with a 2 mm void
 to every other city on both sides, where the routing between blocks runs;
 each city's hub goes first and its members come to it; a connector's city
 comes to the connector (ESD stays at its receptacle); the regulators' cities
-go before everything else. `placement.txt` beside the board file records
-every part's host and ring (or the distance to its pin where no ring had
-room), then each city's extent and the members placed more than 10 mm from
-every other member, then any gap between cities narrower than the void. The
+go before everything else. Since the same day a crystal lies along its IC's edge with its load
+capacitors flanking it, each turned across the edge with its signal pad on
+the trace to the pin (standard 5), and a decoupling capacitor lies across
+the power trace it decouples, its axis along the IC's edge and its power pad
+nearest the pin (standard 3.3). `placement.txt` beside the board file
+records every part's host and ring (or the distance to its pin where no
+ring had room), then each city's extent and the members placed more than
+10 mm from every other member, then any gap between cities narrower than
+the void. The
 generator lists the parts it could not keep within 8 mm of their pin;
 those, the members placed apart from their island, and the indicator LEDs
 are the first things to refine by hand. The anchors are the second: they
