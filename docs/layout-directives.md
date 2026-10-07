@@ -41,7 +41,7 @@ flat against a wall or a DIN rail, which the spec accepted).
 | Edge | Connectors, in order from the back corner to the front | Faces | Bodies (measured) |
 |---|---|---|---|
 | Left (x = 0), 74 mm usable | J2 USB-C PD in (centred y = 30) · J1 USB-C upstream (centred y = 74), split around the middle | charger / workstation | 10.6 + 10.6 = 21.2 mm |
-| Back (y = 0), 114 mm usable | J10 RJ45, from x = 57 (from x = 14 until 2026-10-07, when the bucks took the inlet corner) | workstation | 19.0 mm wide, 22.4 mm deep |
+| Back (y = 0), 114 mm usable | J10 RJ45, from x = 71 (from x = 14 until 2026-10-07, when the two bucks took the back-edge corner beside J2) | workstation | 19.0 mm wide, 22.4 mm deep |
 | Right (x = 140), 74 mm usable | J3 USB-C HID · J13 console · J9 FTDI right-angle, in the back half as before the board grew | target | 10.6 + 16.5 + 16.3 = 43.4 mm |
 | Front (y = 100), left end | J5, J4 USB-A stacks (J5 at x = 19, J4 at x = 37: swapped on 2026-10-06 so each stack's pairs reach the hub row they are wired to without crossing) · J18 PSU in · J19 PSU out | bench / PSU | 17.2 + 17.2 + 13.2 + 13.2 = 60.8 mm |
 | Front (y = 100), right end | J14 +5V_TGT · J12, J11 relays | target | 13.2 + 13.05 + 13.05 = 39.3 mm |
@@ -151,11 +151,11 @@ region. L3 (In2.Cu) carries the rails as rectangles (the autorouter's DSN
 reader takes no concave plane), each at its own priority, the +3V3 base
 in five pieces around the region at the lowest priorities and the others
 carving it: VBUS_IN in the inlet corner under the bucks' VIN pins;
-+5V_PORTS from L101 down the left of the jack to the 3V3 buck, down the
-middle beside the relay and along the band above the USB-A stacks, plus a
-strip to the FTDI switch and down to the relays; +5V_TGT from L102 across
-the board in the band at y 36–40 below the PHY to the right edge, down it
-to the eFuse and J14, with a tab to the level shifter. The autorouter drops
++5V_PORTS from L101's output down to the 3V3 buck, down the middle beside
+the relay and along the band above the USB-A stacks, plus a strip to the
+FTDI switch and down to the relays; +5V_TGT from L102's output down to the
+band at y 36–40 and across it below the PHY to the right edge, down it to
+the eFuse and J14, with a tab to the level shifter. The autorouter drops
 vias into them; the regions are adjusted by hand where it could not.
 
 ## Floods and stitching
@@ -214,16 +214,16 @@ are the knobs.
 |---|---|---|
 | K803 | (56, 73, 0) | straddles the isolation barrier |
 | U801 | (66, 80.5, 180) | straddles the isolation barrier |
-| U301 | (70.5, 29, 270) | PHY below J10 on the back edge, TX/RX pins up toward the jack (J10 + (4.42, 8.77), the ETH lanes' geometry) |
+| U301 | (80.5, 29, 270) | PHY below J10 on the back edge, TX/RX pins up toward the jack (J10 + (4.42, 8.77), the ETH lanes' geometry) |
 | U101 | (16, 43, 0) | PD controller at J2, below the bucks' cities |
 | U102 | (27, 43, 0) | PD bus buffer |
 | J17 | (35.5, 45, 0) | Qwiic programming, top entry, beside the PD controller |
-| U103 | (24, 11, 0) | buck 1 (+5V_PORTS) in the inlet corner beside J2: SW on its right, the loop flows right |
-| U104 | (24, 27, 0) | buck 2 (+5V_TGT) below it, beside J2 |
-| U105 | (44, 41, 0) | +3V3 buck below the bucks' outputs, above the hub |
+| U103 | (24, 24, 0) | buck 1 (+5V_PORTS) in the corner at J2, laid out to TI SLVSF00 Figure 57 (the `TPS54560B` template): input column left at VIN and BOOT, catch diode along the right side at SW, inductor beyond it, output capacitors above the inductor, RT resistor below, compensation and divider right |
+| U104 | (52, 24, 0) | buck 2 (+5V_TGT) beside it along the back edge, the same figure |
+| U105 | (44, 41, 0) | +3V3 buck below buck 1's output, above the hub, laid out to TI SLVSDV6C Figure 52 (the `TPS62823` template): inductor and input capacitor on the power-pin side, output capacitors at the inductor's output, divider and feed-forward on the FB side |
 | U402 | (44, 54, 90) | hub, in the band the taller board gained: downstream pins toward J4/J5, upstream and crystal toward J1 |
-| U201 | (96, 22, 270) | K64: RMII toward the PHY, port/FAULT/UART pins toward the hub and FTDI, GPIO toward J15 |
-| J16 | (86, 6, 0) | SWD to the K64, between the jack and the K64 at the back edge |
+| U201 | (100.5, 23, 270) | K64: RMII toward the PHY, port/FAULT/UART pins toward the hub and FTDI, GPIO toward J15 |
+| J16 | (93.5, 5, 0) | SWD to the K64, between the jack and the K64 at the back edge |
 | U601 | (97, 47, 0) | DAPLink K20 |
 | J601 | (104, 44, 0) | SWD to the K20 |
 | U501 | (117, 51, 0) | FT231X behind J9 |
@@ -252,11 +252,12 @@ hand to where they can be seen.
 ## Flow
 
 Power enters at J2 on the left edge and moves right: the PD controller and
-its parts at the connector, the two 5 V bucks stacked in the corner beside
-it, each a city of its own with its datasheet circuit around it and 2 mm of
-void about it (standard 3.1: `REGULATORS`, the loop flowing right from the
-SW pin), the 3V3 buck below them at buck 1's output, then the rails as
-polygons to each block. Signals read the same way, from the user's edge
+its parts at the connector, the two 5 V bucks side by side along the back
+edge above it, each a city of its own placed to its datasheet's layout
+example (standard 3.2: `REGULATORS` and the `LAYOUTS` templates transcribe
+TI's Figure 57) with 2 mm of void about it, the 3V3 buck below them at buck
+1's output placed to its own figure, then the rails as polygons to each
+block. Signals read the same way, from the user's edge
 on the left to the target's edge on the right. Each IC's own layout rules
 are in [layout-guidelines.md](layout-guidelines.md).
 

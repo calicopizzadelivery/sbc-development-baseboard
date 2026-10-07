@@ -14,7 +14,7 @@ EDGE_GAP = 1.0             # between neighbouring edge connectors' bodies
 # rule that placed them: a horizontal connector's solder pins sit at the rear, so it mates toward the
 # end of its body farthest from the pad rows; a pin header mates where its pins point
 CONNECTORS = {"J1": (3.1, 74.0, -90), "J2": (3.1, 30.0, -90), "J3": (136.9, 19.345, 90), "J4": (37.285, 83.865, 0),
-              "J5": (19.095, 83.865, 0), "J9": (129.435, 45.045, 0), "J10": (66.08, 20.23, 90), "J11": (87.745, 91.475, 0),
+              "J5": (19.095, 83.865, 0), "J9": (129.435, 45.045, 0), "J10": (76.08, 20.23, 90), "J11": (87.745, 91.475, 0),
               "J12": (101.805, 91.475, 0), "J13": (131.475, 39.165, 90), "J14": (116.845, 89.475, 0), "J18": (54.445, 89.475, 0),
               "J19": (68.665, 89.475, 0)}
 EDGE_ZONE = 3.0            # no part other than an edge connector nearer the edge than this (ECSS 14.3.2 c, tailored)
@@ -25,16 +25,16 @@ EDGE_ZONE = 3.0            # no part other than an edge connector nearer the edg
 # beside J2, the 3V3 buck below them at buck 1's output, the RJ45 and PHY moved right along the back edge to
 # make the room, the hub down into the band the taller board gained
 ANCHORS = {
-    "U301": (70.5, 29.0, 270),     # PHY below J10 on the back edge, TX/RX pins up toward the jack (J10 + (4.42, 8.77), the ETH lanes' geometry)
+    "U301": (80.5, 29.0, 270),     # PHY below J10 on the back edge, TX/RX pins up toward the jack (J10 + (4.42, 8.77), the ETH lanes' geometry)
     "U101": (16.0, 43.0, 0),       # PD controller at J2, below the bucks' cities
     "U102": (27.0, 43.0, 0),       # PD bus buffer
     "J17":  (35.5, 45.0, 0),       # Qwiic programming, top entry, beside the PD controller
-    "U103": (24.0, 11.0, 0),       # buck 1 (+5V_PORTS) in the corner beside J2: SW on its right, the loop flows right
-    "U104": (24.0, 27.0, 0),       # buck 2 (+5V_TGT) below it, beside J2
+    "U103": (24.0, 24.0, 0),       # buck 1 (+5V_PORTS) in the corner at J2, laid out as SLVSF00 Figure 57 (LAYOUTS): input left, diode and inductor right, output capacitors above the inductor
+    "U104": (52.0, 24.0, 0),       # buck 2 (+5V_TGT) beside it along the back edge, the same figure
     "U105": (44.0, 41.0, 0),       # +3V3 buck below the bucks' outputs, above the hub
     "U402": (44.0, 54.0, 90),      # hub: downstream pins toward J4/J5, upstream and crystal toward J1
-    "U201": (96.0, 22.0, 270),     # K64: RMII toward the PHY, port/FAULT/UART pins toward the hub and FTDI, GPIO toward J15
-    "J16":  (86.0, 6.0, 0),        # SWD to the K64, between the jack and the K64 at the back edge
+    "U201": (100.5, 23.0, 270),    # K64: RMII toward the PHY, port/FAULT/UART pins toward the hub and FTDI, GPIO toward J15
+    "J16":  (93.5, 5.0, 0),        # SWD to the K64, between the jack and the K64 at the back edge
     "U601": (97.0, 47.0, 0),       # DAPLink K20
     "J601": (104.0, 44.0, 0),      # SWD to the K20
     "U501": (117.0, 51.0, 0),      # FT231X behind J9
@@ -60,11 +60,32 @@ ANCHORS = {
 SPARE = (8.0, 60.0)     # parts the engine cannot attach anywhere are parked here and reported
 # the regulators' cities (standard 3.1 and 3.2): each with its application circuit around it, the inductor and
 # catch diode on the side its SW pin faces, placed before every other satellite; the void between cities below
-REGULATORS = {"U103": {"sw": "R"}, "U104": {"sw": "R"}, "U105": {"sw": "R"}}
+REGULATORS = {"U103": {"layout": "TPS54560B"}, "U104": {"layout": "TPS54560B"}, "U105": {"layout": "TPS62823"}}
+# the datasheets' layout examples as templates (standard 3.2): for each pin of the IC, the side of the IC (in the
+# footprint's own frame, as the library draws it) on which the figure puts the parts hanging from that pin, and
+# those parts' kinds in order outward (ring 0 first; "^" lays the part along the side); where the output capacitors
+# sit relative to the inductor; whether the figure keeps everything on the top side. Pins are listed in the order
+# they are placed: the switching loop first.
+LAYOUTS = {
+    "TPS54560B": {"source": "TI SLVSF00 section 10.2, Figure 57 PCB Layout Example", "top_only": True,
+                  "pins": {"SW": ("R", ["D^", "L"]),           # catch diode along the right side at SW, the inductor beyond it
+                           "VIN": ("L", ["C"]),                # input bypass at VIN
+                           "BOOT": ("L", ["C"]),               # bootstrap capacitor above the input capacitor
+                           "EN": ("L", ["R"]),                 # UVLO divider (none on this board)
+                           "RT/CLK": ("B", ["R"]),             # frequency-set resistor below the IC
+                           "COMP": ("R", ["R", "C"]),          # compensation network right of COMP
+                           "FB": ("R", ["R"], 1)},             # the divider beyond the compensation network
+                  "inductor_out": ("T", ["C"])},               # output capacitors above the inductor, toward Vout
+    "TPS62823": {"source": "TI SLVSDV6C section 11.2, Figure 52 TPS6282x Board Layout", "top_only": True,
+                 "pins": {"SW": ("R", ["L"]),                  # inductor on the power-pin side at SW
+                          "VIN": ("R", ["C"]),                 # input capacitor beside it at VIN/PGND
+                          "FB": ("L", ["R", "C"])},            # divider and feed-forward on the FB/AGND side
+                 "inductor_out": ("T", ["C"])},                # output capacitors at the inductor's output, toward the IC's PG end
+}
 CITY_GAP = 2.0          # the component void between any two islands' parts, both sides of the board (standard 3.1)
 # no plane or pour under the RJ45 on any layer (standard 3.4 and 4: its pins span the body, so the void is the body;
 # the pins' tracks pass)
-COPPER_VOIDS = {"J10_magnetics": (61.0, 1.0, 80.0, 22.5)}
+COPPER_VOIDS = {"J10_magnetics": (71.0, 1.0, 90.1, 22.5)}   # the jack's courtyard: origin -5.07..+13.97 in x
 RING_GAP = 0.15             # a ring's gap to its host and to the ring inside it (courtyards + this: 0.65 mm pad to pad, the standard's spacing)
 RINGS = 8
 BIG_AREA = 20.0              # courtyard mm2 from which a part on an IC's pins goes down before the bulk capacitors (inductors, diodes)
@@ -91,13 +112,13 @@ PLANES = [("GND_L2", "GND", "In1.Cu", GND_PLANE),
           ("3V3_L3_c", "+3V3", "In2.Cu", [(3, 60), (62, 60), (62, 80), (3, 80)], 2),                             # left of the region...
           ("3V3_L3_e", "+3V3", "In2.Cu", [(3, 80), (46, 80), (46, 97), (3, 97)], 15),                            # ...and of its riser
           ("3V3_L3_d", "+3V3", "In2.Cu", [(86, 60), (137, 60), (137, 97), (86, 97)], 3),
-          ("VBUS_IN_L3", "VBUS_IN", "In2.Cu", [(3, 3), (40, 3), (40, 36), (3, 36)], 4),                        # inlet to the bucks' VIN pins
+          ("VBUS_IN_L3", "VBUS_IN", "In2.Cu", [(3, 3), (50, 3), (50, 36), (3, 36)], 4),                        # inlet to the bucks' VIN pins
           ("5V_TGT_L3_band", "+5V_TGT", "In2.Cu", [(44, 36), (129, 36), (129, 40), (44, 40)], 5),              # L102 across the board below the PHY...
           ("5V_TGT_L3_right", "+5V_TGT", "In2.Cu", [(129, 8), (137, 8), (137, 97), (129, 97)], 6),             # ...and the right edge...
           ("5V_TGT_L3_tab", "+5V_TGT", "In2.Cu", [(110, 26), (129, 26), (129, 33), (110, 33)], 7),             # ...a tab to the level shifter...
           ("5V_TGT_L3_efuse", "+5V_TGT", "In2.Cu", [(108, 77), (137, 77), (137, 97), (108, 97)], 8),           # ...to the eFuse and J14
-          ("5V_TGT_L3_l102", "+5V_TGT", "In2.Cu", [(40, 20), (54, 20), (54, 36), (40, 36)], 9),                # the inductor's output, over VBUS_IN
-          ("5V_PORTS_L3_l101", "+5V_PORTS", "In2.Cu", [(40, 3), (60, 3), (60, 20), (40, 20)], 10),              # L101's output, left of the jack...
+          ("5V_TGT_L3_l102", "+5V_TGT", "In2.Cu", [(56, 10), (70, 10), (70, 36), (56, 36)], 9),                # L102's output down to the band
+          ("5V_PORTS_L3_l101", "+5V_PORTS", "In2.Cu", [(28, 10), (42, 10), (42, 36), (28, 36)], 10),            # L101's output down to the 3V3 buck...
           ("5V_PORTS_L3_u105", "+5V_PORTS", "In2.Cu", [(36, 40), (62, 40), (62, 48), (36, 48)], 11),            # ...to the 3V3 buck's input...
           ("5V_PORTS_L3_mid", "+5V_PORTS", "In2.Cu", [(50, 48), (62, 48), (62, 80), (50, 80)], 12),             # ...down beside the relay...
           ("5V_PORTS_L3_band", "+5V_PORTS", "In2.Cu", [(10, 70), (50, 70), (50, 82), (10, 82)], 13),            # ...along the port switches
