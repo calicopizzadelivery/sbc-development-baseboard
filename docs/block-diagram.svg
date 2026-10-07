@@ -1,8 +1,8 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="1760" height="1600" viewBox="0 0 1760 1600" font-family="Inter, Helvetica, Arial, DejaVu Sans, sans-serif">
+<svg xmlns="http://www.w3.org/2000/svg" width="1760" height="1700" viewBox="0 0 1760 1700" font-family="Inter, Helvetica, Arial, DejaVu Sans, sans-serif">
 <defs><marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse"><path d="M0,1 L9,5 L0,9 z" fill="#2b3340"/></marker><marker id="arrowR" viewBox="0 0 10 10" refX="1" refY="5" markerWidth="8" markerHeight="8" orient="auto"><path d="M10,1 L1,5 L10,9 z" fill="#2b3340"/></marker></defs>
-<rect width="1760" height="1600" fill="#ffffff"/>
+<rect width="1760" height="1700" fill="#ffffff"/>
 <text x="30" y="34" font-size="20" font-weight="700" fill="#1f2430">SBC development baseboard — block diagram</text>
-<text x="1730" y="34" text-anchor="end" font-size="12.5" fill="#5b6372">spec rev 0.1 · 2026-10-04</text>
+<text x="1730" y="34" text-anchor="end" font-size="12.5" fill="#5b6372">spec rev 0.1 · 2026-10-07</text>
 <rect x="30" y="52" width="240" height="1030" rx="10" fill="#f5f6f8" stroke="#d6d9de"/>
 <text x="44" y="74" font-size="13" font-weight="700" letter-spacing="1.5" fill="#5b6372">FACING YOU</text>
 <rect x="300" y="52" width="1120" height="1030" rx="10" fill="#f5f6f8" stroke="#d6d9de"/>
@@ -204,52 +204,52 @@
 <circle cx="740" cy="975" r="3.2" fill="#15803d"/><circle cx="790" cy="1010" r="3.2" fill="#15803d"/>
 <path d="M 765,900 L 765,850 L 820,850 L 820,760" fill="none" stroke="#2b3340" stroke-width="1.6" marker-end="url(#arrow)"/>
 <text x="700" y="854" text-anchor="end" font-size="12" fill="#5b6372" paint-order="stroke" stroke="#ffffff" stroke-width="4" stroke-linejoin="round">PSU present</text>
-<text x="40" y="1143" font-size="14" font-weight="700" fill="#1f2430">Mechanical — 140 × 80 mm · 4× M3, 10 mm from each corner · to scale · component side</text>
-<rect x="40" y="1165" width="700" height="400" rx="6" fill="#ffffff" stroke="#1f2430" stroke-width="2"/>
-<circle cx="90" cy="1215" r="15" fill="none" stroke="#5b6372" stroke-dasharray="3 3"/>
-<circle cx="90" cy="1215" r="8.0" fill="#ffffff" stroke="#1f2430" stroke-width="1.5"/>
-<circle cx="690" cy="1215" r="15" fill="none" stroke="#5b6372" stroke-dasharray="3 3"/>
-<circle cx="690" cy="1215" r="8.0" fill="#ffffff" stroke="#1f2430" stroke-width="1.5"/>
-<circle cx="90" cy="1515" r="15" fill="none" stroke="#5b6372" stroke-dasharray="3 3"/>
-<circle cx="90" cy="1515" r="8.0" fill="#ffffff" stroke="#1f2430" stroke-width="1.5"/>
-<circle cx="690" cy="1515" r="15" fill="none" stroke="#5b6372" stroke-dasharray="3 3"/>
-<circle cx="690" cy="1515" r="8.0" fill="#ffffff" stroke="#1f2430" stroke-width="1.5"/>
-<text x="108" y="1201" font-size="10" fill="#5b6372">M3 · 6 mm pad</text>
-<rect x="40" y="1235" width="40" height="80" fill="#dbeafe" stroke="#2563eb"/>
-<text x="86" y="1279.0" font-size="11" fill="#1f2430">J10 RJ45</text>
-<rect x="40" y="1330" width="40" height="45" fill="#dbeafe" stroke="#2563eb"/>
-<text x="86" y="1356.5" font-size="11" fill="#1f2430">J1 upstream</text>
-<rect x="40" y="1390" width="40" height="45" fill="#dbeafe" stroke="#2563eb"/>
-<text x="86" y="1416.5" font-size="11" fill="#1f2430">J2 PD in</text>
-<rect x="40" y="1450" width="40" height="32.5" fill="#dbeafe" stroke="#2563eb"/>
-<text x="86" y="1470.25" font-size="11" fill="#1f2430">J17 prog</text>
-<rect x="700" y="1235" width="40" height="45" fill="#dbeafe" stroke="#2563eb"/>
-<text x="694" y="1261.5" text-anchor="end" font-size="11" fill="#1f2430">J3 HID</text>
-<rect x="700" y="1295" width="40" height="77.5" fill="#dbeafe" stroke="#2563eb"/>
-<text x="694" y="1337.75" text-anchor="end" font-size="11" fill="#1f2430">J13 console</text>
-<rect x="700" y="1387.5" width="40" height="62.0" fill="#dbeafe" stroke="#2563eb"/>
-<text x="694" y="1422.5" text-anchor="end" font-size="11" fill="#1f2430">J19 PSU out</text>
-<rect x="110" y="1525" width="66.5" height="40" fill="#dbeafe" stroke="#2563eb"/>
-<text x="143.25" y="1519" text-anchor="middle" font-size="11" fill="#1f2430">J4</text>
-<rect x="187.5" y="1525" width="66.5" height="40" fill="#dbeafe" stroke="#2563eb"/>
-<text x="220.75" y="1519" text-anchor="middle" font-size="11" fill="#1f2430">J5</text>
-<rect x="270" y="1525" width="62.0" height="40" fill="#dbeafe" stroke="#2563eb"/>
-<text x="301.0" y="1519" text-anchor="middle" font-size="11" fill="#1f2430">J18</text>
-<rect x="370" y="1525" width="76.0" height="40" fill="#dbeafe" stroke="#2563eb"/>
-<text x="408.0" y="1519" text-anchor="middle" font-size="11" fill="#1f2430">J9</text>
-<rect x="460" y="1525" width="60" height="40" fill="#dbeafe" stroke="#2563eb"/>
-<text x="490.0" y="1519" text-anchor="middle" font-size="11" fill="#1f2430">J11</text>
-<rect x="532.5" y="1525" width="60" height="40" fill="#dbeafe" stroke="#2563eb"/>
-<text x="562.5" y="1519" text-anchor="middle" font-size="11" fill="#1f2430">J12</text>
-<rect x="605" y="1525" width="62.0" height="40" fill="#dbeafe" stroke="#2563eb"/>
-<text x="636.0" y="1519" text-anchor="middle" font-size="11" fill="#1f2430">J14</text>
-<rect x="200" y="1345" width="40" height="25" fill="#ffffff" stroke="#374151"/>
-<text x="246" y="1361.5" font-size="11" fill="#1f2430">J16 SWD</text>
-<rect x="570" y="1455" width="76.0" height="25" fill="#ffffff" stroke="#374151"/>
-<text x="652.0" y="1471.5" font-size="11" fill="#1f2430">J15 GPIO</text>
-<text transform="rotate(-90 24 1365)" x="24" y="1365" text-anchor="middle" font-size="12" font-weight="700" letter-spacing="1.5" fill="#5b6372">FACING YOU</text>
-<text transform="rotate(90 758 1365)" x="758" y="1365" text-anchor="middle" font-size="12" font-weight="700" letter-spacing="1.5" fill="#5b6372">FACING THE TARGET</text>
-<text x="390" y="1585" text-anchor="middle" font-size="11.5" fill="#5b6372">front edge — overflow from the short edges; your end on the left, the target's on the right · back edge clear</text>
+<text x="40" y="1143" font-size="14" font-weight="700" fill="#1f2430">Mechanical — 140 × 100 mm · 4× M3, 7 mm from each corner · to scale · component side</text>
+<rect x="40" y="1165" width="700" height="500" rx="6" fill="#ffffff" stroke="#1f2430" stroke-width="2"/>
+<circle cx="75" cy="1200" r="15" fill="none" stroke="#5b6372" stroke-dasharray="3 3"/>
+<circle cx="75" cy="1200" r="8.0" fill="#ffffff" stroke="#1f2430" stroke-width="1.5"/>
+<circle cx="705" cy="1200" r="15" fill="none" stroke="#5b6372" stroke-dasharray="3 3"/>
+<circle cx="705" cy="1200" r="8.0" fill="#ffffff" stroke="#1f2430" stroke-width="1.5"/>
+<circle cx="75" cy="1630" r="15" fill="none" stroke="#5b6372" stroke-dasharray="3 3"/>
+<circle cx="75" cy="1630" r="8.0" fill="#ffffff" stroke="#1f2430" stroke-width="1.5"/>
+<circle cx="705" cy="1630" r="15" fill="none" stroke="#5b6372" stroke-dasharray="3 3"/>
+<circle cx="705" cy="1630" r="8.0" fill="#ffffff" stroke="#1f2430" stroke-width="1.5"/>
+<text x="93" y="1186" font-size="10" fill="#5b6372">M3 · 6 mm pad</text>
+<rect x="110" y="1165" width="95" height="112.0" fill="#dbeafe" stroke="#2563eb"/>
+<text x="157.5" y="1291.0" text-anchor="middle" font-size="11" fill="#1f2430">J10 RJ45</text>
+<rect x="40" y="1288.5" width="40" height="53.0" fill="#dbeafe" stroke="#2563eb"/>
+<text x="86" y="1319.0" font-size="11" fill="#1f2430">J2 PD in</text>
+<rect x="40" y="1508.5" width="40" height="53.0" fill="#dbeafe" stroke="#2563eb"/>
+<text x="86" y="1539.0" font-size="11" fill="#1f2430">J1 upstream</text>
+<rect x="700" y="1235" width="40" height="53.0" fill="#dbeafe" stroke="#2563eb"/>
+<text x="694" y="1265.5" text-anchor="end" font-size="11" fill="#1f2430">J3 HID</text>
+<rect x="700" y="1295" width="40" height="82.5" fill="#dbeafe" stroke="#2563eb"/>
+<text x="694" y="1340.25" text-anchor="end" font-size="11" fill="#1f2430">J13 console</text>
+<rect x="700" y="1385" width="40" height="81.5" fill="#dbeafe" stroke="#2563eb"/>
+<text x="694" y="1429.75" text-anchor="end" font-size="11" fill="#1f2430">J9 FTDI</text>
+<rect x="92.5" y="1625" width="86.0" height="40" fill="#dbeafe" stroke="#2563eb"/>
+<text x="135.5" y="1619" text-anchor="middle" font-size="11" fill="#1f2430">J5</text>
+<rect x="183.5" y="1625" width="86.0" height="40" fill="#dbeafe" stroke="#2563eb"/>
+<text x="226.5" y="1619" text-anchor="middle" font-size="11" fill="#1f2430">J4</text>
+<rect x="279.0" y="1625" width="66.0" height="40" fill="#dbeafe" stroke="#2563eb"/>
+<text x="312.0" y="1619" text-anchor="middle" font-size="11" fill="#1f2430">J18</text>
+<rect x="350.5" y="1625" width="66.0" height="40" fill="#dbeafe" stroke="#2563eb"/>
+<text x="383.5" y="1619" text-anchor="middle" font-size="11" fill="#1f2430">J19</text>
+<rect x="446.0" y="1625" width="65.25" height="40" fill="#dbeafe" stroke="#2563eb"/>
+<text x="478.625" y="1619" text-anchor="middle" font-size="11" fill="#1f2430">J11</text>
+<rect x="516.5" y="1625" width="65.25" height="40" fill="#dbeafe" stroke="#2563eb"/>
+<text x="549.125" y="1619" text-anchor="middle" font-size="11" fill="#1f2430">J12</text>
+<rect x="591.0" y="1625" width="66.0" height="40" fill="#dbeafe" stroke="#2563eb"/>
+<text x="624.0" y="1619" text-anchor="middle" font-size="11" fill="#1f2430">J14</text>
+<rect x="455" y="1215" width="40" height="25" fill="#ffffff" stroke="#374151"/>
+<text x="501" y="1231.5" font-size="11" fill="#1f2430">J16 SWD</text>
+<rect x="625" y="1215" width="76.0" height="25" fill="#ffffff" stroke="#374151"/>
+<text x="619" y="1231.5" text-anchor="end" font-size="11" fill="#1f2430">J15 GPIO</text>
+<rect x="195" y="1410" width="32.5" height="20" fill="#ffffff" stroke="#374151"/>
+<text x="233.5" y="1424.0" font-size="11" fill="#1f2430">J17 prog</text>
+<text transform="rotate(-90 24 1415)" x="24" y="1415" text-anchor="middle" font-size="12" font-weight="700" letter-spacing="1.5" fill="#5b6372">FACING YOU</text>
+<text transform="rotate(90 758 1415)" x="758" y="1415" text-anchor="middle" font-size="12" font-weight="700" letter-spacing="1.5" fill="#5b6372">FACING THE TARGET</text>
+<text x="390" y="1685" text-anchor="middle" font-size="11.5" fill="#5b6372">front edge — overflow from the short edges; your end on the left, the target's on the right · back edge: the RJ45</text>
 <text x="800" y="1150" font-size="14" font-weight="700" fill="#1f2430">Indicators — on the net, not on a pin</text>
 <circle cx="808" cy="1176" r="5.5" fill="#16a34a" stroke="#1f2430" stroke-width="1"/>
 <text x="840" y="1180" font-size="12.5" fill="#1f2430">Switched outputs, green — PORT 1–4, FT231X, +5V_TGT at the eFuse (6)</text>

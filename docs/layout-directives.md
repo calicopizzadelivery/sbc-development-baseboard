@@ -7,8 +7,14 @@ top-left corner, X to the right, Y down, in millimetres, as KiCad draws it.
 
 ## Outline and stackup
 
-- **140 × 80 mm**, 1.6 mm, 2 mm corner radius. Components on **both sides**
-  by the rule under Sides below (2026-10-06; top side only before that).
+- **140 × 100 mm**, 1.6 mm, 2 mm corner radius (140 × 80 until 2026-10-07,
+  when 20 mm of board was added below y = 52: everything behind the front
+  edge, from the USB-A stacks and the passthrough region to the relays and
+  the eFuse, moved 20 mm with the edge, and the band between the hub, the
+  3V3 buck and the K20 and the front-edge blocks is the room gained. The
+  routed 140 × 80 board was discarded with the change and stays in history).
+  Components on **both sides** by the rule under Sides below (2026-10-06; top
+  side only before that).
 - Advanced Circuits standard 4-layer 0.062": L1 signal (1 oz), 0.012"
   prepreg, L2 **ground plane** (1 oz), 0.028" core, L3 power / signal (1 oz),
   0.012" prepreg, L4 signal (1 oz). State it in the fab notes and ask for
@@ -17,7 +23,7 @@ top-left corner, X to the right, Y down, in millimetres, as KiCad draws it.
 ## Mounting holes
 
 Four M3, plated, on GND, centred **7 mm in from each corner**: (7, 7),
-(133, 7), (7, 73), (133, 73), moved out from 10 mm on 2026-10-06 for 3 mm
+(133, 7), (7, 93), (133, 93), moved out from 10 mm on 2026-10-06 for 3 mm
 more room inboard. A 6 mm standoff pad on each; the corner square of
 10.5 mm around each hole carries nothing else. The edge connectors were
 packed from 14 mm after each corner while the holes were at 10 mm and stay
@@ -34,11 +40,11 @@ flat against a wall or a DIN rail, which the spec accepted).
 
 | Edge | Connectors, in order from the back corner to the front | Faces | Bodies (measured) |
 |---|---|---|---|
-| Left (x = 0), 54 mm usable | J2 USB-C PD in (centred y = 30) · J1 USB-C upstream (centred y = 54), split around the middle | charger / workstation | 10.6 + 10.6 = 21.2 mm |
+| Left (x = 0), 74 mm usable | J2 USB-C PD in (centred y = 30) · J1 USB-C upstream (centred y = 74), split around the middle | charger / workstation | 10.6 + 10.6 = 21.2 mm |
 | Back (y = 0), 114 mm usable | J10 RJ45, from x = 14 | workstation | 19.0 mm wide, 22.4 mm deep |
-| Right (x = 140), 54 mm usable | J3 USB-C HID · J13 console · J9 FTDI right-angle | target | 10.6 + 16.5 + 16.3 = 43.4 mm |
-| Front (y = 80), left end | J5, J4 USB-A stacks (J5 at x = 19, J4 at x = 37: swapped on 2026-10-06 so each stack's pairs reach the hub row they are wired to without crossing) · J18 PSU in · J19 PSU out | bench / PSU | 17.2 + 17.2 + 13.2 + 13.2 = 60.8 mm |
-| Front (y = 80), right end | J14 +5V_TGT · J12, J11 relays | target | 13.2 + 13.05 + 13.05 = 39.3 mm |
+| Right (x = 140), 74 mm usable | J3 USB-C HID · J13 console · J9 FTDI right-angle, in the back half as before the board grew | target | 10.6 + 16.5 + 16.3 = 43.4 mm |
+| Front (y = 100), left end | J5, J4 USB-A stacks (J5 at x = 19, J4 at x = 37: swapped on 2026-10-06 so each stack's pairs reach the hub row they are wired to without crossing) · J18 PSU in · J19 PSU out | bench / PSU | 17.2 + 17.2 + 13.2 + 13.2 = 60.8 mm |
+| Front (y = 100), right end | J14 +5V_TGT · J12, J11 relays | target | 13.2 + 13.05 + 13.05 = 39.3 mm |
 | Inboard | J16 Cortex debug · J15 GPIO header · **J17 programming, top entry** (BM04B-SRSS-TB) | any | — |
 
 Four things moved from the spec's first table once the footprints were
@@ -62,9 +68,9 @@ along it); a pin header mates where its pins point. Checked in the 3D view.
   but the hole, enforced as rule areas.
 - **Isolation**: the PSU passthrough (J18, J19, K803's contact side, the
   opto-coupler's LED side, D807, R810, R811) sits in its own region behind
-  J18/J19 at the front, x 48–84, y 42–80, with the barrier running through
-  K803 between its coil and contact pins (x = 64) and through U801 between
-  its LED and transistor pins (y = 42). It has its own **PSU_GND** copper on
+  J18/J19 at the front, x 48–84, y 62–100 (y 42–80 on the 80 mm board),
+  with the barrier running through K803 between its coil and contact pins
+  and through U801 between its LED and transistor pins, both at x = 64. It has its own **PSU_GND** copper on
   L2 with **no board ground plane under it**, and a 2 mm creepage gap to
   every board net, enforced by DRC rules (`sbc-baseboard.kicad_dru`: board
   nets' tracks and vias are kept out of the region, a board-net zone may not
@@ -92,8 +98,8 @@ passthrough (`LANES` in `gen/layout.py`):
 
 | Lane | Net, class | Path |
 |---|---|---|
-| PSU_VP | PSU_VP, `PSU_3A` (2 mm) | J18 pin 1, up to y = 65, right to the x of K803 pin 6 (COM), up into the relay |
-| PSU_VOUT | PSU_VOUT, `PSU_3A` (2 mm) | K803 pin 4 (NO), down to y = 73 under J19's body past its GND pin, left to the x of J19 pin 1, up into it |
+| PSU_VP | PSU_VP, `PSU_3A` (2 mm) | J18 pin 1, up to y = 85, right to the x of K803 pin 6 (COM), up into the relay |
+| PSU_VOUT | PSU_VOUT, `PSU_3A` (2 mm) | K803 pin 4 (NO), down to y = 93 under J19's body past its GND pin, left to the x of J19 pin 1, up into it |
 
 PSU_GND goes from J18 pin 2 to J19 pin 2 through the PSU_GND island on L2.
 
@@ -125,8 +131,8 @@ the receptacle the pair would otherwise cross itself (standard 3.8); U401
 keeps the stock symbol. The hub's two downstream pairs for the K20 and the
 FTDI leave adjacent 0.5 mm pins: their centre lines are shifted 0.1 mm
 apart and the FTDI pair turns first.
-The VP leg at y = 65 keeps the 2 mm creepage to the opto-coupler's board-side
-pins (y ≤ 62); the VOUT leg at y = 73 clears J19's GND pad by the class
+The VP leg at y = 85 keeps the 2 mm creepage to the opto-coupler's board-side
+pins (y ≤ 82); the VOUT leg at y = 93 clears J19's GND pad by the class
 clearance. The lanes' corridors stop at the courtyards of the parts they join
 and appear in the board as footprint keep-out rule areas named `lane_*`. The
 USB 2.0 pairs get their lanes when the pairs are placed (standard, section
@@ -135,8 +141,10 @@ USB 2.0 pairs get their lanes when the pairs are placed (standard, section
 ## Planes
 
 L2 (In1.Cu) is the ground plane, one outline notched around the isolation
-region. L3 (In2.Cu) carries the rails as regions, the +3V3 plane underneath
-at the lowest priority and the others carving it: VBUS_IN top-left to the
+region. L3 (In2.Cu) carries the rails as rectangles (the autorouter's DSN
+reader takes no concave plane), each at its own priority, the +3V3 base
+in five pieces around the region at the lowest priorities and the others
+carving it: VBUS_IN top-left to the
 bucks' VIN pins; +5V_PORTS from L101 along the back, down the middle beside
 the relay and along the band above the USB-A stacks, plus a strip under the
 relays and the FTDI switch; +5V_TGT from L102 along the back and right
@@ -188,8 +196,8 @@ things to refine by hand. The anchors are the second: they are the knobs.
 
 | Part | (x, y, rot) | Why there |
 |---|---|---|
-| K803 | (56, 53, 0) | straddles the isolation barrier |
-| U801 | (66, 60.5, 180) | straddles the isolation barrier |
+| K803 | (56, 73, 0) | straddles the isolation barrier |
+| U801 | (66, 80.5, 180) | straddles the isolation barrier |
 | U301 | (23.5, 29, 270) | PHY below J10 on the back edge, TX/RX pins up toward the jack |
 | U101 | (15, 36, 0) | PD controller at J2 |
 | U102 | (26, 35, 0) | PD bus buffer |
@@ -203,18 +211,18 @@ things to refine by hand. The anchors are the second: they are the knobs.
 | U601 | (97, 47, 0) | DAPLink K20 |
 | J601 | (104, 44, 0) | SWD to the K20 |
 | U501 | (117, 51, 0) | FT231X behind J9 |
-| K801 | (91, 60, 0) | relays behind J11 / J12 |
-| K802 | (105, 60, 0) |  |
-| U701 | (119, 61, 0) | +5V_TGT eFuse behind J14 |
+| K801 | (91, 80, 0) | relays behind J11 / J12 |
+| K802 | (105, 80, 0) |  |
+| U701 | (119, 81, 0) | +5V_TGT eFuse behind J14 |
 | U704 | (118, 30, 0) | GPIO level shifter near J15 |
 | U702 | (112, 37, 0) | console UART shifter near J13 |
-| U703 | (123, 37, 0) | ESD arrays at their receptacles, in line with the pair, and the series parts of the K20 and FTDI pairs |
-| U401 | (10.3, 54, 0) | J1 upstream array, pins 1/3 toward J1 |
+| U703 | (123, 37, 0) |  |
+| U401 | (10.3, 74, 0) | J1 upstream array at its receptacle, in line with the pair, pins 1/3 toward J1 |
 | U202 | (129.7, 19.34, 180) | J3 array |
-| U408 | (40.78, 59, -90) | J4 front row (port 1) -> hub DN4, straight above its pads |
-| U409 | (45.5, 57.4, -90) | J4 back row (port 2) -> hub DN5, reached on the bottom around the pin rows |
-| U410 | (20, 59, -90) | J5 front row (port 3) -> hub DN6 |
-| U411 | (25.2, 59, -90) | J5 back row (port 4) -> hub DN7 |
+| U408 | (40.78, 79, -90) | J4 front row (port 1) -> hub DN4, straight above its pads |
+| U409 | (45.5, 77.4, -90) | J4 back row (port 2) -> hub DN5, reached on the bottom around the pin rows |
+| U410 | (20, 79, -90) | J5 front row (port 3) -> hub DN6 |
+| U411 | (25.2, 79, -90) | J5 back row (port 4) -> hub DN7 |
 | R602 | (88.6, 37.75, 180) | K20 pair series resistors, P above N as the lane arrives from the left |
 | R603 | (88.6, 39.75, 180) |  |
 | R504 | (123.5, 52.6, 0) | FTDI pair series resistors, N above P as the lane arrives from the right |

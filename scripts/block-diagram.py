@@ -19,7 +19,7 @@ PNG = ROOT / "docs" / "block-diagram.png"
 
 STAMP = f"spec rev 0.1 · {datetime.date.today().isoformat()}"
 
-W, H = 1760, 1600
+W, H = 1760, 1700
 out = []
 def e(s): out.append(s)
 
@@ -209,16 +209,20 @@ path([(765, 900), (765, 850), (820, 850), (820, 760)], "PSU present", (700, 854)
 # ---------- mechanical inset, to scale
 MX, MY, S = 40, 1165, 5            # origin in px, px per mm
 def mm(x, y): return (MX + x*S, MY + y*S)
-e(f'<text x="{MX}" y="{MY-22}" font-size="14" font-weight="700" fill="{C["ink"]}">Mechanical — 140 × 80 mm · 4× M3, 10 mm from each corner · to scale · component side</text>')
-e(f'<rect x="{MX}" y="{MY}" width="{140*S}" height="{80*S}" rx="6" fill="#ffffff" stroke="{C["ink"]}" stroke-width="2"/>')
-for hx, hy in [(10,10),(130,10),(10,70),(130,70)]:
+e(f'<text x="{MX}" y="{MY-22}" font-size="14" font-weight="700" fill="{C["ink"]}">Mechanical — 140 × 100 mm · 4× M3, 7 mm from each corner · to scale · component side</text>')
+e(f'<rect x="{MX}" y="{MY}" width="{140*S}" height="{100*S}" rx="6" fill="#ffffff" stroke="{C["ink"]}" stroke-width="2"/>')
+for hx, hy in [(7,7),(133,7),(7,93),(133,93)]:
     cx, cy = mm(hx, hy)
     e(f'<circle cx="{cx}" cy="{cy}" r="{3*S}" fill="none" stroke="{C["mute"]}" stroke-dasharray="3 3"/>')
     e(f'<circle cx="{cx}" cy="{cy}" r="{1.6*S}" fill="#ffffff" stroke="{C["ink"]}" stroke-width="1.5"/>')
-e(f'<text x="{mm(10,10)[0]+18}" y="{mm(10,10)[1]-14}" font-size="10" fill="{C["mute"]}">M3 · 6 mm pad</text>')
+e(f'<text x="{mm(7,7)[0]+18}" y="{mm(7,7)[1]-14}" font-size="10" fill="{C["mute"]}">M3 · 6 mm pad</text>')
 DEPTH = 8
-def conn(edge, a, L, label):
-    if edge == "L":
+def conn(edge, a, L, label, depth=DEPTH):
+    if edge == "T":                                               # the back edge: the RJ45, its long axis inboard
+        x, y = mm(a, 0)
+        e(f'<rect x="{x}" y="{y}" width="{L*S}" height="{depth*S}" fill="{C["conn"]}" stroke="{C["conn_edge"]}"/>')
+        e(f'<text x="{x+L*S/2}" y="{y+depth*S+14}" text-anchor="middle" font-size="11" fill="{C["ink"]}">{label}</text>')
+    elif edge == "L":
         x, y = mm(0, a)
         e(f'<rect x="{x}" y="{y}" width="{DEPTH*S}" height="{L*S}" fill="{C["conn"]}" stroke="{C["conn_edge"]}"/>')
         e(f'<text x="{x+DEPTH*S+6}" y="{y+L*S/2+4}" font-size="11" fill="{C["ink"]}">{label}</text>')
@@ -227,20 +231,25 @@ def conn(edge, a, L, label):
         e(f'<rect x="{x}" y="{y}" width="{DEPTH*S}" height="{L*S}" fill="{C["conn"]}" stroke="{C["conn_edge"]}"/>')
         e(f'<text x="{x-6}" y="{y+L*S/2+4}" text-anchor="end" font-size="11" fill="{C["ink"]}">{label}</text>')
     elif edge == "B":
-        x, y = mm(a, 80-DEPTH)
+        x, y = mm(a, 100-DEPTH)
         e(f'<rect x="{x}" y="{y}" width="{L*S}" height="{DEPTH*S}" fill="{C["conn"]}" stroke="{C["conn_edge"]}"/>')
         e(f'<text x="{x+L*S/2}" y="{y-6}" text-anchor="middle" font-size="11" fill="{C["ink"]}">{label}</text>')
-conn("L", 14, 16, "J10 RJ45"); conn("L", 33, 9, "J1 upstream"); conn("L", 45, 9, "J2 PD in"); conn("L", 57, 6.5, "J17 prog")
-conn("R", 14, 9, "J3 HID"); conn("R", 26, 15.5, "J13 console"); conn("R", 44.5, 12.4, "J19 PSU out")
-conn("B", 14, 13.3, "J4"); conn("B", 29.5, 13.3, "J5"); conn("B", 46, 12.4, "J18")
-conn("B", 66, 15.2, "J9"); conn("B", 84, 12, "J11"); conn("B", 98.5, 12, "J12"); conn("B", 113, 12.4, "J14")
-for (hx, hy, hw, hh, lab) in [(32, 36, 8, 5, "J16 SWD"), (106, 58, 15.2, 5, "J15 GPIO")]:
+# the edge table of docs/layout-directives.md (gen/layout.py CONNECTORS, body widths measured from the footprints)
+conn("T", 14, 19, "J10 RJ45", depth=22.4)
+conn("L", 24.7, 10.6, "J2 PD in"); conn("L", 68.7, 10.6, "J1 upstream")
+conn("R", 14, 10.6, "J3 HID"); conn("R", 26, 16.5, "J13 console"); conn("R", 44, 16.3, "J9 FTDI")
+conn("B", 10.5, 17.2, "J5"); conn("B", 28.7, 17.2, "J4"); conn("B", 47.8, 13.2, "J18"); conn("B", 62.1, 13.2, "J19")
+conn("B", 81.2, 13.05, "J11"); conn("B", 95.3, 13.05, "J12"); conn("B", 110.2, 13.2, "J14")
+for (hx, hy, hw, hh, lab) in [(83, 10, 8, 5, "J16 SWD"), (117, 10, 15.2, 5, "J15 GPIO"), (31, 49, 6.5, 4, "J17 prog")]:
     x, y = mm(hx, hy)
     e(f'<rect x="{x}" y="{y}" width="{hw*S}" height="{hh*S}" fill="{C["dev"]}" stroke="{C["dev_edge"]}"/>')
-    e(f'<text x="{x+hw*S+6}" y="{y+hh*S/2+4}" font-size="11" fill="{C["ink"]}">{lab}</text>')
-e(f'<text transform="rotate(-90 {MX-16} {MY+40*S})" x="{MX-16}" y="{MY+40*S}" text-anchor="middle" font-size="12" font-weight="700" letter-spacing="1.5" fill="{C["mute"]}">FACING YOU</text>')
-e(f'<text transform="rotate(90 {MX+140*S+18} {MY+40*S})" x="{MX+140*S+18}" y="{MY+40*S}" text-anchor="middle" font-size="12" font-weight="700" letter-spacing="1.5" fill="{C["mute"]}">FACING THE TARGET</text>')
-e(f'<text x="{MX+70*S}" y="{MY+80*S+20}" text-anchor="middle" font-size="11.5" fill="{C["mute"]}">front edge — overflow from the short edges; your end on the left, the target\'s on the right · back edge clear</text>')
+    if hx + hw > 110:                                                 # near the right edge: the label on the left, clear of J3
+        e(f'<text x="{x-6}" y="{y+hh*S/2+4}" text-anchor="end" font-size="11" fill="{C["ink"]}">{lab}</text>')
+    else:
+        e(f'<text x="{x+hw*S+6}" y="{y+hh*S/2+4}" font-size="11" fill="{C["ink"]}">{lab}</text>')
+e(f'<text transform="rotate(-90 {MX-16} {MY+50*S})" x="{MX-16}" y="{MY+50*S}" text-anchor="middle" font-size="12" font-weight="700" letter-spacing="1.5" fill="{C["mute"]}">FACING YOU</text>')
+e(f'<text transform="rotate(90 {MX+140*S+18} {MY+50*S})" x="{MX+140*S+18}" y="{MY+50*S}" text-anchor="middle" font-size="12" font-weight="700" letter-spacing="1.5" fill="{C["mute"]}">FACING THE TARGET</text>')
+e(f'<text x="{MX+70*S}" y="{MY+100*S+20}" text-anchor="middle" font-size="11.5" fill="{C["mute"]}">front edge — overflow from the short edges; your end on the left, the target\'s on the right · back edge: the RJ45</text>')
 
 # ---------- indicator key
 KX, KY = 800, 1150

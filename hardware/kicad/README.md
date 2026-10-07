@@ -122,7 +122,7 @@ repository as a submodule at `standards/`, on KiCad's `pcbnew` Python module)
 called from `gen/pcb.py`, from the schematic's netlist, the project file and
 the directives in `gen/layout.py`, which are
 [docs/layout-directives.md](../../docs/layout-directives.md) as data. It
-carries the 140 × 80 mm outline with 2 mm corners, the four M3 holes on GND
+carries the 140 × 100 mm outline with 2 mm corners, the four M3 holes on GND
 7 mm from the corners with their corner keep-outs, Advanced Circuits' 4-layer
 stackup, every footprint with its nets, the L2 ground plane with the isolated
 PSU_GND island, and `sbc-baseboard.kicad_dru` with the passthrough's
@@ -173,25 +173,26 @@ the Specctra rules and the fixed lanes, so it stays the bulk router.
 fill or strays into a keep-out shows; the unconnected count is the ratsnest's
 and does not credit the planes); its report is `drc.txt`.
 
-The board as committed is the autorouter's result over the engine's work,
-with the standard's copper pass over it (`gen/pcb.py --copper`, the
-standard's `tools/copper.py`, 2026-10-07): 3 067 track segments and 594
-vias, 297 of them ground stitching on the directives' 5 mm grid (2.7 ground
-vias per cm² outside the isolated region, where the routing let them in),
-ground floods on both outer layers covering 47 % of the top and 56 % of the
-bottom, notched around the passthrough block, which floods its own
-`PSU_GND`. 142 of the 499 connections are left for the hand pass, among them
-the rail pieces on L3 that still want vias (the 20 isolated-copper
-warnings). DRC reports no errors other than those unrouted connections and
-twelve inside the GCT USB-C footprints, whose mounting holes sit 0.19 mm from
-their own shield pads against the 0.25 mm hole clearance set for the fab
-(confirm with Advanced Circuits or trim the footprint); its 35
-starved-thermal warnings are ground pads the routing crowds so the flood
-reaches them with one spoke, for the hand pass to free or accept. From here
-the board file is the source of truth and is edited in KiCad; `gen/pcb.py`
-is not run again over it, except `--copper`, which adds only what is
-missing. The schematic generator stays usable: its derived UUIDs keep the
-footprints linked.
+The board as committed (2026-10-07) is the engine's placement on the
+140 × 100 mm outline, unrouted: the lanes and pairs laid and locked, the
+planes drawn, every connection otherwise open (499 in the ratsnest). It
+replaced the routed 140 × 80 board, which stays in history at a94a986: that
+board had been bulk-routed by FreeRouting and given the standard's copper
+pass (3 067 tracks, 594 vias, floods over 47 % of the top and 56 % of the
+bottom, 142 connections left) and was judged too tight, so 20 mm of board
+was added below y = 52 and the front-edge blocks moved with the edge
+(`gen/layout.py`, [docs/layout-directives.md](../../docs/layout-directives.md)).
+DRC on the regenerated board reports no errors other than the unrouted
+connections and twelve inside the GCT USB-C footprints, whose mounting holes
+sit 0.19 mm from their own shield pads against the 0.25 mm hole clearance
+set for the fab (confirm with Advanced Circuits or trim the footprint); the
+34 isolated-copper warnings are the L3 rail pieces that have no vias yet.
+Next: `gen/pcb.py --route` (FreeRouting over the locked lanes), then
+`--copper` (the floods and the stitching), then the hand pass. From the
+routing on, the board file is the source of truth and is edited in KiCad;
+`gen/pcb.py` is not run again over it, except `--copper`, which adds only
+what is missing. The schematic generator stays usable: its derived UUIDs
+keep the footprints linked.
 
 The ICs' own layout rules, with sources, are in
 [docs/layout-guidelines.md](../../docs/layout-guidelines.md).

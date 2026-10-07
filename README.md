@@ -44,7 +44,7 @@ workstation ──USB-C──> hub ──> 4x USB-A (switched)     ──> whate
  PD charger ──USB-C──> PD sink ──> 5 V rails
 ```
 
-140 × 80 mm, four M3 corner holes. Your connectors leave the left edge, the
+140 × 100 mm, four M3 corner holes. Your connectors leave the left edge, the
 target's the right; an LED on every rail, every switched output and every relay
 coil, and none on the passthrough, whose voltage is whatever you plugged in.
 

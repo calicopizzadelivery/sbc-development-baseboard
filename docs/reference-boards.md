@@ -107,8 +107,10 @@ where it matters:
 | Pair length mismatch, median / 90th percentile | 0.8 / 1.4 mm | within 1 mm |
 | Pairs on a single layer | one in three, 3 vias per pair | one layer, no vias (the parent's rule, kept) |
 
-After the autorouter's pass and the copper pass (2026-10-07) the board
-measures: 3 067 tracks, signal width 0.2 mm, 47 % of the track length on the
+After the autorouter's pass and the copper pass (2026-10-07, on the
+140 × 80 mm revision, commit a94a986; the board was then enlarged to
+140 × 100 mm and re-placed, and will be measured again when it is routed)
+the board measured: 3 067 tracks, signal width 0.2 mm, 47 % of the track length on the
 bottom and none on the inner layers, pairs matched to 0.15 mm (median) with
 no vias on the pairs themselves, ground floods over 47 % of the top and 56 %
 of the bottom, and 2.7 ground vias per cm² from the 5 mm stitching grid

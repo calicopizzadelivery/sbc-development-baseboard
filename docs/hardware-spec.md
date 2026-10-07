@@ -192,8 +192,10 @@ activity at the header. TVS on all four signals; the header will be hot-plugged.
 
 ### Placement and form factor
 
-**140 × 80 mm, four M3 mounting holes 7 mm in from each corner (10 mm until
-the first placement pass, 2026-10-06); connectors, ICs, relays and large parts
+**140 × 100 mm (140 × 80 until 2026-10-07, when the routed board proved
+too tight and 20 mm was added between the middle blocks and the front
+edge), four M3 mounting holes 7 mm in from each corner (10 mm until the
+first placement pass, 2026-10-06); connectors, ICs, relays and large parts
 on top, small passives on the bottom (one side until the placement pass).** Connectors that face you leave the **left** edge; connectors that
 face the target leave the **right** edge. Those are the rules. Here is what
 they produce once the arithmetic is done.
@@ -201,10 +203,12 @@ they produce once the arithmetic is done.
 A corner hole with a 6 mm standoff pad keeps edge connectors out of the first
 ~13 mm at each end of an edge (the edges were packed from 14 mm with the
 holes at 10 mm; at 7 mm the keep-out is 10.5 mm and the connectors stayed), so
-each 80 mm edge has about **54 mm** of usable length and each 140 mm edge
-about **114 mm**. The target-side connectors
-alone — J3, J13, J11, J12, J14, J19, at Phoenix 3.5 and 5.08 mm body widths —
-come to **73 mm**. They do not fit on an 80 mm edge, in any order.
+each 100 mm edge has about **74 mm** of usable length (54 mm while the
+board was 80 mm tall) and each 140 mm edge about **114 mm**. The target-side
+connectors alone — J3, J13, J11, J12, J14, J19, at Phoenix 3.5 and 5.08 mm
+body widths — come to **73 mm**. They did not fit on an 80 mm edge in any
+order, and on the 100 mm edge they would fill it to the last millimetre, so
+the arrangement below stands.
 
 So the short edges carry the primary cable connectors, and the rest go on the
 **front** long edge at the end that matches their direction — your things at
@@ -658,7 +662,7 @@ firmware is running and its loop is not wedged.
 | 4 | USB VID/PID. **Deferred indefinitely, by decision (2026-10-03).** `frdm-k64f-hid` ships `2fe3:0001`, the Zephyr project's VID, and the hub and DAPLink will want identifiers too; all of it stays as-is on the bench. Revisit only if a board leaves the lab. | — |
 | 5 | K64 lead time. If it is bad, the fallback is an RP2350 + W5500, which costs the Zephyr board port and the FRDM tooling. | BOM |
 | 6 | ~~Does J14 need a raw `VBUS_IN` pass-through for 12 V targets?~~ **Resolved** by J18/J19: any PSU passes through, isolated. J14 stays for 5 V targets that want to live inside the PD budget without a PSU of their own. | — |
-| 7 | ~~Form factor and mounting~~ **Resolved:** 140 × 80 mm, four M3 at 7 mm from each corner (10 mm until the first placement pass), you on the left edge, the target on the right, overflow to the front edge. §2. | — |
+| 7 | ~~Form factor and mounting~~ **Resolved:** 140 × 100 mm (140 × 80 until 2026-10-07), four M3 at 7 mm from each corner (10 mm until the first placement pass), you on the left edge, the target on the right, overflow to the front edge. §2. | — |
 | 8 | Authentication on the TCP transport. Today anything that can reach the port can cut the target's power and assert its recovery pins. A trusted segment is the assumption; decide whether that is good enough. | Remote management outside the lab |
 | 9 | Should the K64 be able to rewrite the STUSB4500 NVM itself, over the buffered bus? Then J17 is bring-up and recovery only, and PDO changes become a console command. | Firmware scope |
 | 14 | ~~DAPLink k20dx HIC pin assignments~~ **Resolved** (2026-10-06) against DAPLink's `k20dx/IO_Config.h` and `uart.c` and the FRDM-K64F OpenSDA schematic: SWCLK PTC5, SWDIO out PTC6 **and SWDIO in PTC7** (both on the SWDIO net, as on the FRDM), nRESET PTB1, LED PTD4, UART1 PTC3 RX / PTC4 TX. The FRDM's 33 Ω series resistors on the K20's USB D+/D− are now fitted. PTD6 (POWER_EN) and PTD7 (VTRG_FAULT_B) stay unconnected: nothing here for them to switch or sense. | — |
