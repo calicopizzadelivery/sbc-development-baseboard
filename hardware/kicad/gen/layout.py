@@ -61,7 +61,9 @@ ISOLATION = [(64, 42), (84, 42), (84, 80), (48, 80), (48, 62), (64, 62)]   # beh
 ISOLATION_PLANE_HOLE = [(62, 40), (86, 40), (86, 80), (46, 80), (46, 60), (62, 60)]
 # the ground plane on L2 as one outline: the board less a 1 mm edge margin, notched by ISOLATION_PLANE_HOLE from the
 # front edge (a zone outline with a hole does not fill in KiCad; the notch is open to the edge, so none is needed)
-GND_PLANE = [(1, 1), (139, 1), (139, 79), (86, 79), (86, 40), (62, 40), (62, 60), (46, 60), (46, 79), (1, 79)]   # the same, grown by ISO_GAP: the ground plane stops here
+GND_PLANE = [(1, 1), (139, 1), (139, 79), (86, 79), (86, 40), (62, 40), (62, 60), (46, 60), (46, 79), (1, 79)]
+PLANES = [("GND_L2", "GND", "In1.Cu", GND_PLANE)]
+   # the same, grown by ISO_GAP: the ground plane stops here
 ISO_GAP = 2.0
 # ---- lanes (ecad-standards/layout.md sections 1 and 5): a corridor reserved for one routed path, from pad to pad
 # through axis-aligned legs ("x"/"y" items move along one axis to a coordinate or to another pad's coordinate),
@@ -92,3 +94,7 @@ ISOLATION_GROWN_RECTS = [(62, 40, 86, 80), (46, 60, 62, 80)]     # ISOLATION_PLA
 STACKUP = [  # Advanced Circuits standard 4-layer 0.062"
     ("F.Cu", "copper", 0.035), ("dielectric 1", "prepreg", 0.3048, 4.6), ("In1.Cu", "copper", 0.035),
     ("dielectric 2", "core", 0.7112, 4.7), ("In2.Cu", "copper", 0.035), ("dielectric 3", "prepreg", 0.3048, 4.6), ("B.Cu", "copper", 0.035)]
+# the isolated regions the engine enforces (placement, rule areas, .kicad_dru rules, the region's own island)
+ISOLATION_REGIONS = [{"name": "psu_iso", "note": "PSU passthrough isolation", "outline": ISOLATION, "rects": ISOLATION_RECTS,
+                      "grown": ISOLATION_GROWN_RECTS, "nets": r"(^|/)PSU_(VP|VOUT|GND|SENSE)", "classes": ("PSU_3A", "PSU_ISO"),
+                      "gap": ISO_GAP, "island": ("PSU_GND_L2", "PSU_GND", "In1.Cu", ISOLATION)}]

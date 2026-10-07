@@ -12,8 +12,8 @@ project after this one starts from the same calibrated rules.
 `scripts/reference-boards.txt` lists the sources; `scripts/fetch-reference-boards.sh`
 mirrors them into `reference-boards/` (git-ignored, about 4 GB, shallow
 clones and unpacked archives). The mirror stays until the exercise is
-finished. Vendors and the boards they contributed: mnt 14, olimex 48, rpi 3, sparkfun 14
-(79 board files; SparkFun and MNT entries include panels and revisions
+finished. Vendors and the boards they contributed: mnt 14, olimex 48, rpi 3, sparkfun 16
+(81 board files; SparkFun and MNT entries include panels and revisions
 of the same design, which weigh their practice a little more). Licences as
 published (CERN-OHL-S, CC-BY-SA): the boards are read, measured and cited,
 never copied into ours.
@@ -32,26 +32,26 @@ the nearest pad of an IC on that rail. ESD parts are recognised by value.
 
 | Measure | Reference boards, median | Two-sided boards | This board |
 |---|---|---|---|
-| Decoupling capacitor to its supply pin, median (mm) | 2.41 | 1.99 | 2.19 |
-| Decoupling capacitor to its supply pin, 90th percentile (mm) | 8.41 | 8.41 | 9.75 |
+| Decoupling capacitor to its supply pin, median (mm) | 2.41 | 2.20 | 2.19 |
+| Decoupling capacitor to its supply pin, 90th percentile (mm) | 8.41 | 8.42 | 9.75 |
 | Decoupling on the same side as its IC (share) | 1.00 | 0.89 | 0.93 |
 | ESD part to its connector pad (mm; 15 boards) | 4.65 | 6.79 | 3.31 |
 | Crystal to its IC pad (mm) | 5.90 | 9.36 | 4.42 |
 | Nearest pad-to-pad gap, 10th percentile (mm) | 0.34 | 0.30 | 0.74 |
 | Nearest pad-to-pad gap, median (mm) | 0.62 | 0.49 | 0.90 |
-| Closest non-connector part to the edge (mm) | 0.73 | 0.65 | 3.79 |
-| Parts to the edge, 10th percentile (mm) | 3.67 | 2.13 | 10.07 |
+| Closest non-connector part to the edge (mm) | 0.73 | 0.64 | 3.79 |
+| Parts to the edge, 10th percentile (mm) | 3.67 | 1.91 | 10.07 |
 | Parts on the bottom (share) | 0.15 | 0.55 | 0.31 |
 | Passives on the bottom (share) | 0.00 | 0.63 | 0.38 |
 | ICs on the bottom (share) | 0.00 | 0.33 | 0.00 |
-| Bottom part tucked inside a top IC's courtyard (mm) | 1.77 | 1.77 | 0.85 |
-| Bottom part to through-hole pad, 10th percentile (mm) | 0.50 | 0.49 | 0.92 |
-| Courtyard area over board area (%) | 53.80 | 75.74 | 61.02 |
+| Bottom part tucked inside a top IC's courtyard (mm) | 2.03 | 1.77 | 0.85 |
+| Bottom part to through-hole pad, 10th percentile (mm) | 0.51 | 0.50 | 0.92 |
+| Courtyard area over board area (%) | 53.80 | 76.12 | 61.02 |
 | Designators visible on silk (%; SparkFun hides all, excluded) | 92.91 | 93.38 | 74.63 |
 | Designator height, median (mm) | 0.76 | 0.76 | 0.80 |
 | Smallest designator height (mm) | 0.64 | 0.64 | 0.70 |
 | Narrowest track (mm) | 0.15 | 0.13 | 2.00 |
-| Track width, median (mm) | 0.23 | 0.28 | 2.00 |
+| Track width, median (mm) | 0.20 | 0.25 | 2.00 |
 | Via drill, median (mm) | 0.40 | 0.40 |  |
 
 Decisions taken from this, in the engine's directives (`gen/layout.py`) and
@@ -66,7 +66,7 @@ in the standard:
   0.15 mm margin, ring gap 0.15 mm), which gives 0.65 mm; ours measures
   0.74 mm at the 10th percentile because the rings and lanes add their own
   room.
-- **Bottom parts** tuck about 1.8 mm inside the IC's courtyard edge and sit
+- **Bottom parts** tuck 1.8 to 2.0 mm inside the IC's courtyard edge and sit
   0.5 mm from through-hole pads: both set so (from 1.0 and 1.0 mm).
 - **Designators** are 0.8 mm tall in practice, the smallest 0.65 to 0.72 mm,
   and nearly all are visible. Default 0.8 mm, minimum 0.7 mm (from 1.0 and

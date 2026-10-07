@@ -116,9 +116,11 @@ cd gen && ./build.py        # regenerate everything (only while nothing has been
 
 ## Layout
 
-The board file `sbc-baseboard.kicad_pcb` was generated once, by `gen/pcb.py`
-on KiCad's `pcbnew` Python module, from the schematic's netlist, the project
-file and the directives in `gen/layout.py`, which are
+The board file `sbc-baseboard.kicad_pcb` was generated once, by the
+standard's placement engine (`standards/tools/placer.py`, the ecad-standards
+repository as a submodule at `standards/`, on KiCad's `pcbnew` Python module)
+called from `gen/pcb.py`, from the schematic's netlist, the project file and
+the directives in `gen/layout.py`, which are
 [docs/layout-directives.md](../../docs/layout-directives.md) as data. It
 carries the 140 × 80 mm outline with 2 mm corners, the four M3 holes on GND
 7 mm from the corners with their corner keep-outs, Advanced Circuits' 4-layer
@@ -171,7 +173,8 @@ The ICs' own layout rules, with sources, are in
 The engine's numbers (ring gap, tuck depth, through-hole margin, designator
 sizes, which side decoupling takes) are calibrated against 79 published
 KiCad boards from Olimex, MNT, SparkFun and Raspberry Pi, measured by
-`scripts/harvest-placement.py` over a local mirror; the comparison and the
+`scripts/harvest-placement.py` (the standard's `tools/harvest.py`) over a
+local mirror; the comparison and the
 decisions are in [docs/reference-boards.md](../../docs/reference-boards.md)
 and in the standard's section 9.
 
