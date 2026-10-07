@@ -3791,6 +3791,215 @@
 			)
 			(embedded_fonts no)
 		)
+		(symbol "calico-ic:USBLC6-2SC6-IO2up"
+			(pin_names
+				(offset 0.508)
+			)
+			(exclude_from_sim no)
+			(in_bom yes)
+			(on_board yes)
+			(property "Reference" "U"
+				(at -7.62 8.38 0)
+				(show_name no)
+				(do_not_autoplace no)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+					(justify left)
+				)
+			)
+			(property "Value" "USBLC6-2SC6-IO2up"
+				(at 7.62 -3.81 0)
+				(show_name no)
+				(do_not_autoplace no)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+					(justify right)
+				)
+			)
+			(property "Footprint" "Package_TO_SOT_SMD:SOT-23-6"
+				(at 0 0 0)
+				(hide yes)
+				(show_name no)
+				(do_not_autoplace no)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+				)
+			)
+			(property "Datasheet" "https://www.st.com/resource/en/datasheet/usblc6-2.pdf"
+				(at 0 0 0)
+				(hide yes)
+				(show_name no)
+				(do_not_autoplace no)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+				)
+			)
+			(property "Description" "USB 2.0 ESD protection array, two flow-through channels, SOT-23-6; drawn with I/O2 on the upper row"
+				(at 0 0 0)
+				(hide yes)
+				(show_name no)
+				(do_not_autoplace no)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+				)
+			)
+			(property "ki_keywords" "ST USB ESD protection array flow-through swapped rows"
+				(at 0 0 0)
+				(hide yes)
+				(show_name no)
+				(do_not_autoplace no)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+				)
+			)
+			(property "ki_fp_filters" "SOT*23*6*"
+				(at 0 0 0)
+				(hide yes)
+				(show_name no)
+				(do_not_autoplace no)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+				)
+			)
+			(symbol "USBLC6-2SC6-IO2up_0_1"
+				(rectangle
+					(start -7.62 5.08)
+					(end 7.62 -2.54)
+					(stroke
+						(width 0.254)
+						(type default)
+					)
+					(fill
+						(type background)
+					)
+				)
+			)
+			(symbol "USBLC6-2SC6-IO2up_1_1"
+				(pin passive line
+					(at -10.16 2.54 0)
+					(length 2.54)
+					(name "I/O2"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+					(number "3"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+				)
+				(pin passive line
+					(at -10.16 0 0)
+					(length 2.54)
+					(name "I/O1"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+					(number "1"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+				)
+				(pin passive line
+					(at 10.16 2.54 180)
+					(length 2.54)
+					(name "I/O2"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+					(number "4"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+				)
+				(pin passive line
+					(at 10.16 0 180)
+					(length 2.54)
+					(name "I/O1"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+					(number "6"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+				)
+				(pin passive line
+					(at 0 7.62 270)
+					(length 2.54)
+					(name "VBUS"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+					(number "5"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+				)
+				(pin passive line
+					(at 0 -5.08 90)
+					(length 2.54)
+					(name "GND"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+					(number "2"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+				)
+			)
+			(embedded_fonts no)
+		)
 		(symbol "power:+3V3"
 			(power global)
 			(pin_numbers
@@ -4987,8 +5196,8 @@
 		)
 	)
 	(symbol
-		(lib_id "Power_Protection:USBLC6-2SC6")
-		(at 361.95 45.72 0)
+		(lib_id "calico-ic:USBLC6-2SC6-IO2up")
+		(at 361.95 48.26 0)
 		(unit 1)
 		(body_style 1)
 		(exclude_from_sim no)
@@ -5021,7 +5230,7 @@
 			)
 		)
 		(property "Footprint" "Package_TO_SOT_SMD:SOT-23-6"
-			(at 361.95 45.72 0)
+			(at 361.95 48.26 0)
 			(hide yes)
 			(show_name no)
 			(do_not_autoplace no)
@@ -5032,7 +5241,7 @@
 			)
 		)
 		(property "Datasheet" "~"
-			(at 361.95 45.72 0)
+			(at 361.95 48.26 0)
 			(hide yes)
 			(show_name no)
 			(do_not_autoplace no)
@@ -5042,8 +5251,8 @@
 				)
 			)
 		)
-		(property "Description" "Very low capacitance ESD protection diode, 2 data-line, SOT-23-6"
-			(at 361.95 45.72 0)
+		(property "Description" "USB 2.0 ESD protection array, two flow-through channels, SOT-23-6; drawn with I/O2 on the upper row"
+			(at 361.95 48.26 0)
 			(hide yes)
 			(show_name no)
 			(do_not_autoplace no)
@@ -5052,24 +5261,24 @@
 					(size 1.27 1.27)
 				)
 			)
-		)
-		(pin "1"
-			(uuid "7fd18e48-526a-5e19-88a8-86724f161b78")
-		)
-		(pin "2"
-			(uuid "86409e5e-ebb1-5289-ac1e-abbf49340dfd")
 		)
 		(pin "3"
 			(uuid "c46438c9-a432-52e3-b3a2-f8593567f28a")
 		)
+		(pin "1"
+			(uuid "7fd18e48-526a-5e19-88a8-86724f161b78")
+		)
 		(pin "4"
 			(uuid "3a70e79f-3045-5054-9d65-4dddda65969f")
+		)
+		(pin "6"
+			(uuid "ff078188-6d1b-5a11-b567-cb1bc492a240")
 		)
 		(pin "5"
 			(uuid "bd61b4a0-0393-5e09-b4c9-b2edc12c7af5")
 		)
-		(pin "6"
-			(uuid "ff078188-6d1b-5a11-b567-cb1bc492a240")
+		(pin "2"
+			(uuid "86409e5e-ebb1-5289-ac1e-abbf49340dfd")
 		)
 		(instances
 			(project "sbc-baseboard"
@@ -5263,8 +5472,8 @@
 		)
 	)
 	(symbol
-		(lib_id "Power_Protection:USBLC6-2SC6")
-		(at 361.95 96.52 0)
+		(lib_id "calico-ic:USBLC6-2SC6-IO2up")
+		(at 361.95 99.06 0)
 		(unit 1)
 		(body_style 1)
 		(exclude_from_sim no)
@@ -5297,7 +5506,7 @@
 			)
 		)
 		(property "Footprint" "Package_TO_SOT_SMD:SOT-23-6"
-			(at 361.95 96.52 0)
+			(at 361.95 99.06 0)
 			(hide yes)
 			(show_name no)
 			(do_not_autoplace no)
@@ -5308,7 +5517,7 @@
 			)
 		)
 		(property "Datasheet" "~"
-			(at 361.95 96.52 0)
+			(at 361.95 99.06 0)
 			(hide yes)
 			(show_name no)
 			(do_not_autoplace no)
@@ -5318,8 +5527,8 @@
 				)
 			)
 		)
-		(property "Description" "Very low capacitance ESD protection diode, 2 data-line, SOT-23-6"
-			(at 361.95 96.52 0)
+		(property "Description" "USB 2.0 ESD protection array, two flow-through channels, SOT-23-6; drawn with I/O2 on the upper row"
+			(at 361.95 99.06 0)
 			(hide yes)
 			(show_name no)
 			(do_not_autoplace no)
@@ -5328,24 +5537,24 @@
 					(size 1.27 1.27)
 				)
 			)
-		)
-		(pin "1"
-			(uuid "460d3b13-e7ad-5af9-9b88-044d779a4db9")
-		)
-		(pin "2"
-			(uuid "a0b3d3bb-4b9a-5bd3-8864-9d22052cbc45")
 		)
 		(pin "3"
 			(uuid "427e126e-daeb-5509-9fd8-8fbb8293dbeb")
 		)
+		(pin "1"
+			(uuid "460d3b13-e7ad-5af9-9b88-044d779a4db9")
+		)
 		(pin "4"
 			(uuid "736f36c0-9689-539f-b113-9ecc28f3851d")
+		)
+		(pin "6"
+			(uuid "62aa14ef-4c35-5ef9-873d-22f3267f6784")
 		)
 		(pin "5"
 			(uuid "3448c2a8-c18b-5aa8-a16b-64534e0a94f4")
 		)
-		(pin "6"
-			(uuid "62aa14ef-4c35-5ef9-873d-22f3267f6784")
+		(pin "2"
+			(uuid "a0b3d3bb-4b9a-5bd3-8864-9d22052cbc45")
 		)
 		(instances
 			(project "sbc-baseboard"
@@ -5542,8 +5751,8 @@
 		)
 	)
 	(symbol
-		(lib_id "Power_Protection:USBLC6-2SC6")
-		(at 361.95 147.32 0)
+		(lib_id "calico-ic:USBLC6-2SC6-IO2up")
+		(at 361.95 149.86 0)
 		(unit 1)
 		(body_style 1)
 		(exclude_from_sim no)
@@ -5576,7 +5785,7 @@
 			)
 		)
 		(property "Footprint" "Package_TO_SOT_SMD:SOT-23-6"
-			(at 361.95 147.32 0)
+			(at 361.95 149.86 0)
 			(hide yes)
 			(show_name no)
 			(do_not_autoplace no)
@@ -5587,7 +5796,7 @@
 			)
 		)
 		(property "Datasheet" "~"
-			(at 361.95 147.32 0)
+			(at 361.95 149.86 0)
 			(hide yes)
 			(show_name no)
 			(do_not_autoplace no)
@@ -5597,8 +5806,8 @@
 				)
 			)
 		)
-		(property "Description" "Very low capacitance ESD protection diode, 2 data-line, SOT-23-6"
-			(at 361.95 147.32 0)
+		(property "Description" "USB 2.0 ESD protection array, two flow-through channels, SOT-23-6; drawn with I/O2 on the upper row"
+			(at 361.95 149.86 0)
 			(hide yes)
 			(show_name no)
 			(do_not_autoplace no)
@@ -5607,24 +5816,24 @@
 					(size 1.27 1.27)
 				)
 			)
-		)
-		(pin "1"
-			(uuid "8cfaaa8a-ac50-53ca-9ef1-b1e46f531852")
-		)
-		(pin "2"
-			(uuid "67aaa49f-7787-582c-ba18-afeca2568f72")
 		)
 		(pin "3"
 			(uuid "9c48aed0-4c4e-5f88-b17a-5d095c6ff1d7")
 		)
+		(pin "1"
+			(uuid "8cfaaa8a-ac50-53ca-9ef1-b1e46f531852")
+		)
 		(pin "4"
 			(uuid "308a054f-7cfe-5da1-b0ab-34947d37e76a")
+		)
+		(pin "6"
+			(uuid "03a6b63b-d386-5fb0-aa35-7a083bbdc101")
 		)
 		(pin "5"
 			(uuid "34ad0446-535a-50ea-92b7-47b02516cda0")
 		)
-		(pin "6"
-			(uuid "03a6b63b-d386-5fb0-aa35-7a083bbdc101")
+		(pin "2"
+			(uuid "67aaa49f-7787-582c-ba18-afeca2568f72")
 		)
 		(instances
 			(project "sbc-baseboard"
@@ -5818,8 +6027,8 @@
 		)
 	)
 	(symbol
-		(lib_id "Power_Protection:USBLC6-2SC6")
-		(at 361.95 198.12 0)
+		(lib_id "calico-ic:USBLC6-2SC6-IO2up")
+		(at 361.95 200.66 0)
 		(unit 1)
 		(body_style 1)
 		(exclude_from_sim no)
@@ -5852,7 +6061,7 @@
 			)
 		)
 		(property "Footprint" "Package_TO_SOT_SMD:SOT-23-6"
-			(at 361.95 198.12 0)
+			(at 361.95 200.66 0)
 			(hide yes)
 			(show_name no)
 			(do_not_autoplace no)
@@ -5863,7 +6072,7 @@
 			)
 		)
 		(property "Datasheet" "~"
-			(at 361.95 198.12 0)
+			(at 361.95 200.66 0)
 			(hide yes)
 			(show_name no)
 			(do_not_autoplace no)
@@ -5873,8 +6082,8 @@
 				)
 			)
 		)
-		(property "Description" "Very low capacitance ESD protection diode, 2 data-line, SOT-23-6"
-			(at 361.95 198.12 0)
+		(property "Description" "USB 2.0 ESD protection array, two flow-through channels, SOT-23-6; drawn with I/O2 on the upper row"
+			(at 361.95 200.66 0)
 			(hide yes)
 			(show_name no)
 			(do_not_autoplace no)
@@ -5883,24 +6092,24 @@
 					(size 1.27 1.27)
 				)
 			)
-		)
-		(pin "1"
-			(uuid "6a20d986-8930-577b-a227-168f3e49c325")
-		)
-		(pin "2"
-			(uuid "05185da6-e492-56b5-8f89-2a7f4dcc6902")
 		)
 		(pin "3"
 			(uuid "2ed22bec-ecac-521a-b15c-6ea84d64287e")
 		)
+		(pin "1"
+			(uuid "6a20d986-8930-577b-a227-168f3e49c325")
+		)
 		(pin "4"
 			(uuid "22df30e6-84ff-5e44-9bde-a43864740cf9")
+		)
+		(pin "6"
+			(uuid "7b905379-a829-5646-bfdb-05039960fb64")
 		)
 		(pin "5"
 			(uuid "dc38715c-9841-5a69-aa75-89efaaf6d2ee")
 		)
-		(pin "6"
-			(uuid "7b905379-a829-5646-bfdb-05039960fb64")
+		(pin "2"
+			(uuid "05185da6-e492-56b5-8f89-2a7f4dcc6902")
 		)
 		(instances
 			(project "sbc-baseboard"
@@ -9484,13 +9693,13 @@
 	(wire
 		(pts
 			(xy 270.51 45.72)
-			(xy 356.87 45.72)
+			(xy 351.79 45.72)
 		)
 		(stroke
 			(width 0)
 			(type default)
 		)
-		(uuid "fed57999-7e69-5721-9079-2b2300b9e5f6")
+		(uuid "4e84b9e0-5538-52fa-886d-9dcf1a3afae7")
 	)
 	(wire
 		(pts
@@ -9572,13 +9781,13 @@
 	(wire
 		(pts
 			(xy 271.78 48.26)
-			(xy 356.87 48.26)
+			(xy 351.79 48.26)
 		)
 		(stroke
 			(width 0)
 			(type default)
 		)
-		(uuid "d9851e24-a640-57c8-ab2a-7198c990ef4f")
+		(uuid "e986d974-7305-5f29-af9a-e5fc99977817")
 	)
 	(wire
 		(pts
@@ -9660,13 +9869,13 @@
 	(wire
 		(pts
 			(xy 273.05 96.52)
-			(xy 356.87 96.52)
+			(xy 351.79 96.52)
 		)
 		(stroke
 			(width 0)
 			(type default)
 		)
-		(uuid "3974d59f-b54f-516e-a658-4bcb2466c9f6")
+		(uuid "1689efe6-2b46-55d0-822b-393b4c806fce")
 	)
 	(wire
 		(pts
@@ -9748,13 +9957,13 @@
 	(wire
 		(pts
 			(xy 274.32 99.06)
-			(xy 356.87 99.06)
+			(xy 351.79 99.06)
 		)
 		(stroke
 			(width 0)
 			(type default)
 		)
-		(uuid "33d7dc65-1ef5-528c-80be-ae6b0f04beed")
+		(uuid "326f3e75-9a9a-5697-a462-52e5e5bca07c")
 	)
 	(wire
 		(pts
@@ -9836,13 +10045,13 @@
 	(wire
 		(pts
 			(xy 275.59 147.32)
-			(xy 356.87 147.32)
+			(xy 351.79 147.32)
 		)
 		(stroke
 			(width 0)
 			(type default)
 		)
-		(uuid "7cb6c388-6a83-51b2-8481-a96fcce673e9")
+		(uuid "a696b643-1c54-5b59-bbfe-f55c8e122000")
 	)
 	(wire
 		(pts
@@ -9924,13 +10133,13 @@
 	(wire
 		(pts
 			(xy 276.86 149.86)
-			(xy 356.87 149.86)
+			(xy 351.79 149.86)
 		)
 		(stroke
 			(width 0)
 			(type default)
 		)
-		(uuid "fd7c5bb4-d7a6-5799-bbc3-8a929ebc27e7")
+		(uuid "96049ee6-7e15-5e2f-bd15-025a6a73d1d6")
 	)
 	(wire
 		(pts
@@ -10012,13 +10221,13 @@
 	(wire
 		(pts
 			(xy 278.13 198.12)
-			(xy 356.87 198.12)
+			(xy 351.79 198.12)
 		)
 		(stroke
 			(width 0)
 			(type default)
 		)
-		(uuid "bfb44e33-6848-5429-9871-d49edc845194")
+		(uuid "e6042dea-5eb3-5441-9cb8-36827545e994")
 	)
 	(wire
 		(pts
@@ -10100,13 +10309,13 @@
 	(wire
 		(pts
 			(xy 279.4 200.66)
-			(xy 356.87 200.66)
+			(xy 351.79 200.66)
 		)
 		(stroke
 			(width 0)
 			(type default)
 		)
-		(uuid "1561ba81-8827-5a41-9474-4dc74f3a56a7")
+		(uuid "72cc00c4-9f13-53be-a041-ce861c537235")
 	)
 	(wire
 		(pts
@@ -14935,47 +15144,47 @@
 	)
 	(wire
 		(pts
-			(xy 367.03 45.72)
 			(xy 372.11 45.72)
+			(xy 377.19 45.72)
 		)
 		(stroke
 			(width 0)
 			(type default)
 		)
-		(uuid "b171ebb9-b69f-52eb-99b2-878d3a841840")
+		(uuid "259274da-1181-5d7a-a40a-497b7c383f79")
 	)
 	(wire
 		(pts
-			(xy 372.11 45.72)
+			(xy 377.19 45.72)
 			(xy 384.81 45.72)
 		)
 		(stroke
 			(width 0)
 			(type default)
 		)
-		(uuid "368dde59-d002-5822-a135-6dfc57fbf42c")
+		(uuid "a726eab2-994f-56c2-9648-c7400dec223c")
 	)
 	(wire
 		(pts
-			(xy 367.03 48.26)
 			(xy 372.11 48.26)
+			(xy 377.19 48.26)
 		)
 		(stroke
 			(width 0)
 			(type default)
 		)
-		(uuid "30495ed9-722a-53f1-9c32-7a8d1db38810")
+		(uuid "e1e350f3-81c8-5e9f-81ff-fd89b68445cf")
 	)
 	(wire
 		(pts
-			(xy 372.11 48.26)
+			(xy 377.19 48.26)
 			(xy 384.81 48.26)
 		)
 		(stroke
 			(width 0)
 			(type default)
 		)
-		(uuid "0823369b-208d-5701-a0d0-041c7e1dd58c")
+		(uuid "d66a6a6a-12bc-5bf8-b3f8-963a3e2d5598")
 	)
 	(wire
 		(pts
@@ -16746,47 +16955,47 @@
 	)
 	(wire
 		(pts
-			(xy 367.03 96.52)
 			(xy 372.11 96.52)
+			(xy 377.19 96.52)
 		)
 		(stroke
 			(width 0)
 			(type default)
 		)
-		(uuid "d8a35fc7-b582-551e-9501-0716f2df65ce")
+		(uuid "4d3703a7-ec22-532c-b9b7-d7fdbd021ca5")
 	)
 	(wire
 		(pts
-			(xy 372.11 96.52)
+			(xy 377.19 96.52)
 			(xy 384.81 96.52)
 		)
 		(stroke
 			(width 0)
 			(type default)
 		)
-		(uuid "28db1487-9809-503a-bbd0-a23bd4e944cb")
+		(uuid "fcc51e90-017e-5c3b-968a-1b0e31c3e96d")
 	)
 	(wire
 		(pts
-			(xy 367.03 99.06)
 			(xy 372.11 99.06)
+			(xy 377.19 99.06)
 		)
 		(stroke
 			(width 0)
 			(type default)
 		)
-		(uuid "e37adecf-0caa-59b2-88c4-d51ffac697d6")
+		(uuid "02bdc4ab-9b9f-59e3-8647-5d4fa200351f")
 	)
 	(wire
 		(pts
-			(xy 372.11 99.06)
+			(xy 377.19 99.06)
 			(xy 384.81 99.06)
 		)
 		(stroke
 			(width 0)
 			(type default)
 		)
-		(uuid "e4e42648-4799-502b-9812-31457b4ceb9f")
+		(uuid "fd458c78-d720-562f-bc20-bfb76e00b42b")
 	)
 	(wire
 		(pts
@@ -18468,47 +18677,47 @@
 	)
 	(wire
 		(pts
-			(xy 367.03 147.32)
 			(xy 372.11 147.32)
+			(xy 377.19 147.32)
 		)
 		(stroke
 			(width 0)
 			(type default)
 		)
-		(uuid "e5d8bfcf-0223-5b71-afe5-f8477c0c6f09")
+		(uuid "7472e50c-6db5-5872-9825-6783a7ed6efb")
 	)
 	(wire
 		(pts
-			(xy 372.11 147.32)
+			(xy 377.19 147.32)
 			(xy 384.81 147.32)
 		)
 		(stroke
 			(width 0)
 			(type default)
 		)
-		(uuid "aebca3b3-6041-58d6-b069-007f312a1ac3")
+		(uuid "ceac3638-a1fd-57a8-8a0e-7b3a86f2ff50")
 	)
 	(wire
 		(pts
-			(xy 367.03 149.86)
 			(xy 372.11 149.86)
+			(xy 377.19 149.86)
 		)
 		(stroke
 			(width 0)
 			(type default)
 		)
-		(uuid "3055bf51-0909-5957-b61b-55f3d1586706")
+		(uuid "f329c33f-5ad4-5493-9182-b2c084b00d15")
 	)
 	(wire
 		(pts
-			(xy 372.11 149.86)
+			(xy 377.19 149.86)
 			(xy 384.81 149.86)
 		)
 		(stroke
 			(width 0)
 			(type default)
 		)
-		(uuid "f44c9e34-faba-51ce-a323-5d17a88601f8")
+		(uuid "b7ba5784-801e-5c8b-9120-dec29fe1f7c0")
 	)
 	(wire
 		(pts
@@ -20279,47 +20488,47 @@
 	)
 	(wire
 		(pts
-			(xy 367.03 198.12)
 			(xy 372.11 198.12)
+			(xy 377.19 198.12)
 		)
 		(stroke
 			(width 0)
 			(type default)
 		)
-		(uuid "83b2094a-d5cb-5082-b0e9-a4203009922b")
+		(uuid "ede3da23-5488-5b03-bedc-91014eaa1e44")
 	)
 	(wire
 		(pts
-			(xy 372.11 198.12)
+			(xy 377.19 198.12)
 			(xy 384.81 198.12)
 		)
 		(stroke
 			(width 0)
 			(type default)
 		)
-		(uuid "ccca92d1-4738-5d75-a472-ea8cd53e1c74")
+		(uuid "e71cff85-d6a3-5965-92f1-2f5868fda909")
 	)
 	(wire
 		(pts
-			(xy 367.03 200.66)
 			(xy 372.11 200.66)
+			(xy 377.19 200.66)
 		)
 		(stroke
 			(width 0)
 			(type default)
 		)
-		(uuid "d5711a09-048b-5205-9e36-00b40e4f9995")
+		(uuid "51c186f7-598b-52e1-b962-a424eafd9dd1")
 	)
 	(wire
 		(pts
-			(xy 372.11 200.66)
+			(xy 377.19 200.66)
 			(xy 384.81 200.66)
 		)
 		(stroke
 			(width 0)
 			(type default)
 		)
-		(uuid "fe3bae10-6fe7-59ad-ab07-2106f45108d9")
+		(uuid "8e27a2f2-b1c6-535f-b508-939e80e59958")
 	)
 	(wire
 		(pts

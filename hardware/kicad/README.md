@@ -155,6 +155,19 @@ standard's section 6; ICs and connectors are never omitted, their designator
 steps out to the nearest pocket instead, and the generator lists those too.
 The fabrication layer keeps every designator.
 
+The pairs are laid by the engine as pair lanes (both members at the class's
+differential geometry, escapes, the USB-C bridges, two layer changes where
+a pair must pass under the port pairs, lengths matched by a bump), the ESD
+arrays and series parts anchored for it; the PSU passthrough is laid as
+single-net lanes; the rails are regions on L3. What is left is routed by
+FreeRouting through the standard's `tools/autoroute.py` with all of that
+locked (`gen/pcb.py --route`; the directives' `FREEROUTING` setting names
+the binary), and the hand pass finishes from there. KiCad Routing Tools
+was tried on the same board as a second opinion (2026-10-07): two hours in
+it had 25 connections left and 1 646 DRC errors, having routed below the
+fab's track and via floors and through the keep-outs; FreeRouting honours
+the Specctra rules and the fixed lanes, so it stays the bulk router.
+
 `gen/pcb.py` also runs `kicad-cli pcb drc --severity-all --refill-zones`
 (the planes are filled for the check and not saved, so a plane that fails to
 fill or strays into a keep-out shows; the unconnected count is the ratsnest's

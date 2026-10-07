@@ -37,7 +37,7 @@ flat against a wall or a DIN rail, which the spec accepted).
 | Left (x = 0), 54 mm usable | J2 USB-C PD in (centred y = 30) · J1 USB-C upstream (centred y = 54), split around the middle | charger / workstation | 10.6 + 10.6 = 21.2 mm |
 | Back (y = 0), 114 mm usable | J10 RJ45, from x = 14 | workstation | 19.0 mm wide, 22.4 mm deep |
 | Right (x = 140), 54 mm usable | J3 USB-C HID · J13 console · J9 FTDI right-angle | target | 10.6 + 16.5 + 16.3 = 43.4 mm |
-| Front (y = 80), left end | J4, J5 USB-A stacks · J18 PSU in · J19 PSU out | bench / PSU | 17.2 + 17.2 + 13.2 + 13.2 = 60.8 mm |
+| Front (y = 80), left end | J5, J4 USB-A stacks (J5 at x = 19, J4 at x = 37: swapped on 2026-10-06 so each stack's pairs reach the hub row they are wired to without crossing) · J18 PSU in · J19 PSU out | bench / PSU | 17.2 + 17.2 + 13.2 + 13.2 = 60.8 mm |
 | Front (y = 80), right end | J14 +5V_TGT · J12, J11 relays | target | 13.2 + 13.05 + 13.05 = 39.3 mm |
 | Inboard | J16 Cortex debug · J15 GPIO header · **J17 programming, top entry** (BM04B-SRSS-TB) | any | — |
 
@@ -96,12 +96,52 @@ passthrough (`LANES` in `gen/layout.py`):
 | PSU_VOUT | PSU_VOUT, `PSU_3A` (2 mm) | K803 pin 4 (NO), down to y = 73 under J19's body past its GND pin, left to the x of J19 pin 1, up into it |
 
 PSU_GND goes from J18 pin 2 to J19 pin 2 through the PSU_GND island on L2.
+
+The pairs are lanes too (standard, section 2 step 5 and section 3.8): the
+generator lays both members at the class geometry, matched in length, with
+the escapes, the receptacles' bridges and the layer changes it needs, and
+refuses a lane whose members would cross. The ESD arrays and the series
+parts are anchored so the lanes can be declared before placement.
+
+| Pair lane | From | To | Path | Layer changes |
+|---|---|---|---|---|
+| J1_D | J1 (B7/A6 members; A7/B6 bridged behind the row) | U401 | direct | — |
+| HUB_UP | U401 | U402 pins 59/58 | right to x = 15, up to the pins' row under the port pairs, right into the hub | 2 (under HUB_DN6/DN7) |
+| PORT1_D, PORT3_D | J4 / J5 front rows | U408 / U410 | direct, straight above their pads | — |
+| PORT2_D, PORT4_D | J4 / J5 back rows | U409 / U411 | single-net lanes on the bottom through the front row's pin gaps, up to the array's pads | 1 each |
+| HUB_DN4, HUB_DN5 | U408, U409 | U402 bottom row | up, right, up (DN4); straight up (DN5) | — |
+| HUB_DN6, HUB_DN7 | U410, U411 | U402 left row | up the left of the hub, right into the row, nested, 1.2 mm apart | — |
+| HUB_DN1 | U402 pins 2/1 | R602/R603 (hub side) | down, under the port pairs on the bottom, up along x = 50.5, right above the relay at y = 38.75 | 2 |
+| K20_USB | R602/R603 | U601 pins 3/4 | right, down into the K20's left row | — |
+| HUB_DN2 | U402 pins 4/3 | R505/R504 (hub side) | down, under the port pairs, up along x = 52.1, right above the relay at y = 41.5, down past the DAPLink at x = 86.5, right under it at y = 51.5, down at x = 112, right under the FTDI at y = 57, up at x = 126.5, left into the resistors | 2 |
+| FTDI_USB | R505/R504 | U501 pins 11/12 | direct | — |
+| J3_D | J3 (A7/A6 middle members; B7/B6 bridged at both ends of the row) | U202 | direct | — |
+| K64_USB | U202 | U201 pins 10/11 | left, up to y = 6 along the back edge, left, down into the K64's top row | — |
+| ETH_TD, ETH_RD | J10 pins 1/2, 3/6 | U301 pins 6/5, 4/3 | 100 Ω class ETH; TD jogs right to its pins, RD straight down | — |
+
+Four arrays (U408 to U411) and U202 are drawn with the house symbol
+USBLC6-2SC6-IO2up (D- on I/O2), because with their connector-side pins toward
+the receptacle the pair would otherwise cross itself (standard 3.8); U401
+keeps the stock symbol. The hub's two downstream pairs for the K20 and the
+FTDI leave adjacent 0.5 mm pins: their centre lines are shifted 0.1 mm
+apart and the FTDI pair turns first.
 The VP leg at y = 65 keeps the 2 mm creepage to the opto-coupler's board-side
 pins (y ≤ 62); the VOUT leg at y = 73 clears J19's GND pad by the class
 clearance. The lanes' corridors stop at the courtyards of the parts they join
 and appear in the board as footprint keep-out rule areas named `lane_*`. The
 USB 2.0 pairs get their lanes when the pairs are placed (standard, section
 8.3).
+
+## Planes
+
+L2 (In1.Cu) is the ground plane, one outline notched around the isolation
+region. L3 (In2.Cu) carries the rails as regions, the +3V3 plane underneath
+at the lowest priority and the others carving it: VBUS_IN top-left to the
+bucks' VIN pins; +5V_PORTS from L101 along the back, down the middle beside
+the relay and along the band above the USB-A stacks, plus a strip under the
+relays and the FTDI switch; +5V_TGT from L102 along the back and right
+edges to the eFuse and J14, with a tab to the level shifter. The autorouter
+drops vias into them; the regions are adjusted by hand where it could not.
 
 ## Sides
 
@@ -136,25 +176,35 @@ things to refine by hand. The anchors are the second: they are the knobs.
 |---|---|---|
 | K803 | (56, 53, 0) | straddles the isolation barrier |
 | U801 | (66, 60.5, 180) | straddles the isolation barrier |
-| U301 | (23.5, 27, 270) | PHY below J10 on the back edge, TX/RX pins up toward the jack |
+| U301 | (23.5, 29, 270) | PHY below J10 on the back edge, TX/RX pins up toward the jack |
 | U101 | (15, 36, 0) | PD controller at J2 |
-| U102 | (26, 40, 0) | PD bus buffer |
-| J17 | (14, 44, 0) | Qwiic programming, top entry, beside the PD controller |
+| U102 | (26, 35, 0) | PD bus buffer |
+| J17 | (31, 49, 0) | Qwiic programming, top entry, beside the PD controller |
 | U103 | (56, 11, 0) | buck 1 (+5V_PORTS): SW on its right, the loop flows right |
 | U104 | (56, 27, 0) | buck 2 (+5V_TGT) |
 | U105 | (70, 33, 0) | +3V3 buck |
 | U402 | (44, 40, 90) | hub: downstream pins toward J4/J5, upstream and crystal toward J1 |
 | U201 | (96, 22, 270) | K64: RMII toward the PHY, port/FAULT/UART pins toward the hub and FTDI, GPIO toward J15 |
 | J16 | (83, 10, 0) | SWD to the K64 |
-| U601 | (95, 47, 0) | DAPLink K20 |
-| J601 | (88.5, 46, 0) | SWD to the K20 |
+| U601 | (97, 47, 0) | DAPLink K20 |
+| J601 | (104, 44, 0) | SWD to the K20 |
 | U501 | (117, 51, 0) | FT231X behind J9 |
 | K801 | (91, 60, 0) | relays behind J11 / J12 |
 | K802 | (105, 60, 0) |  |
 | U701 | (119, 61, 0) | +5V_TGT eFuse behind J14 |
 | U704 | (118, 30, 0) | GPIO level shifter near J15 |
 | U702 | (112, 37, 0) | console UART shifter near J13 |
-| U703 | (123, 37, 0) | I2C shifter |
+| U703 | (123, 37, 0) | ESD arrays at their receptacles, in line with the pair, and the series parts of the K20 and FTDI pairs |
+| U401 | (10.3, 54, 0) | J1 upstream array, pins 1/3 toward J1 |
+| U202 | (129.7, 19.34, 180) | J3 array |
+| U408 | (40.78, 59, -90) | J4 front row (port 1) -> hub DN4, straight above its pads |
+| U409 | (45.5, 57.4, -90) | J4 back row (port 2) -> hub DN5, reached on the bottom around the pin rows |
+| U410 | (20, 59, -90) | J5 front row (port 3) -> hub DN6 |
+| U411 | (25.2, 59, -90) | J5 back row (port 4) -> hub DN7 |
+| R602 | (88.6, 37.75, 180) | K20 pair series resistors, P above N as the lane arrives from the left |
+| R603 | (88.6, 39.75, 180) |  |
+| R504 | (123.5, 52.6, 0) | FTDI pair series resistors, N above P as the lane arrives from the right |
+| R505 | (123.5, 54.5, 0) | I2C shifter |
 | J15 | (117, 10, 0) | GPIO header, inboard |
 
 The LEDs and their resistors are not anchored: the generator puts them at

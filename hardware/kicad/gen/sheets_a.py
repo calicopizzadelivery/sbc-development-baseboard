@@ -128,10 +128,12 @@ def mcu(project, num, page, sheet_path, plib):
                 "A5": chain(Ser("R", "5.1k", None, step=12.7), P("GND")),       # the upper GND lands past the lower row's end
                 "B5": chain(Ser("R", "5.1k", None, step=7.62), P("GND")),
                 "A1": P("GND"), "SH": P("GND")}, align="top")
-    esd = s.add("Power_Protection", "USBLC6-2SC6", "U202", "USBLC6-2SC6", (83.82, 74.93), footprint=FP["SOT236"])  # I/O rows = J3 B7 (D-) and A6 (D+); VBUS pin lands on J3's VBUS lane
+    # the array drawn with I/O2 on the D- row (house symbol, one row lower than the stock one), so the pair runs through it
+    # uncrossed on the board (ecad-standards/layout.md 3.8); I/O rows = J3 B7 (D-) and A6 (D+); VBUS pin lands on J3's VBUS lane
+    esd = s.add("calico-ic", "USBLC6-2SC6-IO2up", "U202", "USBLC6-2SC6", (83.82, 74.93 + 2.54), footprint=FP["SOT236"])
     esd.val_at = (83.82, 91.44)                                            # value under the part, clear of the K64's route columns
     # the joined pairs continue straight into the ESD array from their join
-    for pin, row in (("1", j3.pin("B7")[1]), ("3", j3.pin("A6")[1])):
+    for pin, row in (("3", j3.pin("B7")[1]), ("1", j3.pin("A6")[1])):
         s.wire((jx, row), esd.pin(pin)); s.junction((jx, row))
     fan(s, esd, {2: P("GND")})
     for pin, net in (("B7", "J3_D_N"), ("B6", "J3_D_P")):              # the connector side of the pair, named for the router: on the lower stub of each joined pair
@@ -146,7 +148,7 @@ def mcu(project, num, page, sheet_path, plib):
         # left: USB regulator, USB, clock, reset
         13: chain(Flag(None), Pull("GND", "C", "2u2", None), Ser("D", "BAT54", None, lib="Device", name="D_Schottky", near="1", fp=FP["SOD123"]), To("j3vbus", direct=True)),
         12: Pull("GND", "C", "2u2", None),
-        10: Conn(esd, 4), 11: Conn(esd, 6),                   # I/O2 carries D+, I/O1 D-
+        10: Conn(esd, 6), 11: Conn(esd, 4),                   # I/O1 carries D+ (the lower row of the house symbol), I/O2 D-
         50: L("RMII_CLK_50M"),
         29: End("extal32"), 28: End("xtal32"),                                # the 32 kHz crystal hangs below, drawn by crystal()
         52: chain(Tag("K64_RESET_N", None), Reset("+3V3", "10k", "1u", "RESET", sw_fp=FP["SW"])),   # pull-up, cap and button in one downward-flowing cluster
@@ -167,7 +169,7 @@ def mcu(project, num, page, sheet_path, plib):
         99: chain(Pull("GND", "R", "47k", None), Ser("R", "100k", None), L("J3_VBUS")),      # VBUS sense divider at the ADC pin
         31: chain(Pull("+3V3", "R", "4.7k", None), Gap(17.78), L("I2C0_SCL")), 32: chain(Gap(7.62), Pull("+3V3", "R", "4.7k", None), L("I2C0_SDA")),
     }, align={"L": "top"})
-    for pin, net in (("4", "K64_USB_P"), ("6", "K64_USB_N")):            # the K64 side of the pair, named for the router: at the ESD's pin end, text along the route
+    for pin, net in (("6", "K64_USB_P"), ("4", "K64_USB_N")):            # the K64 side of the pair, named for the router: at the ESD's pin end, text along the route
         s.label(net, esd.pin(pin), 0)
     # seven pull-ups to +3V3 on adjacent pins (four port /FAULT, FTDI /FAULT, I2C1 SCL/SDA): one column
     # of resistors to one rail symbol, as the strap buses are drawn. Hung one per lane they would stagger

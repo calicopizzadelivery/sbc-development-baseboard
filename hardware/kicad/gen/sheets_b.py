@@ -29,6 +29,8 @@ def ethernet(project, num, page, sheet_path, plib):
                8: End("xi"), 7: End("xo"),                                   # the crystal hangs below, drawn by crystal()
                3: To("rd-"), 4: To("rd+"), 5: To("td-"), 6: To("td+"), 9: Pull("GND", "R", "6.49k 1%", None), 23: To("ledg_k"),
                22: P("GND"), 25: P("GND")}, align={"L": "top"})
+    for pin, net in (("6", "ETH_TD_P"), ("5", "ETH_TD_N"), ("4", "ETH_RD_P"), ("3", "ETH_RD_N")):   # the MDI pairs, named for the router: class ETH, 100 ohm
+        s.label(net, s.lane_end[(u.ref, pin)], rot=0)
     jog(s, u, 2, "+3V3A_PHY", up=5.08, over=10.16)
     jog(s, u, 14, "+3V3", up=2.54, over=12.7)
     top_caps(s, u, 1, [("2u2", None), ("100n", None)], height=15.24, sx=-1)
@@ -62,7 +64,9 @@ def hub(project, num, page, sheet_path, plib):
         Y = 45.72 + (n - 1) * 50.8                                    # D- row of this port
         ref, unit = [("J4", 1), ("J4", 2), ("J5", 1), ("J5", 2)][n - 1]
         j = s.add("calico-electromechanical", "USB_A_Stacked2", ref, "USB-A x2", (394.97, Y + 7.62), unit=unit, footprint=FP["USBA2"])   # D-/D+ on the ESD's I/O rows; one value for both units (differing unit values are an annotation error)   # D-/D+ rows on the ESD's I/O rows
-        esd = s.add("Power_Protection", "USBLC6-2SC6", f"U4{7+n:02d}", "USBLC6-2SC6", (361.95, Y), footprint=FP["SOT236"])   # room for the pair's labels before the receptacle
+        # the array drawn with I/O2 on the D- row (house symbol, one row lower than the stock one): on the board the receptacle's D-
+        # pad is on the I/O2 end of the package, so the pair runs through uncrossed (ecad-standards/layout.md 3.8)
+        esd = s.add("calico-ic", "USBLC6-2SC6-IO2up", f"U4{7+n:02d}", "USBLC6-2SC6", (361.95, Y + 2.54), footprint=FP["SOT236"])   # room for the pair's labels before the receptacle
         esd.ref_at, esd.val_at = (361.95 - 1.27, Y - 5.715), (361.95 - 1.27, Y - 3.81)   # texts left of its VBUS stub, clear of the labels
         esd.ref_just = esd.val_just = "right"
         tps = s.add("calico-ic", "TPS2553DBV", f"U40{2+n}", "TPS2553DBV", (327.66, Y + 15.24), footprint=FP["SOT236"])   # OUT (its third right-hand row) on the VBUS row
@@ -85,7 +89,7 @@ def hub(project, num, page, sheet_path, plib):
         atts[pin] = chain(Ser("R", "10k", None), BusEnd("strap_gnd"))      # LED_A/B straps: one shared GND bus
     for n, (esd, tps, j, unit) in enumerate(ports, start=1):
         dp, dm = {1: (9, 8), 2: (12, 11), 3: (54, 53), 4: (56, 55)}[n]
-        atts[dp] = chain(Tag(f"HUB_DN{n + 3}_P", None), Conn(esd, 3)); atts[dm] = chain(Tag(f"HUB_DN{n + 3}_N", None), Conn(esd, 1))   # I/O2 is the D+ row, I/O1 the D- row; hub ports 4..7
+        atts[dp] = chain(Tag(f"HUB_DN{n + 3}_P", None), Conn(esd, 1)); atts[dm] = chain(Tag(f"HUB_DN{n + 3}_N", None), Conn(esd, 3))   # I/O1 is the D+ row, I/O2 the D- row; hub ports 4..7
     ends = fan(s, u, atts, align={"L": "top"}, channels={"R": 270.51}, turn_at={"L": 118.11})    # left rows stay on their pins for U401; routes clear the cap ladder and pull-ups; the strap lanes turn clear of the bottom ladders
     for pin, net in (("58", "HUB_UP_N"), ("59", "HUB_UP_P")):          # the upstream pair to U401, named for the router: at the lane end, text toward the hub
         s.label(net, s.lane_end[(u.ref, pin)], 0)
@@ -110,7 +114,7 @@ def hub(project, num, page, sheet_path, plib):
     s.wire((vx, vy), vb); s.junction(vb)
     for n, (esd, tps, j, unit) in enumerate(ports, start=1):
         vb, dmp, dpp, gnd = (1, 2, 3, 4) if unit == 1 else (5, 6, 7, 8)
-        fan(s, esd, {6: Conn(j, dmp), 4: Conn(j, dpp), 2: P("GND")})
+        fan(s, esd, {4: Conn(j, dmp), 6: Conn(j, dpp), 2: P("GND")})
         for cpin, net in ((dmp, f"PORT{n}_D_N"), (dpp, f"PORT{n}_D_P")):   # the connector side of the pair, named for the router; at the wire end
             s.label(net, j.pin(cpin), 180)
         e5 = esd.pin("5")                                              # VBUS pin: short stub up, label reading right

@@ -17,7 +17,7 @@ HERE = os.path.dirname(os.path.abspath(__file__))
 OUT = os.path.normpath(os.path.join(HERE, "..", "sbc-baseboard"))
 LIBS = os.path.normpath(os.path.join(HERE, "..", "libs"))          # the ecad-libraries submodule
 PROJECT = "sbc-baseboard"
-PAIR_CLASSES = {"USB"}                        # the controlled-impedance classes; every _P/_N net is in one (checked at build)
+PAIR_CLASSES = {"USB", "ETH"}                        # the controlled-impedance classes; every _P/_N net is in one (checked at build)
 # the house symbol libraries, by their nickname (file stem), as the project's sym-lib-table names them
 kisym.EXTRA_LIBS = {os.path.splitext(os.path.basename(f))[0]: f for f in glob.glob(os.path.join(LIBS, "symbols", "*.kicad_sym"))}
 
@@ -43,11 +43,13 @@ def net_settings():
                         netclass("PSU_3A", priority=1, track_width=2.0, clearance=0.3, via_diameter=1.0, via_drill=0.5),
                         netclass("USB_VBUS_3A", priority=2, track_width=2.0, via_diameter=1.0, via_drill=0.5),
                         netclass("PWR_6A", priority=3, track_width=4.0, via_diameter=1.2, via_drill=0.6),
-                        netclass("PSU_ISO", priority=4, track_width=0.25)],               # the opto's sense nets: isolated like PSU_3A, thin "meta": {"version": 4}, "net_colors": None,
+                        netclass("PSU_ISO", priority=4, track_width=0.25),
+                        netclass("ETH", priority=5, diff_pair_width=0.28, diff_pair_gap=0.25, track_width=0.28)],   # 100 ohm MDI pairs on the same stackup (estimate; the fab's calculator rules)               # the opto's sense nets: isolated like PSU_3A, thin "meta": {"version": 4}, "net_colors": None,
             "netclass_assignments": None,
             "netclass_patterns": [{"netclass": "USB", "pattern": p} for p in ("*_USB_?", "*_D_?", "*HUB_UP_?", "*HUB_DN?_?")]   # sheet-local nets carry their sheet path: the leading * matches it
                                + [{"netclass": "PSU_3A", "pattern": p} for p in ("*PSU_VP", "*PSU_VOUT", "PSU_GND")]   # local nets carry their sheet path
                                + [{"netclass": "PSU_ISO", "pattern": "*PSU_SENSE*"}]
+                               + [{"netclass": "ETH", "pattern": "*ETH_?D_?"}]
                                + [{"netclass": "USB_VBUS_3A", "pattern": p} for p in ("VBUS_IN", "PORT?_VBUS", "FTDI_VBUS")]
                                + [{"netclass": "PWR_6A", "pattern": p} for p in ("+5V_PORTS", "+5V_TGT")]}
 

@@ -13,8 +13,8 @@ EDGE_GAP = 1.0             # between neighbouring edge connectors' bodies
 # edge connectors are locked at the positions the first board settled (x, y, rotation); the mating
 # rule that placed them: a horizontal connector's solder pins sit at the rear, so it mates toward the
 # end of its body farthest from the pad rows; a pin header mates where its pins point
-CONNECTORS = {"J1": (3.1, 54.0, -90), "J2": (3.1, 30.0, -90), "J3": (136.9, 19.345, 90), "J4": (19.095, 63.865, 0),
-              "J5": (37.285, 63.865, 0), "J9": (129.435, 45.045, 0), "J10": (19.08, 20.23, 90), "J11": (87.745, 71.475, 0),
+CONNECTORS = {"J1": (3.1, 54.0, -90), "J2": (3.1, 30.0, -90), "J3": (136.9, 19.345, 90), "J4": (37.285, 63.865, 0),
+              "J5": (19.095, 63.865, 0), "J9": (129.435, 45.045, 0), "J10": (19.08, 20.23, 90), "J11": (87.745, 71.475, 0),
               "J12": (101.805, 71.475, 0), "J13": (131.475, 39.165, 90), "J14": (116.845, 69.475, 0), "J18": (54.445, 69.475, 0),
               "J19": (68.665, 69.475, 0)}
 EDGE_ZONE = 3.0            # no part other than an edge connector nearer the edge than this (ECSS 14.3.2 c, tailored)
@@ -22,25 +22,36 @@ EDGE_ZONE = 3.0            # no part other than an edge connector nearer the edg
 # the ICs and inboard headers, placed by the flow in the directives (x, y, rotation of the footprint origin):
 # power enters at J2 and moves right through the bucks; each block sits behind the connector it serves
 ANCHORS = {
-    "U301": (23.5, 27.0, 270),     # PHY below J10 on the back edge, TX/RX pins up toward the jack
+    "U301": (23.5, 29.0, 270),     # PHY below J10 on the back edge, TX/RX pins up toward the jack
     "U101": (15.0, 36.0, 0),       # PD controller at J2
-    "U102": (26.0, 40.0, 0),       # PD bus buffer
-    "J17":  (14.0, 44.0, 0),       # Qwiic programming, top entry, beside the PD controller
+    "U102": (26.0, 35.0, 0),       # PD bus buffer
+    "J17":  (31.0, 49.0, 0),       # Qwiic programming, top entry, beside the PD controller
     "U103": (56.0, 11.0, 0),       # buck 1 (+5V_PORTS): SW on its right, the loop flows right
     "U104": (56.0, 27.0, 0),       # buck 2 (+5V_TGT)
     "U105": (70.0, 33.0, 0),       # +3V3 buck
     "U402": (44.0, 40.0, 90),      # hub: downstream pins toward J4/J5, upstream and crystal toward J1
     "U201": (96.0, 22.0, 270),     # K64: RMII toward the PHY, port/FAULT/UART pins toward the hub and FTDI, GPIO toward J15
     "J16":  (83.0, 10.0, 0),       # SWD to the K64
-    "U601": (95.0, 47.0, 0),       # DAPLink K20
-    "J601": (88.5, 46.0, 0),      # SWD to the K20
+    "U601": (97.0, 47.0, 0),       # DAPLink K20
+    "J601": (104.0, 44.0, 0),      # SWD to the K20
     "U501": (117.0, 51.0, 0),      # FT231X behind J9
     "K801": (91.0, 60.0, 0),       # relays behind J11 / J12
     "K802": (105.0, 60.0, 0),
     "U701": (119.0, 61.0, 0),      # +5V_TGT eFuse behind J14
     "U704": (118.0, 30.0, 0),      # GPIO level shifter near J15
     "U702": (112.0, 37.0, 0),      # console UART shifter near J13
-    "U703": (123.0, 37.0, 0),      # I2C shifter
+    "U703": (123.0, 37.0, 0),
+    # ESD arrays at their receptacles, in line with the pair, and the series parts of the K20 and FTDI pairs
+    "U401": (10.3, 54.0, 0),       # J1 upstream array, pins 1/3 toward J1
+    "U202": (129.7, 19.34, 180),   # J3 array
+    "U408": (40.78, 59.0, -90),    # J4 front row (port 1) -> hub DN4, straight above its pads
+    "U409": (45.5, 57.4, -90),     # J4 back row (port 2) -> hub DN5, reached on the bottom around the pin rows
+    "U410": (20.0, 59.0, -90),     # J5 front row (port 3) -> hub DN6
+    "U411": (25.2, 59.0, -90),     # J5 back row (port 4) -> hub DN7
+    "R602": (88.6, 37.75, 180),    # K20 pair series resistors, P above N as the lane arrives from the left
+    "R603": (88.6, 39.75, 180),
+    "R504": (123.5, 52.6, 0),      # FTDI pair series resistors, N above P as the lane arrives from the right
+    "R505": (123.5, 54.5, 0),      # I2C shifter
     "J15":  (117.0, 10.0, 0),      # GPIO header, inboard
 }
 SPARE = (72.0, 6.0)     # parts the engine cannot attach anywhere are parked here and reported
@@ -62,7 +73,24 @@ ISOLATION_PLANE_HOLE = [(62, 40), (86, 40), (86, 80), (46, 80), (46, 60), (62, 6
 # the ground plane on L2 as one outline: the board less a 1 mm edge margin, notched by ISOLATION_PLANE_HOLE from the
 # front edge (a zone outline with a hole does not fill in KiCad; the notch is open to the edge, so none is needed)
 GND_PLANE = [(1, 1), (139, 1), (139, 79), (86, 79), (86, 40), (62, 40), (62, 60), (46, 60), (46, 79), (1, 79)]
-PLANES = [("GND_L2", "GND", "In1.Cu", GND_PLANE)]
+PLANES = [("GND_L2", "GND", "In1.Cu", GND_PLANE),
+          # L3 rails as rectangles (FreeRouting cannot take a concave plane): every piece at its own priority (KiCad wants
+          # touching zones distinct), the 3V3 base lowest, the rails above it, the L102 tab above VBUS_IN; same-net pieces merge
+          ("3V3_L3_a", "+3V3", "In2.Cu", [(3, 3), (137, 3), (137, 40), (3, 40)], 0),
+          ("3V3_L3_b", "+3V3", "In2.Cu", [(3, 40), (62, 40), (62, 60), (3, 60)], 1),
+          ("3V3_L3_c", "+3V3", "In2.Cu", [(3, 60), (46, 60), (46, 77), (3, 77)], 2),
+          ("3V3_L3_d", "+3V3", "In2.Cu", [(86, 40), (137, 40), (137, 77), (86, 77)], 3),
+          ("VBUS_IN_L3", "VBUS_IN", "In2.Cu", [(3, 3), (55, 3), (55, 33), (3, 33)], 4),                        # inlet to the bucks' VIN pins
+          ("5V_TGT_L3_top", "+5V_TGT", "In2.Cu", [(55, 3), (137, 3), (137, 8), (55, 8)], 5),                   # L102 along the back edge...
+          ("5V_TGT_L3_right", "+5V_TGT", "In2.Cu", [(129, 8), (137, 8), (137, 77), (129, 77)], 6),             # ...and the right edge...
+          ("5V_TGT_L3_tab", "+5V_TGT", "In2.Cu", [(110, 26), (129, 26), (129, 33), (110, 33)], 7),             # ...a tab to the level shifter...
+          ("5V_TGT_L3_efuse", "+5V_TGT", "In2.Cu", [(108, 57), (137, 57), (137, 77), (108, 77)], 8),           # ...to the eFuse and J14
+          ("5V_TGT_L3_l102", "+5V_TGT", "In2.Cu", [(50, 12), (62, 12), (62, 22), (50, 22)], 9),                # the inductor's output, over VBUS_IN
+          ("5V_PORTS_L3_top", "+5V_PORTS", "In2.Cu", [(62, 8), (86, 8), (86, 30), (62, 30)], 10),               # L101...
+          ("5V_PORTS_L3_u105", "+5V_PORTS", "In2.Cu", [(62, 30), (72, 30), (72, 38), (62, 38)], 11),            # ...to the 3V3 buck's input...
+          ("5V_PORTS_L3_mid", "+5V_PORTS", "In2.Cu", [(50, 38), (62, 38), (62, 60), (50, 60)], 12),             # ...down beside the relay...
+          ("5V_PORTS_L3_band", "+5V_PORTS", "In2.Cu", [(10, 50), (50, 50), (50, 62), (10, 62)], 13),            # ...along the port switches
+          ("5V_PORTS_L3_right", "+5V_PORTS", "In2.Cu", [(86, 52), (126, 52), (126, 57), (86, 57)], 1)]         # and to the relays and the FTDI switch, 1)]                                 # and to the relays and the FTDI switch
    # the same, grown by ISO_GAP: the ground plane stops here
 ISO_GAP = 2.0
 # ---- lanes (ecad-standards/layout.md sections 1 and 5): a corridor reserved for one routed path, from pad to pad
@@ -72,6 +100,37 @@ ISO_GAP = 2.0
 LANES = {
     "PSU_VP":   {"net": "PSU_VP",   "layer": "F.Cu", "path": [("J18", "1"), ("y", 65.0), ("x", ("K803", "6")), ("K803", "6")]},
     "PSU_VOUT": {"net": "PSU_VOUT", "layer": "F.Cu", "path": [("K803", "4"), ("y", 73.0), ("x", ("J19", "1")), ("J19", "1")]},   # under J19's body, past its GND pin
+    # USB 2.0 pairs: receptacle -> ESD array (direct), array -> hub / transceiver along legs; one layer change where a
+    # pair must cross another (the upstream pair under the left stack's pairs)
+    "J1_D":    {"pair": "J1_D",    "path": [("J1", {"P": ["A6", "B6"], "N": ["A7", "B7"]}), ("U401", {"P": "3", "N": "1"})]},
+    "HUB_UP":  {"pair": "HUB_UP",  "path": [("U401", {"P": "4", "N": "6"}), ("x", 15.0), ("layer", "B.Cu"), ("y", ("U402", {"P": "59", "N": "58"}, (0.0, 0.1))),
+                                            ("x", 36.5), ("layer", "F.Cu"), ("U402", {"P": "59", "N": "58"}, (0.0, 0.1))]},
+    "PORT1_D": {"pair": "PORT1_D", "path": [("J4", {"P": "3", "N": "2"}), ("U408", {"P": "6", "N": "4"})]},
+    "HUB_DN4": {"pair": "HUB_DN4", "path": [("U408", {"P": "1", "N": "3"}), ("y", 50.0), ("x", ("U402", {"P": "9", "N": "8"})), ("U402", {"P": "9", "N": "8"})]},
+    "HUB_DN5": {"pair": "HUB_DN5", "path": [("U409", {"P": "1", "N": "3"}), ("U402", {"P": "12", "N": "11"})]},
+    "PORT3_D": {"pair": "PORT3_D", "path": [("J5", {"P": "3", "N": "2"}), ("U410", {"P": "6", "N": "4"})]},
+    # the left row's two port pairs are a pin pitch apart: their centre lines spread 0.2 mm so the members keep clearance
+    "HUB_DN6": {"pair": "HUB_DN6", "path": [("U410", {"P": "1", "N": "3"}), ("y", ("U402", {"P": "54", "N": "53"}, (0.0, -0.05))), ("U402", {"P": "54", "N": "53"}, (0.0, -0.05))]},
+    "HUB_DN7": {"pair": "HUB_DN7", "path": [("U411", {"P": "1", "N": "3"}), ("y", ("U402", {"P": "56", "N": "55"}, (0.0, 0.15))), ("U402", {"P": "56", "N": "55"}, (0.0, 0.15))]},
+    # the two downstream pairs for the K20 and the FTDI leave the hub's bottom row side by side (0.5 mm pins): their centre
+    # lines are shifted 0.1 mm apart, the FTDI pair turns first, and each goes under the port pairs on the bottom
+    "HUB_DN1": {"pair": "HUB_DN1", "path": [("U402", {"P": "2", "N": "1"}, (-0.1, 0.0)), ("y", 47.6), ("layer", "B.Cu"), ("y", 49.2), ("x", 50.5), ("y", 47.6), ("layer", "F.Cu"),
+                                            ("y", ("pads", {"P": ("R602", "2"), "N": ("R603", "2")})), ("pads", {"P": ("R602", "2"), "N": ("R603", "2")})]},
+    "K20_USB": {"pair": "K20_USB", "path": [("pads", {"P": ("R602", "1"), "N": ("R603", "1")}), ("x", 92.0), ("y", ("U601", {"P": "3", "N": "4"})), ("U601", {"P": "3", "N": "4"})]},
+    "HUB_DN2": {"pair": "HUB_DN2", "path": [("U402", {"P": "4", "N": "3"}, (0.1, 0.0)), ("y", 46.6), ("x", 42.8), ("layer", "B.Cu"), ("x", 52.1), ("layer", "F.Cu"), ("y", 41.5),
+                                            ("x", 86.5), ("y", 51.5), ("x", 112.0), ("y", 57.0), ("x", 126.5),   # over the relay, under the DAPLink and SWD, round the FTDI
+                                            ("y", ("pads", {"P": ("R505", "2"), "N": ("R504", "2")})), ("pads", {"P": ("R505", "2"), "N": ("R504", "2")})]},
+    "FTDI_USB": {"pair": "FTDI_USB", "path": [("pads", {"P": ("R505", "1"), "N": ("R504", "1")}), ("x", 121.2), ("y", ("U501", {"P": "11", "N": "12"})), ("U501", {"P": "11", "N": "12"})]},
+    "J3_D":    {"pair": "J3_D",    "path": [("J3", {"P": ["A6", "B6"], "N": ["A7", "B7"]}), ("U202", {"P": "1", "N": "3"})]},
+    "K64_USB": {"pair": "K64_USB", "path": [("U202", {"P": "6", "N": "4"}), ("x", 124.0), ("y", 6.0), ("x", ("U201", {"P": "10", "N": "11"})), ("U201", {"P": "10", "N": "11"})]},
+    # Ethernet MDI pairs, jack to PHY (class ETH, 100 ohm)
+    "ETH_TD":  {"pair": "ETH_TD",  "path": [("J10", {"P": "1", "N": "2"}), ("y", 24.0), ("x", ("U301", {"P": "6", "N": "5"}, (-0.05, 0.0))), ("U301", {"P": "6", "N": "5"}, (-0.05, 0.0))]},
+    "ETH_RD":  {"pair": "ETH_RD",  "path": [("J10", {"P": "3", "N": "6"}), ("U301", {"P": "4", "N": "3"}, (0.05, 0.0))]},
+    # the stacks' back rows on the bottom, through the front row's pin gaps, up to the array's connector-side pads
+    "PORT2_D_N": {"net": "PORT2_D_N", "layer": "B.Cu", "width": 0.2, "path": [("J4", "6"), ("y", 64.92), ("x", 43.03), ("y", 61.7), ("layer", "F.Cu"), ("U409", "4")]},
+    "PORT2_D_P": {"net": "PORT2_D_P", "layer": "B.Cu", "width": 0.2, "path": [("J4", "7"), ("y", 65.43), ("x", 45.44), ("y", 61.7), ("layer", "F.Cu"), ("U409", "6")]},
+    "PORT4_D_N": {"net": "PORT4_D_N", "layer": "B.Cu", "width": 0.2, "path": [("J5", "6"), ("y", 64.92), ("x", 24.84), ("y", 61.7), ("layer", "F.Cu"), ("U411", "4")]},
+    "PORT4_D_P": {"net": "PORT4_D_P", "layer": "B.Cu", "width": 0.2, "path": [("J5", "7"), ("y", 65.43), ("x", 27.25), ("y", 61.7), ("layer", "F.Cu"), ("U411", "6")]},
 }
 LANE_MARGIN = 0.25
 # ---- sides (ecad-standards/layout.md section 3.7): connectors, ICs, relays, inductors, crystals, switches, jumpers,
@@ -98,3 +157,6 @@ STACKUP = [  # Advanced Circuits standard 4-layer 0.062"
 ISOLATION_REGIONS = [{"name": "psu_iso", "note": "PSU passthrough isolation", "outline": ISOLATION, "rects": ISOLATION_RECTS,
                       "grown": ISOLATION_GROWN_RECTS, "nets": r"(^|/)PSU_(VP|VOUT|GND|SENSE)", "classes": ("PSU_3A", "PSU_ISO"),
                       "gap": ISO_GAP, "island": ("PSU_GND_L2", "PSU_GND", "In1.Cu", ISOLATION)}]
+# the bulk router for gen/pcb.py --route (ecad-standards/tools/autoroute.py): FreeRouting 2.4.1, one thread
+FREEROUTING = "/home/flippy/Documents/claude/mythtv-porg/tools/freerouting/bin/freerouting"
+FREEROUTING_PASSES = 30
