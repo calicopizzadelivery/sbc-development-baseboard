@@ -118,14 +118,14 @@ parts are anchored so the lanes can be declared before placement.
 | Pair lane | From | To | Path | Layer changes |
 |---|---|---|---|---|
 | J1_D | J1 (B7/A6 members; A7/B6 bridged behind the row) | U401 | direct | — |
-| HUB_UP | U401 | U402 pins 59/58 | right to x = 15, up to the pins' row under the port pairs, right into the hub | 2 (under HUB_DN6/DN7) |
+| HUB_UP | U401 | U402 pins 59/58 | right to x = 15, up to the pins' row under the port pairs, right to x = 31.5 and into the hub | 2 (under HUB_DN6/DN7) |
 | PORT1_D, PORT3_D | J4 / J5 front rows | U408 / U410 | direct, straight above their pads | — |
 | PORT2_D, PORT4_D | J4 / J5 back rows | U409 / U411 | single-net lanes on the bottom through the front row's pin gaps, up to the array's pads | 1 each |
-| HUB_DN4, HUB_DN5 | U408, U409 | U402 bottom row | up to y = 64, right, up (DN4); straight up (DN5) | — |
+| HUB_DN4, HUB_DN5 | U408, U409 | U402 bottom row | up to y = 69, left, up (DN4); up to y = 67.5, left, up (DN5) | — |
 | HUB_DN6, HUB_DN7 | U410, U411 | U402 left row | up the left of the hub, right into the row, nested, 1.2 mm apart | — |
-| HUB_DN1 | U402 pins 2/1 | R602/R603 (hub side) | down to y = 61.6, under the port pairs on the bottom, up along x = 50.5, right across the band at y = 38.75 | 2 |
+| HUB_DN1 | U402 pins 2/1 | R602/R603 (hub side) | down to y = 66.6, under the port pairs on the bottom, up along x = 50.5, right across the band at y = 38.75 | 2 |
 | K20_USB | R602/R603 | U601 pins 3/4 | right, down into the K20's left row | — |
-| HUB_DN2 | U402 pins 4/3 | R505/R504 (hub side) | down to y = 60.6, under the port pairs, up along x = 52.1, right across the band at y = 41.5, down past the DAPLink at x = 86.5, right under it at y = 51.5, down at x = 112, right under the FTDI at y = 57, up at x = 126.5, left into the resistors | 2 |
+| HUB_DN2 | U402 pins 4/3 | R505/R504 (hub side) | down to y = 65.6, under the port pairs, up along x = 52.1, right across the band at y = 41.5, down past the DAPLink at x = 86.5, right under it at y = 51.5, down at x = 112, right under the FTDI at y = 57, up at x = 126.5, left into the resistors | 2 |
 | FTDI_USB | R505/R504 | U501 pins 11/12 | direct | — |
 | J3_D | J3 (A7/A6 middle members; B7/B6 bridged at both ends of the row) | U202 | direct | — |
 | K64_USB | U202 | U201 pins 10/11 | left, up to y = 6 along the back edge, left, down into the K64's top row | — |
@@ -215,13 +215,13 @@ are the knobs.
 | K803 | (56, 73, 0) | straddles the isolation barrier |
 | U801 | (66, 80.5, 180) | straddles the isolation barrier |
 | U301 | (80.5, 29, 270) | PHY below J10 on the back edge, TX/RX pins up toward the jack (J10 + (4.42, 8.77), the ETH lanes' geometry) |
-| U101 | (16, 43, 0) | PD controller at J2, below the bucks' cities |
-| U102 | (27, 43, 0) | PD bus buffer |
-| J17 | (35.5, 45, 0) | Qwiic programming, top entry, beside the PD controller |
+| U101 | (16, 41, 0) | PD controller behind J2 with its CC pins toward it, laid out as ST's STEVAL-ISC005V1 (UM2398 Figure 24, the `STUSB4500` template): decoupling in a column above, VBUS sense and enable parts right, I2C pull-ups below, reset pull-down left, all top side |
+| U102 | (28, 44, 0) | PD bus buffer, right of the PD controller |
+| J17 | (38, 50, 0) | Qwiic programming, top entry, beside the PD buffer |
 | U103 | (24, 24, 0) | buck 1 (+5V_PORTS) in the corner at J2, laid out to TI SLVSF00 Figure 57 (the `TPS54560B` template): input column left at VIN and BOOT, catch diode along the right side at SW, inductor beyond it, output capacitors above the inductor, RT resistor below, compensation and divider right |
 | U104 | (52, 24, 0) | buck 2 (+5V_TGT) beside it along the back edge, the same figure |
-| U105 | (44, 41, 0) | +3V3 buck below buck 1's output, above the hub, laid out to TI SLVSDV6C Figure 52 (the `TPS62823` template): inductor and input capacitor on the power-pin side, output capacitors at the inductor's output, divider and feed-forward on the FB side |
-| U402 | (44, 54, 90) | hub, in the band the taller board gained: downstream pins toward J4/J5, upstream and crystal toward J1 |
+| U105 | (41, 41, 0) | +3V3 buck below buck 1's output, above the hub, laid out to TI SLVSDV6C Figure 52 (the `TPS62823` template): inductor and input capacitor on the power-pin side, output capacitors at the inductor's output, divider and feed-forward on the FB side |
+| U402 | (39, 59, 90) | hub, moved 5 mm down and left toward the USB ports on 2026-10-07 to open the centre: downstream pins toward J4/J5, upstream and crystal toward J1 |
 | U201 | (100.5, 23, 270) | K64: RMII toward the PHY, port/FAULT/UART pins toward the hub and FTDI, GPIO toward J15 |
 | J16 | (93.5, 5, 0) | SWD to the K64, between the jack and the K64 at the back edge |
 | U601 | (97, 47, 0) | DAPLink K20 |
@@ -251,9 +251,10 @@ hand to where they can be seen.
 
 ## Flow
 
-Power enters at J2 on the left edge and moves right: the PD controller and
-its parts at the connector, the two 5 V bucks side by side along the back
-edge above it, each a city of its own placed to its datasheet's layout
+Power enters at J2 on the left edge and moves right: the PD controller
+behind the connector with its CC pins toward it, laid out as ST's
+evaluation board (standard 3.2, the `STUSB4500` template from UM2398
+Figure 24), the two 5 V bucks side by side along the back edge above it, each a city of its own placed to its datasheet's layout
 example (standard 3.2: `REGULATORS` and the `LAYOUTS` templates transcribe
 TI's Figure 57) with 2 mm of void about it, the 3V3 buck below them at buck
 1's output placed to its own figure, then the rails as polygons to each

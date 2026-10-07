@@ -26,13 +26,13 @@ EDGE_ZONE = 3.0            # no part other than an edge connector nearer the edg
 # make the room, the hub down into the band the taller board gained
 ANCHORS = {
     "U301": (80.5, 29.0, 270),     # PHY below J10 on the back edge, TX/RX pins up toward the jack (J10 + (4.42, 8.77), the ETH lanes' geometry)
-    "U101": (16.0, 43.0, 0),       # PD controller at J2, below the bucks' cities
-    "U102": (27.0, 43.0, 0),       # PD bus buffer
-    "J17":  (35.5, 45.0, 0),       # Qwiic programming, top entry, beside the PD controller
+    "U101": (16.0, 41.0, 0),      # PD controller behind J2, CC pins toward it, laid out as the STEVAL-ISC005V1 (UM2398 Figure 24; LAYOUTS)
+    "U102": (28.0, 44.0, 0),      # PD bus buffer, right of the PD controller
+    "J17": (38.0, 50.0, 0),      # Qwiic programming, top entry, beside the PD controller
     "U103": (24.0, 24.0, 0),       # buck 1 (+5V_PORTS) in the corner at J2, laid out as SLVSF00 Figure 57 (LAYOUTS): input left, diode and inductor right, output capacitors above the inductor
     "U104": (52.0, 24.0, 0),       # buck 2 (+5V_TGT) beside it along the back edge, the same figure
-    "U105": (44.0, 41.0, 0),       # +3V3 buck below the bucks' outputs, above the hub
-    "U402": (44.0, 54.0, 90),      # hub: downstream pins toward J4/J5, upstream and crystal toward J1
+    "U105": (41.0, 41.0, 0),      # +3V3 buck below buck 1's output, above the hub, laid out as SLVSDV6C Figure 52 (LAYOUTS)
+    "U402": (39.0, 59.0, 90),     # hub, 5 mm down and left toward the USB ports (2026-10-07) to open the centre: downstream pins toward J4/J5, upstream and crystal toward J1
     "U201": (100.5, 23.0, 270),    # K64: RMII toward the PHY, port/FAULT/UART pins toward the hub and FTDI, GPIO toward J15
     "J16":  (93.5, 5.0, 0),        # SWD to the K64, between the jack and the K64 at the back edge
     "U601": (97.0, 47.0, 0),       # DAPLink K20
@@ -61,6 +61,7 @@ SPARE = (8.0, 60.0)     # parts the engine cannot attach anywhere are parked her
 # the regulators' cities (standard 3.1 and 3.2): each with its application circuit around it, the inductor and
 # catch diode on the side its SW pin faces, placed before every other satellite; the void between cities below
 REGULATORS = {"U103": {"layout": "TPS54560B"}, "U104": {"layout": "TPS54560B"}, "U105": {"layout": "TPS62823"}}
+TEMPLATED = {"U101": "STUSB4500"}   # other ICs placed from a figure (standard 3.2): the PD controller from its evaluation board
 # the datasheets' layout examples as templates (standard 3.2): for each pin of the IC, the side of the IC (in the
 # footprint's own frame, as the library draws it) on which the figure puts the parts hanging from that pin, and
 # those parts' kinds in order outward (ring 0 first; "^" lays the part along the side); where the output capacitors
@@ -81,6 +82,14 @@ LAYOUTS = {
                           "VIN": ("R", ["C"]),                 # input capacitor beside it at VIN/PGND
                           "FB": ("L", ["R", "C"])},            # divider and feed-forward on the FB/AGND side
                  "inductor_out": ("T", ["C"])},                # output capacitors at the inductor's output, toward the IC's PG end
+    "STUSB4500": {"source": "ST UM2398 section 4, Figure 24 STEVAL-ISC005V1 top composite (the datasheet has no layout figure)", "top_only": True,
+                  # U1 sits behind the receptacle with its CC pins toward it; the decoupling in a column above and to the left of the
+                  # IC; the VBUS sense and discharge resistors to the right; the I2C pull-ups and address straps in a row below
+                  "pins": {"CC1": ("L", ["D"]), "CC2": ("L", ["D"]),
+                           "VDD": ("T", ["C"]), "VREG_2V7": ("T", ["C"]), "VREG_1V2": ("T", ["C"]), "VSYS": ("T", ["C"]),
+                           "ALERT": ("T", ["R"]),
+                           "VBUS_VS_DISCH": ("R", ["R"]), "VBUS_EN_SNK": ("R", ["R", "D"]), "DISCH": ("R", ["R"]),
+                           "RESET": ("L", ["R"]), "SCL": ("B", ["R"]), "SDA": ("B", ["R"])}},
 }
 CITY_GAP = 2.0          # the component void between any two islands' parts, both sides of the board (standard 3.1)
 # no plane or pour under the RJ45 on any layer (standard 3.4 and 4: its pins span the body, so the void is the body;
@@ -136,20 +145,20 @@ LANES = {
     # pair must cross another (the upstream pair under the left stack's pairs)
     "J1_D":    {"pair": "J1_D",    "path": [("J1", {"P": ["A6", "B6"], "N": ["A7", "B7"]}), ("U401", {"P": "3", "N": "1"})]},
     "HUB_UP":  {"pair": "HUB_UP",  "path": [("U401", {"P": "4", "N": "6"}), ("x", 15.0), ("layer", "B.Cu"), ("y", ("U402", {"P": "59", "N": "58"}, (0.0, 0.1))),
-                                            ("x", 36.5), ("layer", "F.Cu"), ("U402", {"P": "59", "N": "58"}, (0.0, 0.1))]},
+                                            ("x", 31.5), ("layer", "F.Cu"), ("U402", {"P": "59", "N": "58"}, (0.0, 0.1))]},
     "PORT1_D": {"pair": "PORT1_D", "path": [("J4", {"P": "3", "N": "2"}), ("U408", {"P": "6", "N": "4"})]},
-    "HUB_DN4": {"pair": "HUB_DN4", "path": [("U408", {"P": "1", "N": "3"}), ("y", 64.0), ("x", ("U402", {"P": "9", "N": "8"})), ("U402", {"P": "9", "N": "8"})]},
-    "HUB_DN5": {"pair": "HUB_DN5", "path": [("U409", {"P": "1", "N": "3"}), ("U402", {"P": "12", "N": "11"})]},
+    "HUB_DN4": {"pair": "HUB_DN4", "path": [("U408", {"P": "1", "N": "3"}), ("y", 69.0), ("x", ("U402", {"P": "9", "N": "8"})), ("U402", {"P": "9", "N": "8"})]},
+    "HUB_DN5": {"pair": "HUB_DN5", "path": [("U409", {"P": "1", "N": "3"}), ("y", 67.5), ("x", ("U402", {"P": "12", "N": "11"})), ("U402", {"P": "12", "N": "11"})]},
     "PORT3_D": {"pair": "PORT3_D", "path": [("J5", {"P": "3", "N": "2"}), ("U410", {"P": "6", "N": "4"})]},
     # the left row's two port pairs are a pin pitch apart: their centre lines spread 0.2 mm so the members keep clearance
     "HUB_DN6": {"pair": "HUB_DN6", "path": [("U410", {"P": "1", "N": "3"}), ("y", ("U402", {"P": "54", "N": "53"}, (0.0, -0.05))), ("U402", {"P": "54", "N": "53"}, (0.0, -0.05))]},
     "HUB_DN7": {"pair": "HUB_DN7", "path": [("U411", {"P": "1", "N": "3"}), ("y", ("U402", {"P": "56", "N": "55"}, (0.0, 0.15))), ("U402", {"P": "56", "N": "55"}, (0.0, 0.15))]},
     # the two downstream pairs for the K20 and the FTDI leave the hub's bottom row side by side (0.5 mm pins): their centre
     # lines are shifted 0.1 mm apart, the FTDI pair turns first, and each goes under the port pairs on the bottom
-    "HUB_DN1": {"pair": "HUB_DN1", "path": [("U402", {"P": "2", "N": "1"}, (-0.1, 0.0)), ("y", 61.6), ("layer", "B.Cu"), ("y", 63.2), ("x", 50.5), ("y", 61.6), ("layer", "F.Cu"),
+    "HUB_DN1": {"pair": "HUB_DN1", "path": [("U402", {"P": "2", "N": "1"}, (-0.1, 0.0)), ("y", 66.6), ("layer", "B.Cu"), ("y", 68.2), ("x", 50.5), ("y", 66.6), ("layer", "F.Cu"),
                                             ("y", ("pads", {"P": ("R602", "2"), "N": ("R603", "2")})), ("pads", {"P": ("R602", "2"), "N": ("R603", "2")})]},
     "K20_USB": {"pair": "K20_USB", "path": [("pads", {"P": ("R602", "1"), "N": ("R603", "1")}), ("x", 92.0), ("y", ("U601", {"P": "3", "N": "4"})), ("U601", {"P": "3", "N": "4"})]},
-    "HUB_DN2": {"pair": "HUB_DN2", "path": [("U402", {"P": "4", "N": "3"}, (0.1, 0.0)), ("y", 60.6), ("x", 42.8), ("layer", "B.Cu"), ("x", 52.1), ("layer", "F.Cu"), ("y", 41.5),
+    "HUB_DN2": {"pair": "HUB_DN2", "path": [("U402", {"P": "4", "N": "3"}, (0.1, 0.0)), ("y", 65.6), ("x", 37.8), ("layer", "B.Cu"), ("x", 52.1), ("layer", "F.Cu"), ("y", 41.5),
                                             ("x", 86.5), ("y", 51.5), ("x", 112.0), ("y", 57.0), ("x", 126.5),   # over the relay, under the DAPLink and SWD, round the FTDI
                                             ("y", ("pads", {"P": ("R505", "2"), "N": ("R504", "2")})), ("pads", {"P": ("R505", "2"), "N": ("R504", "2")})]},
     "FTDI_USB": {"pair": "FTDI_USB", "path": [("pads", {"P": ("R505", "1"), "N": ("R504", "1")}), ("x", 121.2), ("y", ("U501", {"P": "11", "N": "12"})), ("U501", {"P": "11", "N": "12"})]},
