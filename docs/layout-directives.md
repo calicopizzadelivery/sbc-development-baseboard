@@ -42,7 +42,7 @@ flat against a wall or a DIN rail, which the spec accepted).
 |---|---|---|---|
 | Left (x = 0), 74 mm usable | J2 USB-C PD in (centred y = 30) · J1 USB-C upstream (centred y = 74), split around the middle | charger / workstation | 10.6 + 10.6 = 21.2 mm |
 | Back (y = 0), 114 mm usable | J10 RJ45, from x = 71 (from x = 14 until 2026-10-07, when the two bucks took the back-edge corner beside J2) | workstation | 19.0 mm wide, 22.4 mm deep |
-| Right (x = 140), 74 mm usable | J3 USB-C HID · J13 console · J9 FTDI right-angle, in the back half as before the board grew | target | 10.6 + 16.5 + 16.3 = 43.4 mm |
+| Right (x = 140), 74 mm usable | J3 USB-C HID (centred y = 19.3) · J13 console (origin y = 49.2) · J9 FTDI right-angle (origin y = 65.0), spaced 10 mm apart since 2026-10-07 (they were packed 1.5 mm apart in the back half) | target | 10.6 + 16.5 + 16.3 = 43.4 mm |
 | Front (y = 100), left end | J5, J4 USB-A stacks (J5 at x = 19, J4 at x = 37: swapped on 2026-10-06 so each stack's pairs reach the hub row they are wired to without crossing) · J18 PSU in · J19 PSU out | bench / PSU | 17.2 + 17.2 + 13.2 + 13.2 = 60.8 mm |
 | Front (y = 100), right end | J14 +5V_TGT · J12, J11 relays | target | 13.2 + 13.05 + 13.05 = 39.3 mm |
 | Inboard | J16 Cortex debug · J15 GPIO header · **J17 programming, top entry** (BM04B-SRSS-TB) | any | — |
@@ -153,8 +153,8 @@ reader takes no concave plane), each at its own priority, the +3V3 base
 in five pieces around the region at the lowest priorities and the others
 carving it: VBUS_IN in the inlet corner under the bucks' VIN pins;
 +5V_PORTS from L101's output down to the 3V3 buck, down the middle beside
-the relay and along the band above the USB-A stacks, plus a strip to the
-FTDI switch and down to the relays; +5V_TGT from L102's output down to the
+the relay and along the band above the USB-A stacks, plus a strip east
+under the DAPLink, down to the relays and to the FTDI switch behind J9; +5V_TGT from L102's output down to the
 band at y 36–40 and across it below the PHY to the right edge, down it to
 the eFuse and J14, with a tab to the level shifter. The autorouter drops
 vias into them; the regions are adjusted by hand where it could not.
@@ -238,13 +238,13 @@ are the knobs.
 | J16 | (93.5, 5, 0) | SWD to the K64, between the jack and the K64 at the back edge |
 | U601 | (97, 47, 0) | DAPLink K20 |
 | J601 | (104, 44, 0) | SWD to the K20 |
-| U501 | (117, 56, 0) | FT231X behind J9, 5 mm down with its island (2026-10-07) |
+| U501 | (117, 70, 0) | FT231X behind J9, which moved 20 mm down the edge; its island follows (2026-10-07) |
 | K801 | (91, 80, 0) | relays behind J11 / J12 |
 | K802 | (105, 80, 0) |  |
 | U701 | (119, 81, 0) | +5V_TGT eFuse behind J14 |
 | U704 | (118, 29, 0) | GPIO level shifter near J15 |
-| U702 | (112, 38.5, 0) | console UART shifter near J13 (the three shifters 2 mm apart: the void between cities) |
-| U703 | (123, 38.5, 0) |  |
+| U702 | (112, 46.5, 0) | console UART shifter behind J13, which moved 10 mm down the edge; clear of the HUB_DN2 leg at x = 112 |
+| U703 | (123, 46.5, 0) |  |
 | U401 | (10.3, 74, 0) | J1 upstream array at its receptacle, in line with the pair, pins 1/3 toward J1 |
 | U202 | (129.7, 19.34, 180) | J3 array |
 | U408 | (40.78, 79, -90) | J4 front row (port 1) -> hub DN4, straight above its pads |
@@ -253,8 +253,8 @@ are the knobs.
 | U411 | (25.2, 79, -90) | J5 back row (port 4) -> hub DN7 |
 | R602 | (88.6, 37.75, 180) | K20 pair series resistors, P above N as the lane arrives from the left |
 | R603 | (88.6, 39.75, 180) |  |
-| R504 | (123.5, 57.6, 0) | FTDI pair series resistors, N above P as the lane arrives from the right |
-| R505 | (123.5, 59.5, 0) |  |
+| R504 | (123.5, 71.6, 0) | FTDI pair series resistors, N above P as the lane arrives from the right |
+| R505 | (123.5, 73.5, 0) |  |
 | J15 | (117, 10, 0) | GPIO header, inboard |
 | SW201 | (66, 50, 0) | K64 reset button in the open centre band (2026-10-07), its debounce parts with it |
 | SW601 | (80, 50, 0) | DAPLink reset button beside it, 2 mm of void between the two cities |

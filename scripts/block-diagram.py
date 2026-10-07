@@ -237,7 +237,7 @@ def conn(edge, a, L, label, depth=DEPTH):
 # the edge table of docs/layout-directives.md (gen/layout.py CONNECTORS, body widths measured from the footprints)
 conn("T", 71, 19, "J10 RJ45", depth=22.4)
 conn("L", 24.7, 10.6, "J2 PD in"); conn("L", 68.7, 10.6, "J1 upstream")
-conn("R", 14, 10.6, "J3 HID"); conn("R", 26, 16.5, "J13 console"); conn("R", 44, 16.3, "J9 FTDI")
+conn("R", 14, 10.6, "J3 HID"); conn("R", 36, 16.5, "J13 console"); conn("R", 64, 16.3, "J9 FTDI")
 conn("B", 10.5, 17.2, "J5"); conn("B", 28.7, 17.2, "J4"); conn("B", 47.8, 13.2, "J18"); conn("B", 62.1, 13.2, "J19")
 conn("B", 81.2, 13.05, "J11"); conn("B", 95.3, 13.05, "J12"); conn("B", 110.2, 13.2, "J14")
 for (hx, hy, hw, hh, lab) in [(91.9, 3.8, 4.5, 7.5, "J16 SWD"), (117, 10, 15.2, 5, "J15 GPIO"), (34.3, 47.9, 7.5, 4.2, "J17 prog")]:

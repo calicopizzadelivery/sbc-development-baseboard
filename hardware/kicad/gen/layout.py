@@ -14,8 +14,8 @@ EDGE_GAP = 1.0             # between neighbouring edge connectors' bodies
 # rule that placed them: a horizontal connector's solder pins sit at the rear, so it mates toward the
 # end of its body farthest from the pad rows; a pin header mates where its pins point
 CONNECTORS = {"J1": (3.1, 74.0, -90), "J2": (3.1, 30.0, -90), "J3": (136.9, 19.345, 90), "J4": (37.285, 83.865, 0),
-              "J5": (19.095, 83.865, 0), "J9": (129.435, 45.045, 0), "J10": (76.08, 20.23, 90), "J11": (87.745, 91.475, 0),
-              "J12": (101.805, 91.475, 0), "J13": (131.475, 39.165, 90), "J14": (116.845, 89.475, 0), "J18": (54.445, 89.475, 0),
+              "J5": (19.095, 83.865, 0), "J9": (129.435, 65.045, 0), "J10": (76.08, 20.23, 90), "J11": (87.745, 91.475, 0),
+              "J12": (101.805, 91.475, 0), "J13": (131.475, 49.165, 90), "J14": (116.845, 89.475, 0), "J18": (54.445, 89.475, 0),
               "J19": (68.665, 89.475, 0)}
 EDGE_ZONE = 3.0            # no part other than an edge connector nearer the edge than this (ECSS 14.3.2 c, tailored)
 
@@ -37,13 +37,13 @@ ANCHORS = {
     "J16":  (93.5, 5.0, 0),        # SWD to the K64, between the jack and the K64 at the back edge
     "U601": (97.0, 47.0, 0),       # DAPLink K20
     "J601": (104.0, 44.0, 0),      # SWD to the K20
-    "U501": (117.0, 56.0, 0),     # FT231X behind J9, 5 mm down (2026-10-07) with its island
+    "U501": (117.0, 70.0, 0),     # FT231X behind J9, which moved 20 mm down the edge (2026-10-07); its island follows
     "K801": (91.0, 80.0, 0),       # relays behind J11 / J12
     "K802": (105.0, 80.0, 0),
     "U701": (119.0, 81.0, 0),      # +5V_TGT eFuse behind J14
     "U704": (118.0, 29.0, 0),      # GPIO level shifter near J15
-    "U702": (112.0, 38.5, 0),      # console UART shifter near J13 (the three shifters 2 mm apart: the void between cities)
-    "U703": (123.0, 38.5, 0),
+    "U702": (112.0, 46.5, 0),     # console UART shifter near J13 (J13 10 mm down the edge on 2026-10-07; the shifters follow, clear of the HUB_DN2 leg at x 112)
+    "U703": (123.0, 46.5, 0),     # 
     # ESD arrays at their receptacles, in line with the pair, and the series parts of the K20 and FTDI pairs
     "U401": (10.3, 74.0, 0),       # J1 upstream array, pins 1/3 toward J1
     "U202": (129.7, 19.34, 180),   # J3 array
@@ -53,8 +53,8 @@ ANCHORS = {
     "U411": (25.2, 79.0, -90),     # J5 back row (port 4) -> hub DN7
     "R602": (88.6, 37.75, 180),    # K20 pair series resistors, P above N as the lane arrives from the left
     "R603": (88.6, 39.75, 180),
-    "R504": (123.5, 57.6, 0),     # FTDI pair series resistors, N above P as the lane arrives from the right
-    "R505": (123.5, 59.5, 0),     # I2C shifter
+    "R504": (123.5, 71.6, 0),     # FTDI pair series resistors, N above P as the lane arrives from the right
+    "R505": (123.5, 73.5, 0),     # 
     "J15":  (117.0, 10.0, 0),      # GPIO header, inboard
     # the two reset buttons in the open centre band (2026-10-07), their debounce parts with them
     "SW201": (66.0, 50.0, 0),      # K64 reset
@@ -135,7 +135,8 @@ PLANES = [("GND_L2", "GND", "In1.Cu", GND_PLANE),
           ("5V_PORTS_L3_mid", "+5V_PORTS", "In2.Cu", [(50, 48), (62, 48), (62, 80), (50, 80)], 12),             # ...down beside the relay...
           ("5V_PORTS_L3_band", "+5V_PORTS", "In2.Cu", [(10, 70), (50, 70), (50, 82), (10, 82)], 13),            # ...along the port switches
           ("5V_PORTS_L3_right", "+5V_PORTS", "In2.Cu", [(86, 52), (126, 52), (126, 57), (86, 57)], 14),        # ...to the FTDI switch...
-          ("5V_PORTS_L3_relays", "+5V_PORTS", "In2.Cu", [(86, 57), (108, 57), (108, 82), (86, 82)], 16)]       # ...and down to the relays
+          ("5V_PORTS_L3_relays", "+5V_PORTS", "In2.Cu", [(86, 57), (108, 57), (108, 82), (86, 82)], 16),      # ...down to the relays...
+          ("5V_PORTS_L3_ftdi", "+5V_PORTS", "In2.Cu", [(108, 57), (126, 57), (126, 76), (108, 76)], 17)]       # ...and to the FTDI switch behind J9
 ISO_GAP = 2.0
 # ---- lanes (ecad-standards/layout.md sections 1 and 5): a corridor reserved for one routed path, from pad to pad
 # through axis-aligned legs ("x"/"y" items move along one axis to a coordinate or to another pad's coordinate),

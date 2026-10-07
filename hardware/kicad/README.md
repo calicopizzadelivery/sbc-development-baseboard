@@ -186,7 +186,8 @@ port switches and their capacitors on the bottom under the front-row ones
 (standard 3.7), the crystals along their ICs' edges with the load
 capacitors flanking them and the decoupling across its power traces
 (standard 5 and 3.3), the two reset buttons with their debounce parts in
-the open centre band and the FTDI island 5 mm lower, the RJ45 and PHY moved right along the back edge to make
+the open centre band, the right-edge connectors spaced 10 mm apart with the
+console shifters and the FTDI island following them down the edge, the RJ45 and PHY moved right along the back edge to make
 the room (the placement
 report lists every city, the parts placed apart from theirs, and any void
 narrower than 2 mm: none). It
