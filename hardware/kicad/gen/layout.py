@@ -182,6 +182,9 @@ BOTTOM_NEVER_CLASSES = {"USB_VBUS_3A", "PWR_6A", "PSU_3A", "USB"}   # parts on t
 # ---- ESD protection (ecad-standards/layout.md section 3.8): recognised by value; placed first of all, on top, at the
 # connector's signal pins, a flow-through array turned so its connector-side pins face the connector
 ESD_VALUES = ("USBLC", "PESD", "ESDA", "TPD", "SRV05", "IP42", "TVS", "SMAJ", "SMBJ")
+# one channel of each stacked USB-A receptacle on each side (standard 3.7): the back rows' load switches and their
+# capacitors go to the bottom under the front rows' switches; the indicator LEDs stay on top
+SIDES = {"U404": "B", "U406": "B"}
 BOTTOM_TUCK = 1.75    # a bottom part's inner edge sits this far inside its host's courtyard edge, under the pin row (reference boards: 1.8)
 THT_MARGIN = 0.5      # bottom parts keep this far from through-hole pads (reference boards: 0.5; wave or selective soldering needs the assembler's figure)
 EP_MARGIN = 0.6       # and from an exposed pad's via field

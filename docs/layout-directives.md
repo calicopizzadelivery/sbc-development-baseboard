@@ -85,8 +85,9 @@ along it); a pin header mates where its pins point. Checked in the 3D view.
   drawn by the generator as the rule area `void_J10_magnetics` from
   `COPPER_VOIDS`.
 - **Voids between cities** (standard 3.1): every two parts of different
-  schematic islands keep 2 mm apart on both sides of the board; the routing
-  between blocks runs in those voids. Connectors, holes, ESD parts and lone
+  schematic islands on one side of the board keep 2 mm apart; the routing
+  between blocks runs in those voids. The void holds per side, so a split
+  channel's switch may sit under the other channel's. Connectors, holes, ESD parts and lone
   symbols at a connector stand outside the cities.
 - No part other than an edge connector within 3 mm of any edge (a
   tailoring of ECSS-Q-ST-70-12C 14.3.2 c, whose 5 mm is for the assembler's
@@ -182,9 +183,15 @@ stay on the **top**. Resistors and capacitors up to 1206, small diodes
 (SOD-123) and SOT-23 transistors may go to the **bottom**, under the pin they
 serve, 1 mm inside their host's courtyard edge, never within 1 mm of a
 through-hole pad (hand soldering) or 0.6 mm of an exposed pad's via field.
-The corner keep-outs, the 3 mm edge zone, the lanes and the isolation rule
-apply on both sides. The bottom carries nothing taller than 3 mm (the
-standoffs). The area this frees on top is for the blocks' copper zones.
+The two stacked USB-A receptacles each carry two ports: the back rows'
+load switches (U404, U406) and their capacitors go to the **bottom**
+(`SIDES`, standard 3.7, 2026-10-07), the front rows' (U403, U405) stay on
+top with the ESD arrays, so the area in front of each stack holds one
+port's switch per side; the ports' indicator LEDs and their series
+resistors stay on top. The corner keep-outs, the 3 mm edge zone, the lanes
+and the isolation rule apply on both sides. The bottom carries nothing
+taller than 3 mm (the standoffs). The area this frees on top is for the
+blocks' copper zones.
 
 ## Placement
 
