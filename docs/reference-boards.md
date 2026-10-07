@@ -81,6 +81,39 @@ in the standard:
 - **Density**: two-sided boards run at about 76 % courtyard area; ours is at
   61 %, so there is room before the board is full.
 
+## Routing practice
+
+The same harvest reads the routed boards' copper (the engine does not route
+yet; these numbers set the net classes the schematic build writes and the
+routing rules in the standard's sections 4 and 5). Medians over the 81
+boards, with the 51 multilayer boards and the 49 boards with routed pairs
+where it matters:
+
+| Measure | Reference boards | This board's rules |
+|---|---|---|
+| Signal track width | 0.20 mm (multilayer 0.18) | 0.2 mm default (was 0.25) |
+| Clearance in the boards' rules | 0.15 mm (multilayer 0.13) | 0.15 mm, fab minimum 0.127 |
+| Via diameter / drill | 0.6 / 0.4 mm (multilayer 0.56 / 0.3) | 0.6 / 0.3 mm |
+| Blind or micro vias | none on any board | none |
+| Power track width, median / 90th percentile | 0.5 / 1.0 mm | 2 mm and 4 mm classes or pours, by current |
+| Track length on the bottom layer | 45 % (multilayer 39 %) | both outer layers route |
+| Track length on inner layers | 3 % (multilayer 12 %) | planes, a few crossings |
+| Inner ground plane | every multilayer board; most on the layer under the top | GND_L2 on In1.Cu |
+| Ground vias per cm² | 3.3 (multilayer 4.2) | about 4, at routing |
+| Pads to zones | thermal reliefs on every zone, 0.5 mm gap and spoke | thermal, 0.5 / 0.5 |
+| Zone minimum width / clearance | 0.2 / 0.24 mm | 0.25 / 0.3 mm |
+| Ground pour share of the outer layers | 44 % | flood around the routing |
+| Pair gap / width in the copper | 0.15 / 0.13 mm | 0.20 / 0.35 mm from the stackup (90 Ω) |
+| Pair length mismatch, median / 90th percentile | 0.8 / 1.4 mm | within 1 mm |
+| Pairs on a single layer | one in three, 3 vias per pair | one layer, no vias (the parent's rule, kept) |
+
+What changed: the default track width went from 0.25 to 0.2 mm; the
+standard gained layer roles, ground stitching at about four vias per
+square centimetre, thermal reliefs at 0.5 mm, ground floods on the outer
+layers, and the note that a pair class at KiCad's default width and gap is
+not a pair class. Kept with reason: pairs on one layer with no vias (the
+parent's 13.11), and the current-based power widths.
+
 ## Keeping it current
 
 Rerun `scripts/harvest-placement.py` after the mirror grows or a rule

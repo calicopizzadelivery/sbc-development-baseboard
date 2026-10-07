@@ -27,7 +27,7 @@ def netclass(name, **kw):
     the USB class's differential width and gap are set from the stackup before routing."""
     c = {"bus_width": 12, "clearance": 0.2, "diff_pair_gap": 0.25, "diff_pair_via_gap": 0.25, "diff_pair_width": 0.2,   # Default clearance 0.15: 0.5 mm pitch parts (fab minimum 0.127)
          "line_style": 0, "microvia_diameter": 0.3, "microvia_drill": 0.1, "name": name, "pcb_color": "rgba(0, 0, 0, 0.000)",
-         "priority": 2147483647, "schematic_color": "rgba(0, 0, 0, 0.000)", "track_width": 0.25, "via_diameter": 0.6,
+         "priority": 2147483647, "schematic_color": "rgba(0, 0, 0, 0.000)", "track_width": 0.2, "via_diameter": 0.6,     # 0.2 mm signal tracks, 0.6/0.3 vias: layout.md 5 and 9
          "via_drill": 0.3, "wire_width": 6}
     c.update(kw)
     return c
