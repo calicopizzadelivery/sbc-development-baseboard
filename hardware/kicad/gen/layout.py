@@ -160,3 +160,11 @@ ISOLATION_REGIONS = [{"name": "psu_iso", "note": "PSU passthrough isolation", "o
 # the bulk router for gen/pcb.py --route (ecad-standards/tools/autoroute.py): FreeRouting 2.4.1, one thread
 FREEROUTING = "/home/flippy/Documents/claude/mythtv-porg/tools/freerouting/bin/freerouting"
 FREEROUTING_PASSES = 30
+# ---- the copper after routing (ecad-standards/tools/copper.py, layout.md 4 and 5): ground floods on both outer layers,
+# notched around the isolation region like the plane, the region's own ground inside it, and ground stitching at
+# about four vias per square centimetre, clear of the region by the creepage
+FLOODS = [("GND_F", "GND", "F.Cu", GND_PLANE), ("GND_B", "GND", "B.Cu", GND_PLANE),
+          ("PSU_GND_F", "PSU_GND", "F.Cu", ISOLATION), ("PSU_GND_B", "PSU_GND", "B.Cu", ISOLATION)]
+STITCH = [{"net": "GND", "pitch": 5.0, "margin": 1.5, "keep_out": ISOLATION_GROWN_RECTS},      # clear of the region by the creepage
+          {"net": "PSU_GND", "pitch": 5.0, "inside": [(66.3, 44.3, 81.7, 78.5), (50.3, 64.3, 66.3, 78.5)]}]  # the region's own ground, inset by the creepage
+STITCH_VIA = (0.6, 0.3)

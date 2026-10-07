@@ -143,6 +143,20 @@ relays and the FTDI switch; +5V_TGT from L102 along the back and right
 edges to the eFuse and J14, with a tab to the level shifter. The autorouter
 drops vias into them; the regions are adjusted by hand where it could not.
 
+## Floods and stitching
+
+Ground floods both outer layers (`GND_F`, `GND_B`) on the plane's outline,
+notched around the isolation region by the 2 mm creepage, and the region
+floods its own `PSU_GND` on both outer layers inside its outline
+(`PSU_GND_F`, `PSU_GND_B`), all at the lowest priority with thermal
+reliefs. Ground stitching sits on a 5 mm grid, 1.5 mm in from the edge,
+kept out of the isolation region grown by its creepage; the region's own
+ground is stitched on the same grid inside its outline inset by the
+creepage. Vias are 0.6 mm on a 0.3 mm drill. The standard's `copper.py`
+draws all of it over the routed board (`gen/pcb.py --copper`), moving a
+via to the nearest clear spot where the routing is in the way and dropping
+one that would cut a sliver off a rail.
+
 ## Sides
 
 Connectors, ICs, relays, inductors, crystals and their load capacitors,

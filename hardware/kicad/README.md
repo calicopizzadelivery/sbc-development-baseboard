@@ -173,17 +173,24 @@ the Specctra rules and the fixed lanes, so it stays the bulk router.
 fill or strays into a keep-out shows; the unconnected count is the ratsnest's
 and does not credit the planes); its report is `drc.txt`.
 
-The board as committed is the autorouter's result over the engine's work
-(2026-10-07): 3 067 track segments and 297 vias, with 189 of the 499
-connections left for the hand pass, among them the rail pieces on L3 that
-still want vias (the 20 isolated-copper warnings), the ground stitching and
-the outer-layer ground floods of the standard's sections 4 and 5. DRC reports
-no errors other than those unrouted connections and twelve inside the GCT
-USB-C footprints, whose mounting holes sit 0.19 mm from their own shield pads
-against the 0.25 mm hole clearance set for the fab (confirm with Advanced
-Circuits or trim the footprint), and no warnings. From here the board file is
-the source of truth and is edited in KiCad; `gen/pcb.py` is not run again
-over it. The schematic generator stays usable: its derived UUIDs keep the
+The board as committed is the autorouter's result over the engine's work,
+with the standard's copper pass over it (`gen/pcb.py --copper`, the
+standard's `tools/copper.py`, 2026-10-07): 3 067 track segments and 594
+vias, 297 of them ground stitching on the directives' 5 mm grid (2.7 ground
+vias per cm² outside the isolated region, where the routing let them in),
+ground floods on both outer layers covering 47 % of the top and 56 % of the
+bottom, notched around the passthrough block, which floods its own
+`PSU_GND`. 142 of the 499 connections are left for the hand pass, among them
+the rail pieces on L3 that still want vias (the 20 isolated-copper
+warnings). DRC reports no errors other than those unrouted connections and
+twelve inside the GCT USB-C footprints, whose mounting holes sit 0.19 mm from
+their own shield pads against the 0.25 mm hole clearance set for the fab
+(confirm with Advanced Circuits or trim the footprint); its 35
+starved-thermal warnings are ground pads the routing crowds so the flood
+reaches them with one spoke, for the hand pass to free or accept. From here
+the board file is the source of truth and is edited in KiCad; `gen/pcb.py`
+is not run again over it, except `--copper`, which adds only what is
+missing. The schematic generator stays usable: its derived UUIDs keep the
 footprints linked.
 
 The ICs' own layout rules, with sources, are in

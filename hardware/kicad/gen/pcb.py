@@ -4,6 +4,7 @@ standard's placement engine, ecad-standards/tools/placer.py (the submodule at ..
 
     ./pcb.py        # writes ../sbc-baseboard/sbc-baseboard.kicad_pcb (+ .kicad_dru), runs DRC
     ./pcb.py --route            # then FreeRouting (layout.FREEROUTING) over the locked lanes, hours
+    ./pcb.py --copper           # (or alone, over the routed board) ground floods on the outer layers and stitching vias
     DEBUG_REF=C401 ./pcb.py     # and says where that part's candidate spots were refused
 """
 import os, sys
@@ -14,8 +15,13 @@ import placer, layout
 
 if __name__ == "__main__":
     out = os.path.join(HERE, "..", "sbc-baseboard")
-    placer.main(layout, out, "sbc-baseboard", os.path.join(HERE, "..", "libs", "footprints"))
+    if "--copper" not in sys.argv or "--route" in sys.argv:       # --copper alone works over the existing (routed) board: no new placement
+        placer.main(layout, out, "sbc-baseboard", os.path.join(HERE, "..", "libs", "footprints"))
     if "--route" in sys.argv:                                     # then FreeRouting over the locked lanes (not reproducible: the board is the source of truth from here)
         import subprocess
         subprocess.run([sys.executable, os.path.join(os.path.dirname(placer.__file__), "autoroute.py"), os.path.join(out, "sbc-baseboard.kicad_pcb"),
                         layout.FREEROUTING, "--passes", str(getattr(layout, "FREEROUTING_PASSES", 30))], check=True)
+    if "--copper" in sys.argv:                                    # then the ground floods and stitching over the routed board (idempotent)
+        import subprocess
+        subprocess.run([sys.executable, os.path.join(os.path.dirname(placer.__file__), "copper.py"), os.path.join(out, "sbc-baseboard.kicad_pcb"),
+                        os.path.join(HERE, "layout.py")], check=True)
