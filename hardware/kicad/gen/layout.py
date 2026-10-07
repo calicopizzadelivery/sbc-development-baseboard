@@ -44,7 +44,7 @@ ANCHORS = {
     "J15":  (117.0, 10.0, 0),      # GPIO header, inboard
 }
 SPARE = (72.0, 6.0)     # parts the engine cannot attach anywhere are parked here and reported
-RING_GAP = 0.3
+RING_GAP = 0.15             # a ring's gap to its host and to the ring inside it (courtyards + this: 0.65 mm pad to pad, the standard's spacing)
 RINGS = 8
 BIG_AREA = 20.0              # courtyard mm2 from which a part on an IC's pins goes down before the bulk capacitors (inductors, diodes)
 SMALL_AREA = 5.0             # courtyard mm2 below which a decoupling capacitor is placed before anything else (0402, 0603)                    # rings tried along a host's side before the nearest free spot is taken
@@ -54,7 +54,7 @@ SEARCH_RADIUS = 40.0         # the nearest-free-spot search gives up beyond this
 # parts placed by hand across the isolation barrier: (x, y, rotation) of the footprint origin
 FIXED = {"K803": (56.0, 53.0, 0),          # coil pads (1, 8) at x = 56 outside the region, contacts (2, 4, 6) inside
          "U801": (66.0, 60.5, 180)}        # below the relay: LED pins (1, 2) at x = 66 inside the region, transistor pins (3, 4) at 58.4 outside
-PACK_MARGIN = 0.25          # courtyard to courtyard: with KiCad's 0.25 mm courtyards that is ECSS Table 14-2's 0.6 mm between bodies
+PACK_MARGIN = 0.15          # courtyard to courtyard: with KiCad's 0.25 mm courtyards 0.65 mm pad to pad (reference boards: 0.3-0.6; ECSS Table 14-2: 0.6 between bodies)
 
 # the isolated PSU region: the passthrough block behind J18, a strip along the front and a riser to J19
 ISOLATION = [(64, 42), (84, 42), (84, 80), (48, 80), (48, 62), (64, 62)]   # behind J18/J19; x = 64 runs through K803 between coil and contacts
@@ -80,9 +80,10 @@ BOTTOM_NEVER_CLASSES = {"USB_VBUS_3A", "PWR_6A", "PSU_3A", "USB"}   # parts on t
 # ---- ESD protection (ecad-standards/layout.md section 3.8): recognised by value; placed first of all, on top, at the
 # connector's signal pins, a flow-through array turned so its connector-side pins face the connector
 ESD_VALUES = ("USBLC", "PESD", "ESDA", "TPD", "SRV05", "IP42", "TVS")
-BOTTOM_TUCK = 1.0     # a bottom part's inner edge sits this far inside its host's courtyard edge, under the pin row
-THT_MARGIN = 1.0      # bottom parts keep this far from through-hole pads (hand soldering)
+BOTTOM_TUCK = 1.75    # a bottom part's inner edge sits this far inside its host's courtyard edge, under the pin row (reference boards: 1.8)
+THT_MARGIN = 0.5      # bottom parts keep this far from through-hole pads (reference boards: 0.5; wave or selective soldering needs the assembler's figure)
 EP_MARGIN = 0.6       # and from an exposed pad's via field
+REFDES_SIZES = (0.8, 0.7)   # designator text heights tried, mm (reference boards: 0.8 typical, 0.65-0.72 smallest); stroke 15 %, never under 0.1
 CURRENT_CLASSES = {"USB_VBUS_3A", "PWR_6A", "PSU_3A", "PSU_ISO"}   # a part on these nets belongs at the connector or IC that carries them
 PAIR_CLASSES = {"USB"}
 ISOLATION_RECTS = [(64, 42, 84, 80), (48, 62, 64, 80)]           # ISOLATION as rectangles, for the placer

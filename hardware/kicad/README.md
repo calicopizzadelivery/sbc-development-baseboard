@@ -168,6 +168,13 @@ footprints linked.
 The ICs' own layout rules, with sources, are in
 [docs/layout-guidelines.md](../../docs/layout-guidelines.md).
 
+The engine's numbers (ring gap, tuck depth, through-hole margin, designator
+sizes, which side decoupling takes) are calibrated against 79 published
+KiCad boards from Olimex, MNT, SparkFun and Raspberry Pi, measured by
+`scripts/harvest-placement.py` over a local mirror; the comparison and the
+decisions are in [docs/reference-boards.md](../../docs/reference-boards.md)
+and in the standard's section 9.
+
 Layout order, per the standard's section 8: the edge connectors against the
 mechanical drawing (done: they are locked), the isolated passthrough block
 (done: fixed parts, island, rules), then by hand the far-placed parts and

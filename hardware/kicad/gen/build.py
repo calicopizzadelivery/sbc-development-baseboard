@@ -93,7 +93,8 @@ def main():
     # 0.006" drill); thermal vias in the library footprints are 0.2 mm, which the fab allows
     rules = {"min_clearance": 0.127, "min_track_width": 0.127, "min_through_hole_diameter": 0.2, "min_hole_clearance": 0.25,
              "min_hole_to_hole": 0.25, "min_copper_edge_clearance": 0.25, "min_via_diameter": 0.5, "min_via_annular_width": 0.125,
-             "min_connection": 0.127, "solder_mask_to_copper_clearance": 0.0}
+             "min_connection": 0.127, "solder_mask_to_copper_clearance": 0.0,
+             "min_text_height": 0.7, "min_text_thickness": 0.1}       # silk: the standard's smallest designator (section 6), the fab's 0.1 mm line
     pro = {"board": {"design_settings": {"defaults": {}, "rules": rules}, "layer_presets": [], "viewports": []},
            "boards": [], "cvpcb": {"equivalence_files": []}, "libraries": {"pinned_footprint_libs": [], "pinned_symbol_libs": []},
            "meta": {"filename": f"{PROJECT}.kicad_pro", "version": 1}, "net_settings": net_settings(),

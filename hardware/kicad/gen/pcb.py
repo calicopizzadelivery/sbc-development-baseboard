@@ -433,7 +433,7 @@ class Placer:
         self.pose(ref, cx - (ob[0] + ob[2]) / 2, cy - (ob[1] + ob[3]) / 2, rot, layer)
         return True
 
-    def place_in_rings(self, ref, host, point, hostnet, layer):
+    def place_in_rings(self, ref, host, point, hostnet, layer, rings=None):
         hb = self.box_of(host)
         base = -L.BOTTOM_TUCK if (layer == "B" and self.side[host] == "F") else L.RING_GAP   # under the host's pin row, or beside it
         d = {"L": point[0] - hb[0], "R": hb[2] - point[0], "T": point[1] - hb[1], "B": hb[3] - point[1]}
@@ -445,7 +445,7 @@ class Placer:
             t = point[1] if side in ("L", "R") else point[0]
             lo, hi = (hb[1], hb[3]) if side in ("L", "R") else (hb[0], hb[2])
             ringlist = self.rings[(host, side, layer)]
-            for slide, ri in [(s, r) for s in L.RING_SLIDES for r in range(L.RINGS)]:
+            for slide, ri in [(s, r) for s in L.RING_SLIDES for r in range(rings or L.RINGS)]:
                 if ri >= len(ringlist):
                     ringlist.append({"depth": 0.0, "members": []})
                 ring = ringlist[ri]
@@ -503,7 +503,10 @@ class Placer:
             ref, (host, resolve, hostnet, _) = best
             point = resolve()
             layer = "B" if self.bottom_ok(ref, host) else "F"
-            how = self.place_in_rings(ref, host, point, hostnet, layer)
+            how = None
+            if layer == "B" and not self.has_specific(ref):        # decoupling stays on its IC's side unless its first rings are full
+                how = self.place_in_rings(ref, host, point, hostnet, "F", rings=2)
+            how = how or self.place_in_rings(ref, host, point, hostnet, layer)
             if not how and layer == "B":                           # no ring under the pin: near it on the bottom, else beside it on top
                 how = self.place_nearest(ref, point, hostnet, "B", radius=8.0) or self.place_in_rings(ref, host, point, hostnet, "F")
             how = how or self.place_nearest(ref, point, hostnet, layer) or (layer == "B" and self.place_nearest(ref, point, hostnet, "F"))
@@ -582,7 +585,7 @@ class Placer:
             return sorted(dist, key=lambda s: -dist[s])
         def prepare(ref, size):
             layer = self.side[ref]; t = self.fps[ref].Reference()
-            t.SetVisible(True); t.SetLayer(SILK[layer]); t.SetTextThickness(pcbnew.FromMM(0.15))
+            t.SetVisible(True); t.SetLayer(SILK[layer]); t.SetTextThickness(pcbnew.FromMM(max(0.1, round(0.15 * size, 2))))
             t.SetHorizJustify(pcbnew.GR_TEXT_H_ALIGN_CENTER); t.SetVertJustify(pcbnew.GR_TEXT_V_ALIGN_CENTER)
             t.SetTextSize(pcbnew.VECTOR2I(pcbnew.FromMM(size), pcbnew.FromMM(size)))
             return layer, t
@@ -630,13 +633,13 @@ class Placer:
         for ref in L.HOLES:
             self.fps[ref].Reference().SetVisible(False)
         for ref in majors:
-            if not place_ref(ref, (1.0, 0.8)):
-                if place_ref_near(ref, 1.0) or place_ref_near(ref, 0.8):
+            if not place_ref(ref, L.REFDES_SIZES):
+                if any(place_ref_near(ref, s) for s in L.REFDES_SIZES):
                     stepped_out.append(ref)
                 else:
                     omitted.append(ref)
         for ref in minors:
-            if not place_ref(ref, (1.0, 0.8)):
+            if not place_ref(ref, L.REFDES_SIZES):
                 omitted.append(ref)
         # the cluster rule, on the top side
         clusters = collections.defaultdict(list)
