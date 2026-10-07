@@ -188,11 +188,19 @@ generator at the pin it serves** (ecad-standards/layout.md section 2): its
 host is the placed part it shares the most specific nets with, a decoupling
 capacitor's host is the IC the schematic draws it beside, it sits on the
 host's side nearest that pin, turned so the pad on the host's net faces it,
-and the parts along a side pack outward in rings. `placement.txt` beside the
-board file records every part's host and ring (or the distance to its pin
-where no ring had room). The generator lists the parts it could not keep
-within 8 mm of their pin; those, and the indicator LEDs, are the first
-things to refine by hand. The anchors are the second: they are the knobs.
+and the parts along a side pack outward in rings. Since 2026-10-07 the
+board mimics the schematic's islands (standard 3.1): the parts drawn
+together on a sheet (an IC and the parts fanned out from it, a transistor
+with its resistors, a crystal with its load capacitors, a row of straps)
+are placed together, each island's hub first and its members at it, and a
+connector's island comes to the connector (ESD stays at its receptacle).
+`placement.txt` beside the board file records every part's host and ring
+(or the distance to its pin where no ring had room), then each island's
+spread on the board and the members placed more than 15 mm from it. The
+generator lists the parts it could not keep within 8 mm of their pin;
+those, the members placed apart from their island, and the indicator LEDs
+are the first things to refine by hand. The anchors are the second: they
+are the knobs.
 
 | Part | (x, y, rot) | Why there |
 |---|---|---|
