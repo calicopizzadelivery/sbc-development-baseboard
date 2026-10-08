@@ -108,14 +108,15 @@ where it matters:
 | Pairs on a single layer | one in three, 3 vias per pair | one layer, no vias (the parent's rule, kept) |
 
 After the autorouter's pass and the copper pass on the 140 × 100 mm board
-(2026-10-08) the board measures: 2 798 tracks, signal width 0.2 mm, 47 % of
+(2026-10-08) the board measures: 2 823 tracks, signal width 0.2 mm, 46 % of
 the track length on the bottom and none on the inner layers, nine pairs
 matched to 0.00 mm and the two Ethernet pairs 2.5 mm apart (no room for a
-bump in their 8 to 11 mm), no vias on the pairs beyond the lanes' own layer
-changes, ground floods over 50 % of the top and 59 % of the bottom, and 2.3
-ground stitching vias per cm² from the 5 mm grid, 3.5 ground vias per cm²
-with the routing's own (the practice's 3.3; the rest of the grid points fall
-on routing, and the hand pass adds vias where it thins the tracks).
+bump in their 7.4 to 10.9 mm), no vias on the pairs beyond the lanes' own
+layer changes, ground floods over 50 % of the top and 61 % of the bottom,
+and 2.3 ground stitching vias per cm² from the 5 mm grid, 3.5 ground vias
+per cm² with the generator's rail vias (the practice's 3.3; the rest of the
+grid points fall on routing, and the hand pass adds vias where it thins
+the tracks).
 
 What changed: the default track width went from 0.25 to 0.2 mm; the
 standard gained layer roles, ground stitching at about four vias per
