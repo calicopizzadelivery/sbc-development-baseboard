@@ -198,11 +198,14 @@ bottom, 142 connections left) and was judged too tight, so 20 mm of board
 was added below y = 52 and the front-edge blocks moved with the edge
 (`gen/layout.py`, [docs/layout-directives.md](../../docs/layout-directives.md)).
 DRC on the regenerated board reports no errors other than the unrouted
-connections and twelve inside the GCT USB-C footprints, whose two 0.65 mm board-lock
-peg holes sit 0.19 mm from the outer ground contact pads (A1, A12, B1, B12)
-against the 0.25 mm hole clearance set for the fab, exactly as GCT's own
-recommended layout draws them (confirm with Advanced Circuits, or trim
-those four pads by 0.1 mm in a house copy of the footprint); the
+connections. The twelve it used to report inside the GCT USB-C footprints
+(the two 0.65 mm board-lock peg holes 0.19 mm from the outer ground contact
+pads A1, A12, B1 and B12, exactly as GCT's recommended layout draws them,
+against the 0.25 mm hole clearance set for the fab) are gone since
+2026-10-07: the three receptacles use the house footprint
+`calico:USB_C_Receptacle_GCT_USB4105-xx-A_16P_TopMnt_Horizontal_PegClear`
+(ecad-libraries 0.3.5), KiCad's footprint rebuilt pad for pad with those
+four pads 0.1 mm shorter at the peg end, so the gap is 0.29 mm; the
 34 isolated-copper warnings are the L3 rail pieces that have no vias yet.
 Next: `gen/pcb.py --route` (FreeRouting over the locked lanes), then
 `--copper` (the floods and the stitching), then the hand pass. From the
