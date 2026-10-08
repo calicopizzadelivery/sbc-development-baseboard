@@ -177,23 +177,32 @@ the Specctra rules and the fixed lanes, so it stays the bulk router.
 fill or strays into a keep-out shows; the unconnected count is the ratsnest's
 and does not credit the planes); its report is `drc.txt`.
 
-The board as committed (2026-10-07, routed) is the engine's placement on the
+The board as committed (2026-10-08, routed) is the engine's placement on the
 140 × 100 mm outline, bulk-routed by FreeRouting over the locked lanes and
-planes (`gen/pcb.py --route`, 30 passes, the plateau at 172 open
-connections after the router's optimiser) and given the standard's copper
-pass (`--copper`): 3 148 track segments, 47 % of the track length on the
-bottom and none on the inner layers, 664 vias of which 360 are ground
-stitching on the 5 mm grid (2.8 ground vias per cm² outside the isolated
-region), ground floods over 52 % of the top and 60 % of the bottom, notched
-around the passthrough block, which floods its own `PSU_GND`. The 282 lane
-tracks are locked and intact, every pair matched to 0.00 mm. 129 of the 499
-connections are left for the hand pass. DRC reports no errors; its warnings
-are 39 starved thermals (ground pads the routing crowds so a flood reaches
-them with one spoke; the generator writes that check at warning severity),
-three rail islands on L3 that still want vias, and one dangling track end
-the router left. From here the board file is the source of truth and is
-edited in KiCad; `gen/pcb.py` is not run again over it, except `--copper`,
-which adds only what is missing. The schematic generator stays usable: its
+planes (`gen/pcb.py --route --copper`, 24 passes, 2 h 20 min on one thread,
+149 open connections by the router's own count after its optimiser) and
+given the standard's copper pass: 2 798 track segments, 53 % of the track
+length on the top and 47 % on the bottom, none on the inner layers; 799
+vias, of which 198 are the rail vias beside the pads on plane nets, 24 the
+lanes' own layer changes and 334 ground stitching on the 5 mm grid (2.3
+stitching vias per cm² outside the isolated region, 3.5 ground vias per cm²
+with the routing's own); ground floods over 50 % of the top and 59 % of the
+bottom, notched around the passthrough block, which floods its own
+`PSU_GND`. The 282 lane tracks are locked and intact: nine pairs matched to
+0.00 mm by their bumps, the two Ethernet pairs 2.5 mm apart over their 8 to
+11 mm from jack to PHY, where no bump fits (the report says so; the hand
+pass can serpentine them if the PHY's budget wants it). Every VBUS net runs
+at its class's 2 mm: the port VBUS nets sat in `Default` until 2026-10-08
+(see the net classes above) and came back from the router at 0.2 mm, which
+is why the board was re-routed. 137 of the 499 connections are left for the
+hand pass. DRC reports no errors; its warnings are 23 starved thermals (most
+of them the three USB-C receptacles' outer ground pads, whose peg holes
+leave a flood one spoke, the rest passives the routing crowds; the generator
+writes that check at warning severity) and 16 rail islands on L3, pieces of
+the `5V_TGT` and `5V_PORTS` regions that via clearances cut off and that
+still want vias of their own. From here the board file is the source of
+truth and is edited in KiCad; `gen/pcb.py` is not run again over it, except
+`--copper`, which adds only what is missing. The schematic generator stays usable: its
 derived UUIDs keep the footprints linked.
 
 The ICs' own layout rules, with sources, are in

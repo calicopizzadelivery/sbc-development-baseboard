@@ -159,7 +159,7 @@ R305   J10    B     B0
 R306   J10    B     L0
 R506   U501   B     R0
 C505   U501   F     R0
-R438   U407   F     B1
+R438   U407   F     B0
 R501   J9     B     L0
 R507   J9     B     L0
 R601   U601   B     R0
@@ -227,7 +227,7 @@ R433   U406   B     T0
 R436   U407   F     L0
 R704   U704   F     B0
 R706   U704   F     R0
-R812   U801   F     L0
+R812   U801   F     free@5
 C501   U501   B     L0
 R208   U201   F     R1
 R209   U201   F     R1
@@ -241,7 +241,7 @@ C401   U402   B     T1
 C402   U402   B     T1
 R401   U402   B     T2
 D802   K801   F     T2
-D804   K802   F     L1
+D804   K802   F     T1
 D806   K803   F     T2
 R115   U201   B     B0
 C107   J17    B     T0
@@ -254,13 +254,13 @@ D401   R426   F     T0
 D402   R429   F     T0
 D403   R432   F     T0
 D404   R435   F     T0
-D405   R438   F     L5
+D405   R438   F     L0
 R502   D504   B     R0
 R503   D505   B     L0
 R605   D601   B     T0
 D703   R705   F     R0
-R801   D802   F     R0
-R804   D804   F     L0
+R801   D802   F     R3
+R804   D804   F     R0
 R807   D806   F     T0
 R111   Q102   B     T0
 R802   Q801   B     T0
@@ -297,7 +297,7 @@ ftdi/C501                   17 parts   18.3 x  20.9 mm
 hub/C401                    60 parts   38.2 x  38.1 mm
 hub/C419                     7 parts   13.5 x   8.4 mm
 hub/C423                     7 parts   15.5 x  10.2 mm
-hub/C425                     7 parts    8.5 x   8.3 mm
+hub/C425                     7 parts   11.7 x   6.3 mm
 mcu/C201                    39 parts   71.2 x  43.4 mm
 power/C101                   4 parts    8.3 x   5.0 mm
 power/C105                  12 parts   12.8 x  12.8 mm
@@ -309,9 +309,9 @@ power/C129                  10 parts   17.4 x   8.0 mm
 power/D105                   2 parts    1.7 x   0.3 mm
 power/D109                   2 parts    0.0 x   3.2 mm
 power/Q102                   5 parts    4.6 x  11.8 mm
-relays/D801                  7 parts    4.1 x  12.4 mm
-relays/D803                  7 parts   13.7 x  16.3 mm
-relays/D805                 12 parts   26.7 x  33.6 mm  apart: R810@12
+relays/D801                  7 parts    4.6 x  12.4 mm
+relays/D803                  7 parts    8.0 x  11.3 mm
+relays/D805                 12 parts   35.9 x  33.6 mm  apart: R810@12
 target/C701                  5 parts   13.3 x  30.3 mm
 target/C704                  3 parts    4.8 x   9.8 mm
 target/C706                  3 parts    6.5 x   7.0 mm
