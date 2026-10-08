@@ -204,8 +204,10 @@ pads A1, A12, B1 and B12, exactly as GCT's recommended layout draws them,
 against the 0.25 mm hole clearance set for the fab) are gone since
 2026-10-07: the three receptacles use the house footprint
 `calico:USB_C_Receptacle_GCT_USB4105-xx-A_16P_TopMnt_Horizontal_PegClear`
-(ecad-libraries 0.3.5), KiCad's footprint rebuilt pad for pad with those
-four pads 0.1 mm shorter at the peg end, so the gap is 0.29 mm; the
+(ecad-libraries 0.3.6), KiCad's footprint rebuilt field for field with those
+four pads 0.1 mm shorter at the peg end, so their gap is 0.29 mm and the
+footprint's nearest copper to a peg is the next pad in at 0.26 mm, as in
+KiCad's; the
 34 isolated-copper warnings are the L3 rail pieces that have no vias yet.
 Next: `gen/pcb.py --route` (FreeRouting over the locked lanes), then
 `--copper` (the floods and the stitching), then the hand pass. From the
