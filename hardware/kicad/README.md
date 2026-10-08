@@ -163,7 +163,9 @@ The pairs are laid by the engine as pair lanes (both members at the class's
 differential geometry, escapes, the USB-C bridges, two layer changes where
 a pair must pass under the port pairs, lengths matched by a bump), the ESD
 arrays and series parts anchored for it; the PSU passthrough is laid as
-single-net lanes; the rails are regions on L3. What is left is routed by
+single-net lanes; the rails are regions on L3 (+3V3 is routed, in its 0.5 mm
+`PWR_1A` class: on the one rail layer the two 6 A rails and the 3 A inlet cut
+any +3V3 plane into pieces, which the standard's rails gate refuses). What is left is routed by
 FreeRouting through the standard's `tools/autoroute.py` with all of that
 locked (`gen/pcb.py --route`; the directives' `FREEROUTING` setting names
 the binary), and the hand pass finishes from there. KiCad Routing Tools

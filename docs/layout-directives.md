@@ -151,16 +151,24 @@ USB 2.0 pairs get their lanes when the pairs are placed (standard, section
 ## Planes
 
 L2 (In1.Cu) is the ground plane, one outline notched around the isolation
-region. L3 (In2.Cu) carries the rails as rectangles (the autorouter's DSN
-reader takes no concave plane), each at its own priority, the +3V3 base
-in five pieces around the region at the lowest priorities and the others
-carving it: VBUS_IN in the inlet corner under the bucks' VIN pins;
-+5V_PORTS from L101's output down to the 3V3 buck, down the middle beside
-the relay and along the band above the USB-A stacks, plus a strip east
-under the DAPLink, down to the relays and to the FTDI switch behind J9; +5V_TGT from L102's output down to the
-band at y 36–40 and across it below the PHY to the right edge, down it to
-the eFuse and J14, with a tab to the level shifter. The autorouter drops
-vias into them; the regions are adjusted by hand where it could not.
+region. L3 (In2.Cu) carries the three heavy rails as rectangles (the
+autorouter's DSN reader takes no concave plane), each at its own priority,
+every rail one piece (the standard's rails gate rasterises each rail with
+the others carving it and stops on a rail in pieces): VBUS_IN in the inlet
+corner under the bucks' VIN pins and down to the PD controller's VBUS
+parts; +5V_PORTS from L101's output down to the 3V3 buck's input, down the
+middle beside the relay, along the band over the port switches (their pads
+at y 80 to 82), across above the region to the DAPLink's VBUS, to the FTDI
+switch, down to the relays and to the switch behind J9; +5V_TGT from L102's
+output (and R125 at the back edge) down to the band at y 36–40, across it
+below the PHY to the right edge, down it to the eFuse and J14. +3V3 is
+routed, in its 0.5 mm `PWR_1A` class (2026-10-08): until then an +3V3 base
+lay under the rails in five pieces, and the other three rails cut it into
+three islands that no rail via or router track joined, with 16 of its 45
+rail vias standing in copper another rail had carved away; on one rail
+layer the two 6 A trees and the 3 A inlet leave no planar room for a fourth
+net. The generator drops the rail vias into the rails; the autorouter adds
+its own; the hand pass joins the pads the report lists with no room.
 
 ## Floods and stitching
 
@@ -178,7 +186,7 @@ that would cut a sliver off a rail or that the filled floods reach on fewer
 than two layers, and adding one inside any pour island that holds a ground
 pad but no via. Before the router, the generator drops **rail vias** beside
 every SMD pad on a plane net (`RAIL_VIAS`: three for `PWR_6A`, two for the
-3 A classes, one otherwise), joined by a stub at the class width, and
+3 A classes, one otherwise), joined by a stub at the class width or the pad's narrower side, and
 reports the pads the packed rings leave no room beside.
 
 ## Sides

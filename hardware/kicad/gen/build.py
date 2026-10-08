@@ -44,14 +44,16 @@ def net_settings():
                         netclass("USB_VBUS_3A", priority=2, track_width=2.0, via_diameter=1.0, via_drill=0.5),
                         netclass("PWR_6A", priority=3, track_width=4.0, via_diameter=1.2, via_drill=0.6),
                         netclass("PSU_ISO", priority=4, track_width=0.25),
-                        netclass("ETH", priority=5, diff_pair_width=0.28, diff_pair_gap=0.25, track_width=0.28)],   # 100 ohm MDI pairs on the same stackup (estimate; the fab's calculator rules)               # the opto's sense nets: isolated like PSU_3A, thin "meta": {"version": 4}, "net_colors": None,
+                        netclass("ETH", priority=5, diff_pair_width=0.28, diff_pair_gap=0.25, track_width=0.28),
+                        netclass("PWR_1A", priority=6, track_width=0.5, clearance=0.15)],   # +3V3, routed: no room for a plane of it on L3 among the 6 A rails; the default clearance, since it reaches 0.5 mm pitch pins   # 100 ohm MDI pairs on the same stackup (estimate; the fab's calculator rules)               # the opto's sense nets: isolated like PSU_3A, thin "meta": {"version": 4}, "net_colors": None,
             "netclass_assignments": None,
             "netclass_patterns": [{"netclass": "USB", "pattern": p} for p in ("*_USB_?", "*_D_?", "*HUB_UP_?", "*HUB_DN?_?")]   # sheet-local nets carry their sheet path: the leading * matches it
                                + [{"netclass": "PSU_3A", "pattern": p} for p in ("*PSU_VP", "*PSU_VOUT", "PSU_GND")]   # local nets carry their sheet path
                                + [{"netclass": "PSU_ISO", "pattern": "*PSU_SENSE*"}]
                                + [{"netclass": "ETH", "pattern": "*ETH_?D_?"}]
                                + [{"netclass": "USB_VBUS_3A", "pattern": p} for p in ("VBUS_IN", "*PORT?_VBUS", "*FTDI_VBUS")]
-                               + [{"netclass": "PWR_6A", "pattern": p} for p in ("+5V_PORTS", "+5V_TGT", "*+5V_TGT_OUT")]}
+                               + [{"netclass": "PWR_6A", "pattern": p} for p in ("+5V_PORTS", "+5V_TGT", "*+5V_TGT_OUT")]
+                               + [{"netclass": "PWR_1A", "pattern": "+3V3"}]}
 
 
 def main():
