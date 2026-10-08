@@ -288,6 +288,25 @@ D109   R114   F     B0
 R126   L103   F     R0
 D114   R126   F     R0
 
+rail vias (layout.md 4): 237 beside 194 pads on plane nets.
+pads with no room beside them for any via (115; the router or the hand pass joins them to the rail):
+  C103.1 D106.2 D107.2 J2.A4 J2.A9 J2.B1 J2.B4 J2.B9 J2.B12 Q101.2 U101.10 U101.12 U101.13 U101.24 U101.25 U103.2 U103.7 U103.9 U104.2 U104.7 U104.9 U105.1 U105.3 U105.5 U105.7 C202.2 C204.2 C207.2 J3.B1 J3.B12 U201.9 U201.24 U201.41 U201.49 U201.60 U201.74 U201.88 U202.2 C301.2 C302.2 C307.2 C310.2 R311.2 U301.22 U301.25 C401.2 C404.2 C413.2 C415.2 C417.1 C419.1 C420.2 C421.1 C423.1 C423.2 D401.1 J1.B1 J1.B12 R404.2 R405.2 R406.2 R412.2 R414.2 R415.2 R418.2 R419.2 R420.2 R425.2 R428.2 R434.2 U401.2 U402.19 U402.65 U403.1 U403.2 U404.1 U404.2 U405.1 U405.2 U406.1 U406.2 U407.1 U407.2 U408.2 U409.2 U410.2 U411.2 Y401.2 Y401.4 D501.2 D502.2 D503.2 D506.2 U501.6 U501.16 U601.2 U601.6 U601.8 U601.33 C709.1 C711.2 D701.2 D702.2 R703.1 U703.2 U704.2 U704.5 U704.7 U704.8 U704.11 U704.15 U704.25 U704.25 D801.1 R802.2
+pads served short of their class's count or via (placed for wanted; 14; the hand pass adds the rest):
+  C111.1 1x0.6 for 2x1
+  C117.1 2x1.2 for 3x1.2
+  C118.1 2x1.2 for 3x1.2
+  C119.1 2x1.2 for 3x1.2
+  C120.1 1x0.6 for 2x1
+  C126.1 1x1.2 for 3x1.2
+  C127.1 2x1.2 for 3x1.2
+  C128.1 2x1.2 for 3x1.2
+  L101.2 2x1.2 for 3x1.2
+  L102.2 1x1.2 for 3x1.2
+  R125.1 2x1.2 for 3x1.2
+  C605.1 1x1.2 for 3x1.2
+  C708.1 2x1.2 for 3x1.2
+  U704.1 1x1.2 for 3x1.2
+
 cities (layout.md 3.1): the schematic's islands with two or more parts, connectors, holes and ESD aside: each one's extent on
 the board, and the members more than 10 mm from every other member (placed apart from their city)
 daplink/C601                16 parts   27.8 x  20.3 mm
