@@ -47,11 +47,11 @@ def target(project, num, page, sheet_path, plib):
                 6: chain(Pull("GND", "R", "75k", None), Pull("+5V_TGT", "R", "196k", None)),
                 7: P("GND"), 11: P("GND"), 12: chain(Pull("+3V3", "R", "10k", None), L("TGT_EN")),
                 5: P("+5V_TGT"), 8: P("GND"), 25: P("GND"),
-                17: chain(Pull("GND", "C", "22u", None, fp=FP["C1206"]), PullLED(GREEN, "1k", None), Conn(j14, 1)),
+                17: chain(Pull("GND", "C", "22u", None, fp=FP["C1206"]), PullLED(GREEN, "1k", None), L("+5V_TGT_OUT")),   # named: the 5 A output joins the PWR_6A class
                 15: P("GND"), 13: chain(Pull("GND", "C", "1n", None), Pull("GND", "R", "20k", None), L("TGT_IMON")),
                 14: chain(Pull("+3V3", "R", "10k", None), L("TGT_FAULT_N")),
                 9: Pull("GND", "C", "10n", None), 10: Pull("GND", "R", "3.65k 1%", None)})
-    fan(s, j14, {2: P("GND")})
+    fan(s, j14, {1: L("+5V_TGT_OUT"), 2: P("GND")})
     return s
 
 

@@ -51,7 +51,7 @@ def net_settings():
                                + [{"netclass": "PSU_ISO", "pattern": "*PSU_SENSE*"}]
                                + [{"netclass": "ETH", "pattern": "*ETH_?D_?"}]
                                + [{"netclass": "USB_VBUS_3A", "pattern": p} for p in ("VBUS_IN", "*PORT?_VBUS", "*FTDI_VBUS")]
-                               + [{"netclass": "PWR_6A", "pattern": p} for p in ("+5V_PORTS", "+5V_TGT")]}
+                               + [{"netclass": "PWR_6A", "pattern": p} for p in ("+5V_PORTS", "+5V_TGT", "*+5V_TGT_OUT")]}
 
 
 def main():

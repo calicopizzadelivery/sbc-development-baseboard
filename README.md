@@ -82,7 +82,7 @@ preferences. They are written up in full in
 
 ## Status
 
-Specification, a generated schematic (KiCad 10, eight sheets, ERC clean) and
+Specification, a generated schematic (KiCad 10, a root sheet and eight sub-sheets, ERC clean) and
 a generated, placed and autorouted board, both in
 [`hardware/kicad/sbc-baseboard/`](hardware/kicad/sbc-baseboard/) with a
 [PDF](hardware/kicad/sbc-baseboard/sbc-baseboard.pdf) of the schematic for

@@ -11949,38 +11949,16 @@
 		)
 		(uuid "13611935-d57d-5250-b5d8-fbed24565a90")
 	)
-	(wire
-		(pts
-			(xy 341.63 177.8)
-			(xy 373.38 177.8)
+	(label "+5V_TGT_OUT"
+		(at 341.63 177.8 0)
+		(fields_autoplaced yes)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left bottom)
 		)
-		(stroke
-			(width 0)
-			(type default)
-		)
-		(uuid "fb2c1997-479e-58b1-a690-f6c1d7620ee7")
-	)
-	(wire
-		(pts
-			(xy 373.38 177.8)
-			(xy 373.38 190.5)
-		)
-		(stroke
-			(width 0)
-			(type default)
-		)
-		(uuid "7fb062e8-ff9f-5f94-ac99-5dfecc69caff")
-	)
-	(wire
-		(pts
-			(xy 373.38 190.5)
-			(xy 374.65 190.5)
-		)
-		(stroke
-			(width 0)
-			(type default)
-		)
-		(uuid "a97cd256-3bd6-50f7-83d5-1ea8e964dd16")
+		(uuid "360793b1-6cef-57dd-b29f-be21fe698072")
 	)
 	(wire
 		(pts
@@ -13248,6 +13226,28 @@
 				)
 			)
 		)
+	)
+	(wire
+		(pts
+			(xy 374.65 190.5)
+			(xy 369.57 190.5)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "b4dcd8ff-df66-5436-a8d0-e565e6c8afa6")
+	)
+	(label "+5V_TGT_OUT"
+		(at 369.57 190.5 180)
+		(fields_autoplaced yes)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify right bottom)
+		)
+		(uuid "9cc0b908-cd2f-581a-b776-c8d3b353679d")
 	)
 	(wire
 		(pts

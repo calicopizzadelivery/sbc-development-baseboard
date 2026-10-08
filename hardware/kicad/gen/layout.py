@@ -40,9 +40,9 @@ ANCHORS = {
     "U501": (117.0, 70.0, 0),     # FT231X behind J9, which moved 20 mm down the edge (2026-10-07); its island follows
     "K801": (93.0, 80.0, 0),      # relays behind J11 / J12, 2 mm right with the passthrough region (2026-10-08)
     "K802": (106.5, 80.5, 0),   # 2 mm of void to the FTDI island above it
-    "U701": (119.0, 81.0, 0),      # +5V_TGT eFuse behind J14
-    "U704": (118.0, 29.0, 0),      # GPIO level shifter near J15
-    "U702": (112.0, 46.5, 0),     # console UART shifter near J13 (J13 10 mm down the edge on 2026-10-07; the shifters follow, clear of the HUB_DN2 leg at x 112)
+    "U704": (119.0, 81.0, 0),      # +5V_TGT eFuse (TPS26630) behind J14 (anchored under U701's designator until 2026-10-08: the three target-I/O ICs were swapped)
+    "U702": (118.0, 29.0, 0),      # GPIO level shifter (TXB0108) near J15
+    "U701": (112.0, 46.5, 0),     # console UART shifter (TXB0104) near J13 (J13 10 mm down the edge on 2026-10-07; the shifters follow, clear of the HUB_DN2 leg at x 112)
     "U703": (123.0, 46.5, 0),     # 
     # ESD arrays at their receptacles, in line with the pair, and the series parts of the K20 and FTDI pairs
     "U401": (10.3, 74.0, 0),       # J1 upstream array, pins 1/3 toward J1
@@ -108,11 +108,11 @@ RING_SLIDES = (2.0, 5.0, 12.0, 40.0)   # how far along the side from its pin a p
 SEARCH_RADIUS = 40.0         # the nearest-free-spot search gives up beyond this, mm (the part is parked)             # courtyard to courtyard between a part and the pin it serves (courtyards carry 0.25 each)
 # parts placed by hand across the isolation barrier: (x, y, rotation) of the footprint origin
 FIXED = {"K803": (58.0, 73.0, 0),          # coil pads (1, 8) at x = 58 outside the region, contacts (2, 4, 6) inside
-         "U801": (68.0, 80.5, 180)}        # below the relay: LED pins (1, 2) at x = 66 inside the region, transistor pins (3, 4) at 58.4 outside
+         "U801": (68.0, 80.5, 180)}        # below the relay: LED pins (1, 2) at x = 68 inside the region, transistor pins (3, 4) at 60.4 outside
 PACK_MARGIN = 0.15          # courtyard to courtyard: with KiCad's 0.25 mm courtyards 0.65 mm pad to pad (reference boards: 0.3-0.6; ECSS Table 14-2: 0.6 between bodies)
 
 # the isolated PSU region: the passthrough block behind J18, a strip along the front and a riser to J19
-ISOLATION = [(66, 62), (86, 62), (86, 100), (50, 100), (50, 82), (66, 82)]   # behind J18/J19; x = 64 runs through K803 between coil and contacts
+ISOLATION = [(66, 62), (86, 62), (86, 100), (50, 100), (50, 82), (66, 82)]   # behind J18/J19; x = 66 runs through K803 between coil and contacts
 ISOLATION_PLANE_HOLE = [(64, 60), (88, 60), (88, 100), (48, 100), (48, 80), (64, 80)]
 # the ground plane on L2 as one outline: the board less a 1 mm edge margin, notched by ISOLATION_PLANE_HOLE from the
 # front edge (a zone outline with a hole does not fill in KiCad; the notch is open to the edge, so none is needed)

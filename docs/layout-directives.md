@@ -38,17 +38,17 @@ edge so the two USB-C inlets could spread out around the middle of the left
 edge and the lower-left corner stopped crowding; the board no longer lies
 flat against a wall or a DIN rail, which the spec accepted).
 
-| Edge | Connectors, in order from the back corner to the front | Faces | Bodies (measured) |
+| Edge | Connectors, in order from the back corner to the front | Faces | Courtyards (measured) |
 |---|---|---|---|
 | Left (x = 0), 74 mm usable | J2 USB-C PD in (centred y = 30) · J1 USB-C upstream (centred y = 74), split around the middle | charger / workstation | 10.6 + 10.6 = 21.2 mm |
 | Back (y = 0), 114 mm usable | J10 RJ45, from x = 71 (from x = 14 until 2026-10-07, when the two bucks took the back-edge corner beside J2) | workstation | 19.0 mm wide, 22.4 mm deep |
-| Right (x = 140), 74 mm usable | J3 USB-C HID (centred y = 19.3) · J13 console (origin y = 49.2) · J9 FTDI right-angle (origin y = 65.0), spaced 10 mm apart since 2026-10-07 (they were packed 1.5 mm apart in the back half) | target | 10.6 + 16.5 + 16.3 = 43.4 mm |
+| Right (x = 140), 74 mm usable | J3 USB-C HID (centred y = 19.3) · J13 console (origin y = 49.2) · J9 FTDI right-angle (origin y = 65.0), J13 moved 10 mm and J9 20 mm down the edge on 2026-10-07, leaving 11 mm between courtyards (they were packed 1.5 mm apart in the back half) | target | 10.6 + 16.5 + 16.3 = 43.4 mm |
 | Front (y = 100), left end | J5, J4 USB-A stacks (J5 at x = 19, J4 at x = 37: swapped on 2026-10-06 so each stack's pairs reach the hub row they are wired to without crossing) · J18 PSU in (x = 56.4) · J19 PSU out (x = 70.7), both 2 mm right since 2026-10-08 so J4's shield pads stand outside the passthrough's creepage band | bench / PSU | 17.2 + 17.2 + 13.2 + 13.2 = 60.8 mm |
 | Front (y = 100), right end | J14 +5V_TGT · J12, J11 relays | target | 13.2 + 13.05 + 13.05 = 39.3 mm |
 | Inboard | J16 Cortex debug · J15 GPIO header · **J17 programming, top entry** (BM04B-SRSS-TB) | any | — |
 
 Four things moved from the spec's first table once the footprints were
-measured (2026-10-06): the RJ45 is 22 mm wide, not 16, so the left edge
+measured (2026-10-06): the RJ45's courtyard runs 22 mm along the edge, not 16, so the left edge
 could not also take J17, which is now a top-entry part inboard beside the
 PD controller; the RJ45 then went to the back edge so J1 and J2 could spread;
 **J19 sits beside J18** so the PSU passthrough is one compact isolated
@@ -249,9 +249,9 @@ are the knobs.
 | U501 | (117, 70, 0) | FT231X behind J9, which moved 20 mm down the edge; its island follows (2026-10-07) |
 | K801 | (93, 80, 0) | relays behind J11 / J12, 2 mm right with the passthrough region (2026-10-08) |
 | K802 | (106.5, 80.5, 0) | 2 mm of void to the FTDI island above it |
-| U701 | (119, 81, 0) | +5V_TGT eFuse behind J14 |
-| U704 | (118, 29, 0) | GPIO level shifter near J15 |
-| U702 | (112, 46.5, 0) | console UART shifter behind J13, which moved 10 mm down the edge; clear of the HUB_DN2 leg at x = 112 |
+| U704 | (119, 81, 0) | +5V_TGT eFuse (TPS26630) behind J14; its output net `+5V_TGT_OUT` is in the 6 A class (until 2026-10-08 the three target-I/O ICs were anchored under each other's designators: the eFuse sat 60 mm from J14 with its output in the default class) |
+| U702 | (118, 29, 0) | GPIO level shifter (TXB0108) near J15 |
+| U701 | (112, 46.5, 0) | console UART shifter (TXB0104) behind J13, which moved 10 mm down the edge; clear of the HUB_DN2 leg at x = 112 |
 | U703 | (123, 46.5, 0) |  |
 | U401 | (10.3, 74, 0) | J1 upstream array at its receptacle, in line with the pair, pins 1/3 toward J1 |
 | U202 | (129.7, 19.34, 180) | J3 array |

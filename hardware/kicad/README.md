@@ -85,7 +85,7 @@ array, `HUB_UP` and `HUB_DN1`..`HUB_DN7` at the hub, `K64_USB` and
 `FTDI_USB` at the chips (the ESD arrays' pass-through pins and the FT231X's
 series resistors each split a pair into two nets, and both halves are named).
 The project file carries a `USB` net class matched by pattern
-(`*_USB_?`, `*_D_?`, `HUB_UP_?`, `HUB_DN?_?`); the patterns are globs over
+(`*_USB_?`, `*_D_?`, `*HUB_UP_?`, `*HUB_DN?_?`); the patterns are globs over
 the full hierarchical name, so a sheet-local net such as `/USB hub/PORT1_VBUS`
 is matched only by a pattern that starts with `*` (the port VBUS nets sat in
 `Default` until 2026-10-08 for want of that star, and the standard's engine
