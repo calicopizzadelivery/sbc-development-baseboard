@@ -97,7 +97,10 @@ def main():
              "min_hole_to_hole": 0.25, "min_copper_edge_clearance": 0.25, "min_via_diameter": 0.5, "min_via_annular_width": 0.125,
              "min_connection": 0.127, "solder_mask_to_copper_clearance": 0.0,
              "min_text_height": 0.7, "min_text_thickness": 0.1}       # silk: the standard's smallest designator (section 6), the fab's 0.1 mm line
-    pro = {"board": {"design_settings": {"defaults": {}, "rules": rules}, "layer_presets": [], "viewports": []},
+    # a pad the routing crowds so a zone reaches it with one spoke is connected: a warning for the hand pass, not an
+    # error (ecad-standards/layout.md section 4); KiCad's default severity for it is error
+    severities = {"starved_thermal": "warning"}
+    pro = {"board": {"design_settings": {"defaults": {}, "rules": rules, "rule_severities": severities}, "layer_presets": [], "viewports": []},
            "boards": [], "cvpcb": {"equivalence_files": []}, "libraries": {"pinned_footprint_libs": [], "pinned_symbol_libs": []},
            "meta": {"filename": f"{PROJECT}.kicad_pro", "version": 1}, "net_settings": net_settings(),
            "pcbnew": {"page_layout_descr_file": ""}, "schematic": {"legacy_lib_dir": "", "legacy_lib_list": []},

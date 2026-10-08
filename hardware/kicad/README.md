@@ -173,48 +173,24 @@ the Specctra rules and the fixed lanes, so it stays the bulk router.
 fill or strays into a keep-out shows; the unconnected count is the ratsnest's
 and does not credit the planes); its report is `drc.txt`.
 
-The board as committed (2026-10-07) is the engine's placement on the
-140 × 100 mm outline, unrouted: the lanes and pairs laid and locked, the
-planes drawn, every connection otherwise open (499 in the ratsnest). It is
-placed by the standard's city rule: each schematic island packed as one
-group with a 2 mm void to every other, the two 5 V bucks as cities side by
-side along the back edge at J2, each laid out from TI's Figure 57 as a
-template (standard 3.2), the 3V3 buck from TI's Figure 52, the PD
-controller behind J2 from ST's evaluation board (UM2398 Figure 24), the
-hub 5 mm down and left toward the ports to open the centre, the back-row
-port switches and their capacitors on the bottom under the front-row ones
-(standard 3.7), the crystals along their ICs' edges with the load
-capacitors flanking them and the decoupling across its power traces
-(standard 5 and 3.3), the two reset buttons with their debounce parts in
-the open centre band, the right-edge connectors spaced 10 mm apart with the
-console shifters and the FTDI island following them down the edge, the RJ45 and PHY moved right along the back edge to make
-the room (the placement
-report lists every city, the parts placed apart from theirs, and any void
-narrower than 2 mm: none). It
-replaced the routed 140 × 80 board, which stays in history at a94a986: that
-board had been bulk-routed by FreeRouting and given the standard's copper
-pass (3 067 tracks, 594 vias, floods over 47 % of the top and 56 % of the
-bottom, 142 connections left) and was judged too tight, so 20 mm of board
-was added below y = 52 and the front-edge blocks moved with the edge
-(`gen/layout.py`, [docs/layout-directives.md](../../docs/layout-directives.md)).
-DRC on the regenerated board reports no errors other than the unrouted
-connections. The twelve it used to report inside the GCT USB-C footprints
-(the two 0.65 mm board-lock peg holes 0.19 mm from the outer ground contact
-pads A1, A12, B1 and B12, exactly as GCT's recommended layout draws them,
-against the 0.25 mm hole clearance set for the fab) are gone since
-2026-10-07: the three receptacles use the house footprint
-`calico:USB_C_Receptacle_GCT_USB4105-xx-A_16P_TopMnt_Horizontal_PegClear`
-(ecad-libraries 0.3.6), KiCad's footprint rebuilt field for field with those
-four pads 0.1 mm shorter at the peg end, so their gap is 0.29 mm and the
-footprint's nearest copper to a peg is the next pad in at 0.26 mm, as in
-KiCad's; the
-34 isolated-copper warnings are the L3 rail pieces that have no vias yet.
-Next: `gen/pcb.py --route` (FreeRouting over the locked lanes), then
-`--copper` (the floods and the stitching), then the hand pass. From the
-routing on, the board file is the source of truth and is edited in KiCad;
-`gen/pcb.py` is not run again over it, except `--copper`, which adds only
-what is missing. The schematic generator stays usable: its derived UUIDs
-keep the footprints linked.
+The board as committed (2026-10-07, routed) is the engine's placement on the
+140 × 100 mm outline, bulk-routed by FreeRouting over the locked lanes and
+planes (`gen/pcb.py --route`, 30 passes, the plateau at 172 open
+connections after the router's optimiser) and given the standard's copper
+pass (`--copper`): 3 148 track segments, 47 % of the track length on the
+bottom and none on the inner layers, 664 vias of which 360 are ground
+stitching on the 5 mm grid (2.8 ground vias per cm² outside the isolated
+region), ground floods over 52 % of the top and 60 % of the bottom, notched
+around the passthrough block, which floods its own `PSU_GND`. The 282 lane
+tracks are locked and intact, every pair matched to 0.00 mm. 129 of the 499
+connections are left for the hand pass. DRC reports no errors; its warnings
+are 39 starved thermals (ground pads the routing crowds so a flood reaches
+them with one spoke; the generator writes that check at warning severity),
+three rail islands on L3 that still want vias, and one dangling track end
+the router left. From here the board file is the source of truth and is
+edited in KiCad; `gen/pcb.py` is not run again over it, except `--copper`,
+which adds only what is missing. The schematic generator stays usable: its
+derived UUIDs keep the footprints linked.
 
 The ICs' own layout rules, with sources, are in
 [docs/layout-guidelines.md](../../docs/layout-guidelines.md).
