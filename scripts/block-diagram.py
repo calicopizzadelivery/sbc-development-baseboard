@@ -234,13 +234,13 @@ def conn(edge, a, L, label, depth=DEPTH):
         x, y = mm(a, 100-DEPTH)
         e(f'<rect x="{x}" y="{y}" width="{L*S}" height="{DEPTH*S}" fill="{C["conn"]}" stroke="{C["conn_edge"]}"/>')
         e(f'<text x="{x+L*S/2}" y="{y-6}" text-anchor="middle" font-size="11" fill="{C["ink"]}">{label}</text>')
-# the edge table of docs/layout-directives.md (gen/layout.py CONNECTORS, body widths measured from the footprints)
+# the edge table of docs/layout-directives.md (gen/layout.py CONNECTORS; the courtyards of the placed board, 2026-10-08)
 conn("T", 71, 19, "J10 RJ45", depth=22.4)
 conn("L", 24.7, 10.6, "J2 PD in"); conn("L", 68.7, 10.6, "J1 upstream")
-conn("R", 14, 10.6, "J3 HID"); conn("R", 36, 16.5, "J13 console"); conn("R", 64, 16.3, "J9 FTDI")
-conn("B", 10.5, 17.2, "J5"); conn("B", 28.7, 17.2, "J4"); conn("B", 47.8, 13.2, "J18"); conn("B", 62.1, 13.2, "J19")
-conn("B", 81.2, 13.05, "J11"); conn("B", 95.3, 13.05, "J12"); conn("B", 110.2, 13.2, "J14")
-for (hx, hy, hw, hh, lab) in [(91.9, 3.8, 4.5, 7.5, "J16 SWD"), (117, 10, 15.2, 5, "J15 GPIO"), (34.3, 47.9, 7.5, 4.2, "J17 prog")]:
+conn("R", 14, 10.7, "J3 HID"); conn("R", 35.7, 16.6, "J13 console"); conn("R", 63.2, 16.3, "J9 FTDI")
+conn("B", 14, 17.2, "J5"); conn("B", 32.2, 17.2, "J4"); conn("B", 52.4, 13.2, "J18"); conn("B", 66.6, 13.2, "J19")
+conn("B", 84.6, 13.1, "J11"); conn("B", 98.7, 13.1, "J12"); conn("B", 112.8, 13.2, "J14")
+for (hx, hy, hw, hh, lab) in [(91.9, 3.8, 4.5, 7.5, "J16 SWD"), (115.2, 8.2, 6.2, 16.3, "J15 GPIO"), (34.1, 47.4, 7.9, 5.3, "J17 prog")]:
     x, y = mm(hx, hy)
     e(f'<rect x="{x}" y="{y}" width="{hw*S}" height="{hh*S}" fill="{C["dev"]}" stroke="{C["dev_edge"]}"/>')
     if hx + hw > 110:                                                 # near the right edge: the label on the left, clear of J3

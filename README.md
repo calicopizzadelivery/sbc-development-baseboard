@@ -82,12 +82,15 @@ preferences. They are written up in full in
 
 ## Status
 
-Specification, and a first-pass schematic: KiCad 10, eight sheets, ERC clean,
-in [`hardware/kicad/sbc-baseboard/`](hardware/kicad/sbc-baseboard/) with a
-[PDF](hardware/kicad/sbc-baseboard/sbc-baseboard.pdf) for review. No board,
-no firmware.
+Specification, a generated schematic (KiCad 10, eight sheets, ERC clean) and
+a generated, placed and autorouted board, both in
+[`hardware/kicad/sbc-baseboard/`](hardware/kicad/sbc-baseboard/) with a
+[PDF](hardware/kicad/sbc-baseboard/sbc-baseboard.pdf) of the schematic for
+review. The board is placed and bulk-routed by the house standard's engine
+(see [hardware/kicad/README.md](hardware/kicad/README.md)); the hand pass
+that finishes the routing is open. No firmware.
 
-Next: review the schematic, then layout.
+Next: the hand pass on the board, then firmware.
 
 ## Layout
 

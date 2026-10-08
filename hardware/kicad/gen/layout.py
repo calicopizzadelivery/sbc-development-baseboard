@@ -15,8 +15,8 @@ EDGE_GAP = 1.0             # between neighbouring edge connectors' bodies
 # end of its body farthest from the pad rows; a pin header mates where its pins point
 CONNECTORS = {"J1": (3.1, 74.0, -90), "J2": (3.1, 30.0, -90), "J3": (136.9, 19.345, 90), "J4": (37.285, 83.865, 0),
               "J5": (19.095, 83.865, 0), "J9": (129.435, 65.045, 0), "J10": (76.08, 20.23, 90), "J11": (87.745, 91.475, 0),
-              "J12": (101.805, 91.475, 0), "J13": (131.475, 49.165, 90), "J14": (116.845, 89.475, 0), "J18": (54.445, 89.475, 0),
-              "J19": (68.665, 89.475, 0)}
+              "J12": (101.805, 91.475, 0), "J13": (131.475, 49.165, 90), "J14": (116.845, 89.475, 0), "J18": (56.445, 89.475, 0),
+              "J19": (70.665, 89.475, 0)}   # J18/J19 2 mm right (2026-10-08): J4's shield pads out of the passthrough's creepage band
 EDGE_ZONE = 3.0            # no part other than an edge connector nearer the edge than this (ECSS 14.3.2 c, tailored)
 
 # the ICs and inboard headers, placed by the flow in the directives (x, y, rotation of the footprint origin):
@@ -38,8 +38,8 @@ ANCHORS = {
     "U601": (97.0, 47.0, 0),       # DAPLink K20
     "J601": (104.0, 44.0, 0),      # SWD to the K20
     "U501": (117.0, 70.0, 0),     # FT231X behind J9, which moved 20 mm down the edge (2026-10-07); its island follows
-    "K801": (91.0, 80.0, 0),       # relays behind J11 / J12
-    "K802": (105.0, 80.0, 0),
+    "K801": (93.0, 80.0, 0),      # relays behind J11 / J12, 2 mm right with the passthrough region (2026-10-08)
+    "K802": (106.5, 80.5, 0),   # 2 mm of void to the FTDI island above it
     "U701": (119.0, 81.0, 0),      # +5V_TGT eFuse behind J14
     "U704": (118.0, 29.0, 0),      # GPIO level shifter near J15
     "U702": (112.0, 46.5, 0),     # console UART shifter near J13 (J13 10 mm down the edge on 2026-10-07; the shifters follow, clear of the HUB_DN2 leg at x 112)
@@ -94,6 +94,7 @@ LAYOUTS = {
                            "VBUS_VS_DISCH": ("R", ["R"]), "VBUS_EN_SNK": ("R", ["R", "D"]), "DISCH": ("R", ["R"]),
                            "RESET": ("L", ["R"]), "SCL": ("B", ["R"]), "SDA": ("B", ["R"])}},
 }
+RAIL_VIAS = {"PWR_6A": 3, "USB_VBUS_3A": 2, "PSU_3A": 2}   # vias beside each SMD pad on a plane net, by class (standard 4); one otherwise
 CITY_GAP = 2.0          # the component void between any two islands' parts, both sides of the board (standard 3.1)
 # no plane or pour under the RJ45 on any layer (standard 3.4 and 4: its pins span the body, so the void is the body;
 # the pins' tracks pass)
@@ -106,24 +107,24 @@ RING_REACH = 8.0             # how far past a host's side a ring may extend, mm
 RING_SLIDES = (2.0, 5.0, 12.0, 40.0)   # how far along the side from its pin a part slides before it tries the next ring out
 SEARCH_RADIUS = 40.0         # the nearest-free-spot search gives up beyond this, mm (the part is parked)             # courtyard to courtyard between a part and the pin it serves (courtyards carry 0.25 each)
 # parts placed by hand across the isolation barrier: (x, y, rotation) of the footprint origin
-FIXED = {"K803": (56.0, 73.0, 0),          # coil pads (1, 8) at x = 56 outside the region, contacts (2, 4, 6) inside
-         "U801": (66.0, 80.5, 180)}        # below the relay: LED pins (1, 2) at x = 66 inside the region, transistor pins (3, 4) at 58.4 outside
+FIXED = {"K803": (58.0, 73.0, 0),          # coil pads (1, 8) at x = 58 outside the region, contacts (2, 4, 6) inside
+         "U801": (68.0, 80.5, 180)}        # below the relay: LED pins (1, 2) at x = 66 inside the region, transistor pins (3, 4) at 58.4 outside
 PACK_MARGIN = 0.15          # courtyard to courtyard: with KiCad's 0.25 mm courtyards 0.65 mm pad to pad (reference boards: 0.3-0.6; ECSS Table 14-2: 0.6 between bodies)
 
 # the isolated PSU region: the passthrough block behind J18, a strip along the front and a riser to J19
-ISOLATION = [(64, 62), (84, 62), (84, 100), (48, 100), (48, 82), (64, 82)]   # behind J18/J19; x = 64 runs through K803 between coil and contacts
-ISOLATION_PLANE_HOLE = [(62, 60), (86, 60), (86, 100), (46, 100), (46, 80), (62, 80)]
+ISOLATION = [(66, 62), (86, 62), (86, 100), (50, 100), (50, 82), (66, 82)]   # behind J18/J19; x = 64 runs through K803 between coil and contacts
+ISOLATION_PLANE_HOLE = [(64, 60), (88, 60), (88, 100), (48, 100), (48, 80), (64, 80)]
 # the ground plane on L2 as one outline: the board less a 1 mm edge margin, notched by ISOLATION_PLANE_HOLE from the
 # front edge (a zone outline with a hole does not fill in KiCad; the notch is open to the edge, so none is needed)
-GND_PLANE = [(1, 1), (139, 1), (139, 99), (86, 99), (86, 60), (62, 60), (62, 80), (46, 80), (46, 99), (1, 99)]
+GND_PLANE = [(1, 1), (139, 1), (139, 99), (88, 99), (88, 60), (64, 60), (64, 80), (48, 80), (48, 99), (1, 99)]
 PLANES = [("GND_L2", "GND", "In1.Cu", GND_PLANE),
           # L3 rails as rectangles (FreeRouting cannot take a concave plane): every piece at its own priority (KiCad wants
           # touching zones distinct), the 3V3 base lowest, the rails above it, the L102 tab above VBUS_IN; same-net pieces merge
           ("3V3_L3_a", "+3V3", "In2.Cu", [(3, 3), (137, 3), (137, 40), (3, 40)], 0),
           ("3V3_L3_b", "+3V3", "In2.Cu", [(3, 40), (137, 40), (137, 60), (3, 60)], 1),                          # the band above the region
-          ("3V3_L3_c", "+3V3", "In2.Cu", [(3, 60), (62, 60), (62, 80), (3, 80)], 2),                             # left of the region...
-          ("3V3_L3_e", "+3V3", "In2.Cu", [(3, 80), (46, 80), (46, 97), (3, 97)], 15),                            # ...and of its riser
-          ("3V3_L3_d", "+3V3", "In2.Cu", [(86, 60), (137, 60), (137, 97), (86, 97)], 3),
+          ("3V3_L3_c", "+3V3", "In2.Cu", [(3, 60), (64, 60), (64, 80), (3, 80)], 2),                             # left of the region...
+          ("3V3_L3_e", "+3V3", "In2.Cu", [(3, 80), (48, 80), (48, 97), (3, 97)], 15),                            # ...and of its riser
+          ("3V3_L3_d", "+3V3", "In2.Cu", [(88, 60), (137, 60), (137, 97), (88, 97)], 3),
           ("VBUS_IN_L3", "VBUS_IN", "In2.Cu", [(3, 3), (50, 3), (50, 36), (3, 36)], 4),                        # inlet to the bucks' VIN pins
           ("5V_TGT_L3_band", "+5V_TGT", "In2.Cu", [(44, 36), (129, 36), (129, 40), (44, 40)], 5),              # L102 across the board below the PHY...
           ("5V_TGT_L3_right", "+5V_TGT", "In2.Cu", [(129, 8), (137, 8), (137, 97), (129, 97)], 6),             # ...and the right edge...
@@ -132,10 +133,10 @@ PLANES = [("GND_L2", "GND", "In1.Cu", GND_PLANE),
           ("5V_TGT_L3_l102", "+5V_TGT", "In2.Cu", [(56, 10), (70, 10), (70, 36), (56, 36)], 9),                # L102's output down to the band
           ("5V_PORTS_L3_l101", "+5V_PORTS", "In2.Cu", [(28, 10), (42, 10), (42, 36), (28, 36)], 10),            # L101's output down to the 3V3 buck...
           ("5V_PORTS_L3_u105", "+5V_PORTS", "In2.Cu", [(36, 40), (62, 40), (62, 48), (36, 48)], 11),            # ...to the 3V3 buck's input...
-          ("5V_PORTS_L3_mid", "+5V_PORTS", "In2.Cu", [(50, 48), (62, 48), (62, 80), (50, 80)], 12),             # ...down beside the relay...
-          ("5V_PORTS_L3_band", "+5V_PORTS", "In2.Cu", [(10, 70), (50, 70), (50, 82), (10, 82)], 13),            # ...along the port switches
+          ("5V_PORTS_L3_mid", "+5V_PORTS", "In2.Cu", [(50, 48), (64, 48), (64, 80), (50, 80)], 12),             # ...down beside the relay...
+          ("5V_PORTS_L3_band", "+5V_PORTS", "In2.Cu", [(10, 70), (48, 70), (48, 80), (10, 80)], 13),            # ...along the port switches
           ("5V_PORTS_L3_right", "+5V_PORTS", "In2.Cu", [(86, 52), (126, 52), (126, 57), (86, 57)], 14),        # ...to the FTDI switch...
-          ("5V_PORTS_L3_relays", "+5V_PORTS", "In2.Cu", [(86, 57), (108, 57), (108, 82), (86, 82)], 16),      # ...down to the relays...
+          ("5V_PORTS_L3_relays", "+5V_PORTS", "In2.Cu", [(88, 57), (108, 57), (108, 82), (88, 82)], 16),      # ...down to the relays...
           ("5V_PORTS_L3_ftdi", "+5V_PORTS", "In2.Cu", [(108, 57), (126, 57), (126, 76), (108, 76)], 17)]       # ...and to the FTDI switch behind J9
 ISO_GAP = 2.0
 # ---- lanes (ecad-standards/layout.md sections 1 and 5): a corridor reserved for one routed path, from pad to pad
@@ -195,8 +196,8 @@ EP_MARGIN = 0.6       # and from an exposed pad's via field
 REFDES_SIZES = (0.8, 0.7)   # designator text heights tried, mm (reference boards: 0.8 typical, 0.65-0.72 smallest); stroke 15 %, never under 0.1
 CURRENT_CLASSES = {"USB_VBUS_3A", "PWR_6A", "PSU_3A", "PSU_ISO"}   # a part on these nets belongs at the connector or IC that carries them
 PAIR_CLASSES = {"USB"}
-ISOLATION_RECTS = [(64, 62, 84, 100), (48, 82, 64, 100)]           # ISOLATION as rectangles, for the placer
-ISOLATION_GROWN_RECTS = [(62, 60, 86, 100), (46, 80, 62, 100)]     # ISOLATION_PLANE_HOLE likewise: board-net parts stay out              # creepage between PSU_3A nets and board nets
+ISOLATION_RECTS = [(66, 62, 86, 100), (50, 82, 66, 100)]           # ISOLATION as rectangles, for the placer
+ISOLATION_GROWN_RECTS = [(64, 60, 88, 100), (48, 80, 64, 100)]     # ISOLATION_PLANE_HOLE likewise: board-net parts stay out              # creepage between PSU_3A nets and board nets
 
 STACKUP = [  # Advanced Circuits standard 4-layer 0.062"
     ("F.Cu", "copper", 0.035), ("dielectric 1", "prepreg", 0.3048, 4.6), ("In1.Cu", "copper", 0.035),
@@ -207,12 +208,12 @@ ISOLATION_REGIONS = [{"name": "psu_iso", "note": "PSU passthrough isolation", "o
                       "gap": ISO_GAP, "island": ("PSU_GND_L2", "PSU_GND", "In1.Cu", ISOLATION)}]
 # the bulk router for gen/pcb.py --route (ecad-standards/tools/autoroute.py): FreeRouting 2.4.1, one thread
 FREEROUTING = "/home/flippy/Documents/claude/mythtv-porg/tools/freerouting/bin/freerouting"
-FREEROUTING_PASSES = 30
+FREEROUTING_PASSES = 24   # the plateau comes before 20 on this board; the session is written only at the end
 # ---- the copper after routing (ecad-standards/tools/copper.py, layout.md 4 and 5): ground floods on both outer layers,
 # notched around the isolation region like the plane, the region's own ground inside it, and ground stitching at
 # about four vias per square centimetre, clear of the region by the creepage
 FLOODS = [("GND_F", "GND", "F.Cu", GND_PLANE), ("GND_B", "GND", "B.Cu", GND_PLANE),
           ("PSU_GND_F", "PSU_GND", "F.Cu", ISOLATION), ("PSU_GND_B", "PSU_GND", "B.Cu", ISOLATION)]
 STITCH = [{"net": "GND", "pitch": 5.0, "margin": 1.5, "keep_out": ISOLATION_GROWN_RECTS},      # clear of the region by the creepage
-          {"net": "PSU_GND", "pitch": 5.0, "inside": [(66.3, 64.3, 81.7, 98.5), (50.3, 84.3, 66.3, 98.5)]}]  # the region's own ground, inset by the creepage
+          {"net": "PSU_GND", "pitch": 5.0, "inside": [(68.3, 64.3, 83.7, 98.5), (52.3, 84.3, 68.3, 98.5)]}]  # the region's own ground, inset by the creepage
 STITCH_VIA = (0.6, 0.3)

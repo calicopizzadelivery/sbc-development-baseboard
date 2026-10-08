@@ -43,7 +43,7 @@ flat against a wall or a DIN rail, which the spec accepted).
 | Left (x = 0), 74 mm usable | J2 USB-C PD in (centred y = 30) · J1 USB-C upstream (centred y = 74), split around the middle | charger / workstation | 10.6 + 10.6 = 21.2 mm |
 | Back (y = 0), 114 mm usable | J10 RJ45, from x = 71 (from x = 14 until 2026-10-07, when the two bucks took the back-edge corner beside J2) | workstation | 19.0 mm wide, 22.4 mm deep |
 | Right (x = 140), 74 mm usable | J3 USB-C HID (centred y = 19.3) · J13 console (origin y = 49.2) · J9 FTDI right-angle (origin y = 65.0), spaced 10 mm apart since 2026-10-07 (they were packed 1.5 mm apart in the back half) | target | 10.6 + 16.5 + 16.3 = 43.4 mm |
-| Front (y = 100), left end | J5, J4 USB-A stacks (J5 at x = 19, J4 at x = 37: swapped on 2026-10-06 so each stack's pairs reach the hub row they are wired to without crossing) · J18 PSU in · J19 PSU out | bench / PSU | 17.2 + 17.2 + 13.2 + 13.2 = 60.8 mm |
+| Front (y = 100), left end | J5, J4 USB-A stacks (J5 at x = 19, J4 at x = 37: swapped on 2026-10-06 so each stack's pairs reach the hub row they are wired to without crossing) · J18 PSU in (x = 56.4) · J19 PSU out (x = 70.7), both 2 mm right since 2026-10-08 so J4's shield pads stand outside the passthrough's creepage band | bench / PSU | 17.2 + 17.2 + 13.2 + 13.2 = 60.8 mm |
 | Front (y = 100), right end | J14 +5V_TGT · J12, J11 relays | target | 13.2 + 13.05 + 13.05 = 39.3 mm |
 | Inboard | J16 Cortex debug · J15 GPIO header · **J17 programming, top entry** (BM04B-SRSS-TB) | any | — |
 
@@ -68,9 +68,12 @@ along it); a pin header mates where its pins point. Checked in the 3D view.
   but the hole, enforced as rule areas.
 - **Isolation**: the PSU passthrough (J18, J19, K803's contact side, the
   opto-coupler's LED side, D807, R810, R811) sits in its own region behind
-  J18/J19 at the front, x 48–84, y 62–100 (y 42–80 on the 80 mm board),
-  with the barrier running through K803 between its coil and contact pins
-  and through U801 between its LED and transistor pins, both at x = 64. It has its own **PSU_GND** copper on
+  J18/J19 at the front, x 50–86, y 62–100 (x 48–84 until 2026-10-08, y
+  42–80 on the 80 mm board), with the barrier running through K803 between
+  its coil and contact pins and through U801 between its LED and transistor
+  pins, both at x = 66. A part of the region keeps the 2 mm creepage from
+  every part and connector outside it by placement, and a board-net plane
+  that enters the region's grown outline is refused at generation. It has its own **PSU_GND** copper on
   L2 with **no board ground plane under it**, and a 2 mm creepage gap to
   every board net, enforced by DRC rules (`sbc-baseboard.kicad_dru`: board
   nets' tracks and vias are kept out of the region, a board-net zone may not
@@ -170,8 +173,13 @@ kept out of the isolation region grown by its creepage; the region's own
 ground is stitched on the same grid inside its outline inset by the
 creepage. Vias are 0.6 mm on a 0.3 mm drill. The standard's `copper.py`
 draws all of it over the routed board (`gen/pcb.py --copper`), moving a
-via to the nearest clear spot where the routing is in the way and dropping
-one that would cut a sliver off a rail.
+via to the nearest clear spot where the routing is in the way, dropping one
+that would cut a sliver off a rail or that the filled floods reach on fewer
+than two layers, and adding one inside any pour island that holds a ground
+pad but no via. Before the router, the generator drops **rail vias** beside
+every SMD pad on a plane net (`RAIL_VIAS`: three for `PWR_6A`, two for the
+3 A classes, one otherwise), joined by a stub at the class width, and
+reports the pads the packed rings leave no room beside.
 
 ## Sides
 
@@ -224,8 +232,8 @@ are the knobs.
 
 | Part | (x, y, rot) | Why there |
 |---|---|---|
-| K803 | (56, 73, 0) | straddles the isolation barrier |
-| U801 | (66, 80.5, 180) | straddles the isolation barrier |
+| K803 | (58, 73, 0) | straddles the isolation barrier |
+| U801 | (68, 80.5, 180) | straddles the isolation barrier |
 | U301 | (80.5, 29, 270) | PHY below J10 on the back edge, TX/RX pins up toward the jack (J10 + (4.42, 8.77), the ETH lanes' geometry) |
 | U101 | (16, 41, 0) | PD controller behind J2 with its CC pins toward it, laid out as ST's STEVAL-ISC005V1 (UM2398 Figure 24, the `STUSB4500` template): decoupling in a column above, VBUS sense and enable parts right, I2C pull-ups below, reset pull-down left, all top side |
 | U102 | (28, 44, 0) | PD bus buffer, right of the PD controller |
@@ -239,8 +247,8 @@ are the knobs.
 | U601 | (97, 47, 0) | DAPLink K20 |
 | J601 | (104, 44, 0) | SWD to the K20 |
 | U501 | (117, 70, 0) | FT231X behind J9, which moved 20 mm down the edge; its island follows (2026-10-07) |
-| K801 | (91, 80, 0) | relays behind J11 / J12 |
-| K802 | (105, 80, 0) |  |
+| K801 | (93, 80, 0) | relays behind J11 / J12, 2 mm right with the passthrough region (2026-10-08) |
+| K802 | (106.5, 80.5, 0) | 2 mm of void to the FTDI island above it |
 | U701 | (119, 81, 0) | +5V_TGT eFuse behind J14 |
 | U704 | (118, 29, 0) | GPIO level shifter near J15 |
 | U702 | (112, 46.5, 0) | console UART shifter behind J13, which moved 10 mm down the edge; clear of the HUB_DN2 leg at x = 112 |
@@ -291,7 +299,8 @@ are in [layout-guidelines.md](layout-guidelines.md).
   console, ESDA25W at the PD inlet): on top at the connector pin, first,
   the signal passing the diode's pad, the ground pad to the plane by a via.
 - **High current**: `PSU_3A` (PSU_VP, PSU_VOUT, PSU_GND) and `USB_VBUS_3A`
-  (VBUS_IN, PORTn_VBUS, FTDI_VBUS) at 2 mm or pours; `PWR_6A` (+5V_PORTS,
+  (VBUS_IN, PORTn_VBUS, FTDI_VBUS; the project's patterns for the sheet-local
+  ones start with `*`) at 2 mm or pours; `PWR_6A` (+5V_PORTS,
   +5V_TGT) at 4 mm or pours; two 0.5 mm vias per layer change on any of them.
 - **Crystals** next to their IC, load capacitors between crystal and IC,
   no signals under them.
