@@ -90,9 +90,9 @@ the full hierarchical name, so a sheet-local net such as `/USB hub/PORT1_VBUS`
 is matched only by a pattern that starts with `*` (the port VBUS nets sat in
 `Default` until 2026-10-08 for want of that star, and the standard's engine
 now stops on a class that no net resolves to). Its differential width and
-gap are KiCad's defaults until the stackup is chosen, then set them from the
-fab's impedance calculator for 90 Ω before routing. Route each pair as a
-pair, no stubs, over an unbroken reference plane.
+gap are 0.35 / 0.20 mm, 90 Ω on the chosen stackup (the fab's calculator
+rules when the stackup is confirmed). Route each pair as a pair, no stubs,
+over an unbroken reference plane.
 
 **Builds are reproducible.** Every UUID in the generated files is derived,
 not drawn: a UUID5 in a namespace made from the project name, keyed by what
@@ -204,10 +204,13 @@ wants it). The router laid the wide classes at the 2 mm cap apart from the
 pad-entry necks; five segments run on at a pad's width more than a
 millimetre beyond the pad (two on +3V3, two on +5V_PORTS, one on
 PORT1_VBUS) and are listed for the hand pass to widen. 116 of the 499
-connections are left for the hand pass: 13 on +3V3, 10 on +5V_PORTS, 7 on
-ground and 5 on VBUS_IN among them, mostly pads with no room beside them
-for a rail via, the rest the port and FTDI VBUS stubs, the eFuse output
-and the passthrough's sense lines. DRC reports no errors; its warnings are
+connections are left for the hand pass: 25 on the four plane nets (10 on
++5V_PORTS, 7 on ground, 5 on VBUS_IN, 3 on +5V_TGT: pads with no room
+beside them for a rail via), 13 on the routed +3V3, 16 on the port and
+FTDI VBUS nets, 2 on the eFuse output, 6 on the passthrough's sense lines,
+and 54 on ordinary signals the router left (the RMII lines, the SWD lines,
+the jack's LED and centre-tap nets, the hub straps, the port fault and
+enable lines among them). DRC reports no errors; its warnings are
 25 starved thermals (10 at the three USB-C receptacles' outer ground pads,
 whose peg holes leave a flood one spoke, the rest IC, connector and
 passive ground pads the routing crowds; the generator writes that check at

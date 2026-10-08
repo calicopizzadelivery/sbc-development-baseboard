@@ -47,7 +47,6 @@
     Local override; warning
     @(1.0000 mm, 1.0000 mm): Zone 'GND_F' [GND] on F.Cu, priority 0
     @(32.7250 mm, 62.4000 mm): Pad 2 [GND] of Y401 on F.Cu
-
 [starved_thermal]: Thermal relief connection to zone incomplete (layer F.Cu; zone min spoke count 2; actual 1)
     Local override; warning
     @(1.0000 mm, 1.0000 mm): Zone 'GND_F' [GND] on F.Cu, priority 0
@@ -104,6 +103,7 @@
     Local override; warning
     @(1.0000 mm, 1.0000 mm): Zone 'GND_L2' [GND] on In1.Cu, priority 0
     @(47.3550 mm, 83.5150 mm): PTH pad SH [GND] of J4
+
 ** Found 116 unconnected pads, as a tally per net **
 [unconnected_items]: 13 missing connection(s) on +3V3
 [unconnected_items]: 10 missing connection(s) on +5V_PORTS
@@ -171,6 +171,9 @@
 [unconnected_items]: 1 missing connection(s) on RMII_TXD1
 [unconnected_items]: 1 missing connection(s) on RMII_TXEN
 [unconnected_items]: 1 missing connection(s) on TGT_IMON
+
+** Found 0 Footprint errors **
+
 ** Ignored checks **
     - Footprint has no courtyard defined
     - Track endpoint not centered on via
