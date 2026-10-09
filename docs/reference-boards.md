@@ -103,7 +103,7 @@ where it matters:
 | Pads to zones | thermal reliefs on every zone, 0.5 mm gap and spoke | thermal, 0.5 / 0.5 |
 | Zone minimum width / clearance | 0.2 / 0.24 mm | 0.25 / 0.3 mm |
 | Ground pour share of the outer layers | 44 % | flood around the routing |
-| Pair gap / width in the copper | 0.15 / 0.13 mm | 0.20 / 0.32 mm from the six-layer stackup (90 Ω) |
+| Pair gap / width in the copper | 0.15 / 0.13 mm | 0.20 / 0.33 mm from the six-layer stackup (90 Ω) |
 | Pair length mismatch, median / 90th percentile | 0.8 / 1.4 mm | within 1 mm |
 | Pairs on a single layer | one in three, 3 vias per pair | one layer, no vias (the parent's rule, kept) |
 

@@ -19,10 +19,12 @@ top-left corner, X to the right, Y down, in millimetres, as KiCad draws it.
   four layers until then: the router left 116 connections open on two
   routing layers, 99 with its costs tuned, and the wall was the layer
   count): 1 oz on all six layers; L1 signal and ground flood, two 2116
-  sheets (≈ 0.009"), L2 **ground plane**, 0.014" core, L3 signal, two 2116
-  sheets, L4 **rails**, 0.014" core, L5 **ground plane**, two 2116 sheets,
-  L6 signal and ground flood. State it in the fab notes and ask for
-  controlled impedance on the `USB` and `ETH` classes.
+  sheets (9.8 mil pressed), L2 **ground plane**, 0.014" core, L3 signal,
+  two 2116 sheets, L4 **rails**, 0.014" core, L5 **ground plane**, two 2116
+  sheets, L6 signal and ground flood. Order it Custom / Controlled
+  Dielectric (their standard stackups are not guaranteed otherwise) with
+  controlled impedance on the `USB` and `ETH` classes, and confirm both
+  cores are 0.014".
 
 ## Mounting holes
 
@@ -156,7 +158,7 @@ USB 2.0 pairs get their lanes when the pairs are placed (standard, section
 
 L2 (In1.Cu) and L5 (In4.Cu) are the ground planes, one outline each
 notched around the isolation region, which holds its own PSU_GND island on
-both; L3 (In2.Cu) routes with the outer layers. L4 (In3.Cu) carries the
+both and on the rail layer; L3 (In2.Cu) routes with the outer layers. L4 (In3.Cu) carries the
 three heavy rails as rectangles, referenced to L5 across the core (the
 autorouter's DSN reader takes no concave plane), each at its own priority,
 every rail one piece (the standard's rails gate rasterises each rail with

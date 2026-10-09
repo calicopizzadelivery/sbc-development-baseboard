@@ -203,18 +203,22 @@ ISOLATION_RECTS = [(66, 62, 86, 100), (50, 82, 66, 100)]           # ISOLATION a
 ISOLATION_GROWN_RECTS = [(64, 60, 88, 100), (48, 80, 64, 100)]     # ISOLATION_PLANE_HOLE likewise: board-net parts stay out              # creepage between PSU_3A nets and board nets
 
 STACKUP = [  # Advanced Circuits standard 6-layer 0.062" (their drawing, 2026-10-09): 1 oz on all six layers, two 2116 sheets
-    # (0.009", er 4.3) between L1-L2, L3-L4 and L5-L6, a 0.014" core (er 4.6) between L2-L3 and L4-L5; 0.0634" with the copper
-    ("F.Cu", "copper", 0.035), ("dielectric 1", "prepreg", 0.229, 4.3), ("In1.Cu", "copper", 0.035),
-    ("dielectric 2", "core", 0.356, 4.6), ("In2.Cu", "copper", 0.035), ("dielectric 3", "prepreg", 0.229, 4.3),
+    # between L1-L2, L3-L4 and L5-L6 (pressed 5.1 + 4.7 mil = 0.249 mm by their prepreg guide, er 4.3), a 0.014" core (er 4.6)
+    # between L2-L3 and L4-L5; 0.064" with the copper, inside their +/- 10 %. Their standard stackups are not guaranteed unless
+    # the order says so: order it Custom / Controlled Dielectric with controlled impedance on the USB and ETH classes
+    ("F.Cu", "copper", 0.035), ("dielectric 1", "prepreg", 0.249, 4.3), ("In1.Cu", "copper", 0.035),
+    ("dielectric 2", "core", 0.356, 4.6), ("In2.Cu", "copper", 0.035), ("dielectric 3", "prepreg", 0.249, 4.3),
     ("In3.Cu", "copper", 0.035), ("dielectric 4", "core", 0.356, 4.6), ("In4.Cu", "copper", 0.035),
-    ("dielectric 5", "prepreg", 0.229, 4.3), ("B.Cu", "copper", 0.035)]
+    ("dielectric 5", "prepreg", 0.249, 4.3), ("B.Cu", "copper", 0.035)]
 # the isolated regions the engine enforces (placement, rule areas, .kicad_dru rules, the region's own island)
 ISOLATION_REGIONS = [{"name": "psu_iso", "note": "PSU passthrough isolation", "outline": ISOLATION, "rects": ISOLATION_RECTS,
                       "grown": ISOLATION_GROWN_RECTS, "nets": r"(^|/)PSU_(VP|VOUT|GND|SENSE)", "classes": ("PSU_3A", "PSU_ISO"),
-                      "gap": ISO_GAP, "islands": [("PSU_GND_L2", "PSU_GND", "In1.Cu", ISOLATION), ("PSU_GND_L5", "PSU_GND", "In4.Cu", ISOLATION)]}]
+                      "gap": ISO_GAP, "islands": [("PSU_GND_L2", "PSU_GND", "In1.Cu", ISOLATION), ("PSU_GND_L4", "PSU_GND", "In3.Cu", ISOLATION),
+                                  ("PSU_GND_L5", "PSU_GND", "In4.Cu", ISOLATION)]}]   # the region's own ground on every plane layer
 # the bulk router for gen/pcb.py --route (ecad-standards/tools/autoroute.py): FreeRouting 2.4.1, one thread
 FREEROUTING = "/home/flippy/Documents/claude/mythtv-porg/tools/freerouting/bin/freerouting"
-FREEROUTING_PASSES = 24   # the plateau comes before 20 on this board; the session is written only at the end
+FREEROUTING_PASSES = 24   # the plateau came before 20 on four layers; the session is written only at the end
+FREEROUTING_TIMEOUT = 28800   # seconds: with three signal layers a pass takes twice as long (pass 17 at 3.5 h on 2026-10-09; the 4 h default cut the run)
 # ---- the copper after routing (ecad-standards/tools/copper.py, layout.md 4 and 5): ground floods on both outer layers,
 # notched around the isolation region like the plane, the region's own ground inside it, and ground stitching at
 # about four vias per square centimetre, clear of the region by the creepage

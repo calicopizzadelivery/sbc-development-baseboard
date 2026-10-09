@@ -90,7 +90,7 @@ the full hierarchical name, so a sheet-local net such as `/USB hub/PORT1_VBUS`
 is matched only by a pattern that starts with `*` (the port VBUS nets sat in
 `Default` until 2026-10-08 for want of that star, and the standard's engine
 now stops on a class that no net resolves to). Its differential width and
-gap are 0.32 / 0.20 mm, 90 Ω over the ground plane beside each outer layer on
+gap are 0.33 / 0.20 mm, 90 Ω over the ground plane beside each outer layer on
 the six-layer stackup (the fab's calculator rules when the stackup is
 confirmed); the `ETH` class 0.29 / 0.25 mm for 100 Ω. Route each pair as a pair, no stubs,
 over an unbroken reference plane.
@@ -164,7 +164,7 @@ The pairs are laid by the engine as pair lanes (both members at the class's
 differential geometry, escapes, the USB-C bridges, two layer changes where
 a pair must pass under the port pairs, lengths matched by a bump), the ESD
 arrays and series parts anchored for it; the PSU passthrough is laid as
-single-net lanes; the rails are regions on L3 (+3V3 is routed, in its 0.5 mm
+single-net lanes; the rails are regions on L3 (+3V3 is routed, in its 0.6 mm
 `PWR_1A` class: on the one rail layer the two 6 A rails and the 3 A inlet cut
 any +3V3 plane into pieces, which the standard's rails gate refuses). What is left is routed by
 FreeRouting through the standard's `tools/autoroute.py` with all of that

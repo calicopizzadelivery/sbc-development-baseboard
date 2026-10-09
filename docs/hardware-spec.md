@@ -682,13 +682,19 @@ lab, and a VID has lead time of its own, so that is the moment to start it.
 Advanced Circuits' standard 6-layer 0.062" stackup (their drawing,
 2026-10-09; the board was four layers until then and ran out of routing
 room): 1 oz copper on all six layers, two 2116 prepreg sheets (≈ 0.009",
-εr ≈ 4.3) between L1 and L2, L3 and L4, and L5 and L6, a 0.014" core
-between L2 and L3 and between L4 and L5; 0.062" ± 10 %. L2 and L5 are the
+εr ≈ 4.3; 9.8 mil pressed by their prepreg guide) between L1 and L2, L3
+and L4, and L5 and L6, a 0.014" core between L2 and L3 and between L4 and
+L5; 0.062" ± 10 %. Their standard stackups are not guaranteed unless the
+order specifies them: order the board as Custom / Controlled Dielectric,
+and confirm at quote time that both cores are 0.014" (one of their pages
+shows 0.005" for the second core; if that is what they build, the rails
+and the inner routing layer swap places). L2 and L5 are the
 ground planes, L3 routes, L4 carries the power rails. The USB 2.0 pairs run
 on the outer layers as 90 Ω edge-coupled microstrip over the ground plane
-beside them: **0.32 mm traces, 0.20 mm gap** (IPC-2141 estimate for a
-0.229 mm dielectric at εr 4.3 with 1 oz copper); the Ethernet pairs at
-100 Ω, 0.29 mm and 0.25 mm. These are the `USB` and `ETH` net classes'
+beside them: **0.33 mm traces, 0.20 mm gap** (centred on 90 Ω across the
+Kirschning-Jansen and IPC-2141 estimates for a 0.249 mm dielectric at
+εr 4.3 with 1 oz copper); the Ethernet pairs at 100 Ω, 0.29 mm and
+0.25 mm. These are the `USB` and `ETH` net classes'
 differential width and gap in the project file. State the stackup in the
 fab notes and ask for controlled impedance on those classes; the fab's
 impedance calculator has the last word on the width and gap.
