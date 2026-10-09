@@ -180,42 +180,40 @@ the Specctra rules and the fixed lanes, so it stays the bulk router.
 fill or strays into a keep-out shows; the unconnected count is the ratsnest's
 and does not credit the planes); its report is `drc.txt`.
 
-The board as committed (2026-10-08, routed) is the engine's placement on the
-140 × 100 mm outline, bulk-routed by FreeRouting over the locked lanes, rail
-vias and planes (`gen/pcb.py --route --copper`, 24 passes, 3 h on one
-thread, 130 open connections by the router's own count after its optimiser)
-and given the standard's copper pass: 2 833 track segments, 53 % of the
-track length on the top and 47 % on the bottom, none on the inner layers;
-836 vias, of which 237 are the rail vias beside the pads on the plane nets
-(156 on ground, 39 on +5V_PORTS, 26 on VBUS_IN, 14 on +5V_TGT, 2 on the
-passthrough's ground; the 6 A and 3 A pads get chains of their class's
-1.2 mm and 1.0 mm vias where they fit, 14 pads fewer than their class's
-count and 115 none at all, both listed in `placement.txt`), 24 the lanes'
-own layer changes and 340 ground stitching on the 5 mm grid (2.4 stitching
-vias per cm² outside the isolated region, 3.6 ground vias per cm² with the
-rail vias); ground floods over 52 % of the top and 59 % of the bottom,
-notched around the passthrough block, which floods its own `PSU_GND`, all
-saved filled. The three L3 rails are each one piece; +3V3 is routed, 277
-segments and 535 mm, 250 of them at its 0.5 mm class width, through 17
-vias. The 282 lane tracks are locked and intact: nine pairs matched to
-0.00 mm (six by bumps, three by symmetric legs), the two Ethernet pairs
-2.5 mm apart over their 7.4 to 10.9 mm from jack to PHY, where no bump fits
-(the report says so; the hand pass can serpentine them if the PHY's budget
-wants it). The router laid the wide classes at the 2 mm cap apart from the
-pad-entry necks; five segments run on at a pad's width more than a
-millimetre beyond the pad (two on +3V3, two on +5V_PORTS, one on
-PORT1_VBUS) and are listed for the hand pass to widen. 116 of the 499
-connections are left for the hand pass: 25 on the four plane nets (10 on
-+5V_PORTS, 7 on ground, 5 on VBUS_IN, 3 on +5V_TGT: pads with no room
-beside them for a rail via), 13 on the routed +3V3, 16 on the port and
-FTDI VBUS nets, 2 on the eFuse output, 6 on the passthrough's sense lines,
-and 54 on ordinary signals the router left (the RMII lines, the SWD lines,
-the jack's LED and centre-tap nets, the hub straps, the port fault and
-enable lines among them). DRC reports no errors; its warnings are
-25 starved thermals (10 at the three USB-C receptacles' outer ground pads,
-whose peg holes leave a flood one spoke, the rest IC, connector and
-passive ground pads the routing crowds; the generator writes that check at
-warning severity) and no rail island. From here the board file is the
+The board as committed (2026-10-09, routed, six layers) is the engine's
+placement on the 140 × 100 mm outline, bulk-routed by FreeRouting on L1,
+L3 and L6 over the locked lanes, rail vias and planes (`gen/pcb.py --route
+--copper`, 24 passes, 5 h 12 min on one thread of which 55 min were its
+fanout stage, 122 open connections by its own count after its optimiser)
+and given the standard's copper pass: 3 050 track segments, 42 % of the
+track length on the top, 37 % on L3 and 21 % on the bottom (of the
+router's own, 47 % on L3); 939 vias, of which 237 are the rail vias beside
+the pads on the plane nets (156 on ground, 39 on +5V_PORTS, 26 on VBUS_IN,
+14 on +5V_TGT, 2 on the passthrough's ground; 14 pads fewer than their
+class's count and 115 none at all, both listed in `placement.txt`), 24 the
+lanes' own layer changes, 332 ground stitching on the 5 mm grid (2.3
+stitching vias per cm² outside the isolated region, 3.5 ground vias per
+cm² with the rail vias) and 346 the router's; ground floods over 54 % of
+the top and 67 % of the bottom, notched around the passthrough block,
+which floods its own `PSU_GND`, all saved filled; the ground planes on L2
+and L5 over 76 % each. The three L4 rails are each one piece; +3V3 is
+routed at 0.6 mm, 243 segments and 496 mm. The 282 lane tracks are locked
+and intact: nine pairs matched to 0.00 mm (six by bumps, three by
+symmetric legs), the two Ethernet pairs 2.5 mm apart over their 7.4 to
+10.9 mm from jack to PHY, where no bump fits. The router laid the wide
+classes at the 2 mm cap apart from the pad-entry necks; five segments run
+on at a pad's width more than a millimetre beyond the pad (three on +3V3,
+one each on +5V_PORTS and FTDI_VBUS) and are listed for the hand pass to
+widen. 98 of the 499 connections are left for the hand pass: 36 on
+ordinary signals (61 on four layers), 20 on +3V3, 21 on the port and FTDI
+VBUS nets, 15 on the 6 A rails and 9 on ground (pads with no room beside
+them for a rail via, the port and FTDI VBUS stubs), 6 on the passthrough's
+sense lines and the eFuse output, 1 on the passthrough. DRC reports no
+errors; its warnings are 23 starved thermals (10 at the three USB-C
+receptacles' outer ground pads, whose peg holes leave a flood one spoke,
+the rest IC and passive ground pads the routing crowds; the generator
+writes that check at warning severity) and one flood neck narrower than
+the fab's minimum beside a ground via. From here the board file is the
 source of truth and is edited in KiCad; `gen/pcb.py` is not run again over
 it, except `--copper`, which adds only what is missing and saves the
 board with its fills (the pours are in the file as it is opened and rendered;

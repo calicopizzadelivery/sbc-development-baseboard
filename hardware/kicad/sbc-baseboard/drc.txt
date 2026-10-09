@@ -2,15 +2,19 @@
 ** Created on 2026-10-03T00:00:00 **
 ** Report includes: Errors, Warnings, Exclusions **
 
-** Found 25 DRC violations **
+** Found 24 DRC violations **
+[connection_width]: Copper connection too narrow (board setup constraints minimum connection width 0.1270 mm; actual 0.1094 mm) (F.Cu)
+    Rule: board setup constraints; warning
+    @(100.3205 mm, 57.0545 mm): Via [GND] on F.Cu - B.Cu
+    @(1.0000 mm, 1.0000 mm): Zone 'GND_F' [GND] on F.Cu, priority 0
 [starved_thermal]: Thermal relief connection to zone incomplete (layer B.Cu; zone min spoke count 2; actual 1)
     Local override; warning
     @(1.0000 mm, 1.0000 mm): Zone 'GND_B' [GND] on B.Cu, priority 0
-    @(119.5400 mm, 22.7000 mm): PTH pad 12 [GND] of J15
-[starved_thermal]: Thermal relief connection to zone incomplete (layer B.Cu; zone min spoke count 2; actual 1)
+    @(104.0000 mm, 49.0800 mm): PTH pad 9 [GND] of J601
+[starved_thermal]: Thermal relief connection to zone incomplete (layer F.Cu; zone min spoke count 2; actual 1)
     Local override; warning
-    @(1.0000 mm, 1.0000 mm): Zone 'GND_B' [GND] on B.Cu, priority 0
-    @(48.2750 mm, 48.3250 mm): Pad 2 [GND] of C107 on B.Cu
+    @(1.0000 mm, 1.0000 mm): Zone 'GND_F' [GND] on F.Cu, priority 0
+    @(102.5000 mm, 15.3250 mm): Pad 9 [GND] of U201 on F.Cu
 [starved_thermal]: Thermal relief connection to zone incomplete (layer F.Cu; zone min spoke count 2; actual 1)
     Local override; warning
     @(1.0000 mm, 1.0000 mm): Zone 'GND_F' [GND] on F.Cu, priority 0
@@ -34,7 +38,15 @@
 [starved_thermal]: Thermal relief connection to zone incomplete (layer F.Cu; zone min spoke count 2; actual 1)
     Local override; warning
     @(1.0000 mm, 1.0000 mm): Zone 'GND_F' [GND] on F.Cu, priority 0
-    @(133.1700 mm, 22.5450 mm): Pad A1 [GND] of J3 on F.Cu
+    @(124.9700 mm, 67.5850 mm): Pad 2 [GND] of D503 on F.Cu
+[starved_thermal]: Thermal relief connection to zone incomplete (layer F.Cu; zone min spoke count 2; actual 1)
+    Local override; warning
+    @(1.0000 mm, 1.0000 mm): Zone 'GND_F' [GND] on F.Cu, priority 0
+    @(133.1700 mm, 16.1450 mm): Pad A12 [GND] of J3 on F.Cu
+[starved_thermal]: Thermal relief connection to zone incomplete (layer F.Cu; zone min spoke count 2; actual 1)
+    Local override; warning
+    @(1.0000 mm, 1.0000 mm): Zone 'GND_F' [GND] on F.Cu, priority 0
+    @(133.1700 mm, 16.1450 mm): Pad A12 [GND] of J3 on F.Cu
 [starved_thermal]: Thermal relief connection to zone incomplete (layer F.Cu; zone min spoke count 2; actual 1)
     Local override; warning
     @(1.0000 mm, 1.0000 mm): Zone 'GND_F' [GND] on F.Cu, priority 0
@@ -42,15 +54,7 @@
 [starved_thermal]: Thermal relief connection to zone incomplete (layer F.Cu; zone min spoke count 2; actual 1)
     Local override; warning
     @(1.0000 mm, 1.0000 mm): Zone 'GND_F' [GND] on F.Cu, priority 0
-    @(17.2500 mm, 42.9625 mm): Pad 12 [GND] of U101 on F.Cu
-[starved_thermal]: Thermal relief connection to zone incomplete (layer F.Cu; zone min spoke count 2; actual 1)
-    Local override; warning
-    @(1.0000 mm, 1.0000 mm): Zone 'GND_F' [GND] on F.Cu, priority 0
-    @(32.7250 mm, 62.4000 mm): Pad 2 [GND] of Y401 on F.Cu
-[starved_thermal]: Thermal relief connection to zone incomplete (layer F.Cu; zone min spoke count 2; actual 1)
-    Local override; warning
-    @(1.0000 mm, 1.0000 mm): Zone 'GND_F' [GND] on F.Cu, priority 0
-    @(41.7250 mm, 41.7500 mm): Pad 5 [GND] of U105 on F.Cu
+    @(133.1700 mm, 22.5450 mm): Pad A1 [GND] of J3 on F.Cu
 [starved_thermal]: Thermal relief connection to zone incomplete (layer F.Cu; zone min spoke count 2; actual 1)
     Local override; warning
     @(1.0000 mm, 1.0000 mm): Zone 'GND_F' [GND] on F.Cu, priority 0
@@ -58,10 +62,6 @@
 [starved_thermal]: Thermal relief connection to zone incomplete (layer F.Cu; zone min spoke count 2; actual 1)
     Local override; warning
     @(1.0000 mm, 1.0000 mm): Zone 'GND_F' [GND] on F.Cu, priority 0
-    @(6.2050 mm, 78.3200 mm): PTH pad SH [GND] of J1
-[starved_thermal]: Thermal relief connection to zone incomplete (layer F.Cu; zone min spoke count 2; actual 1)
-    Local override; warning
-    @(1.0000 mm, 1.0000 mm): Zone 'GND_F' [GND] on F.Cu, priority 0
     @(6.8300 mm, 26.8000 mm): Pad A1 [GND] of J2 on F.Cu
 [starved_thermal]: Thermal relief connection to zone incomplete (layer F.Cu; zone min spoke count 2; actual 1)
     Local override; warning
@@ -83,14 +83,6 @@
     Local override; warning
     @(1.0000 mm, 1.0000 mm): Zone 'GND_F' [GND] on F.Cu, priority 0
     @(6.8300 mm, 70.8000 mm): Pad A1 [GND] of J1 on F.Cu
-[starved_thermal]: Thermal relief connection to zone incomplete (layer F.Cu; zone min spoke count 2; actual 1)
-    Local override; warning
-    @(1.0000 mm, 1.0000 mm): Zone 'GND_F' [GND] on F.Cu, priority 0
-    @(6.8300 mm, 77.2000 mm): Pad A12 [GND] of J1 on F.Cu
-[starved_thermal]: Thermal relief connection to zone incomplete (layer F.Cu; zone min spoke count 2; actual 1)
-    Local override; warning
-    @(1.0000 mm, 1.0000 mm): Zone 'GND_F' [GND] on F.Cu, priority 0
-    @(6.8300 mm, 77.2000 mm): Pad A12 [GND] of J1 on F.Cu
 [starved_thermal]: Thermal relief connection to zone incomplete (layer F.Cu; zone min spoke count 2; actual 1)
     Local override; warning
     @(1.0000 mm, 1.0000 mm): Zone 'GND_F' [GND] on F.Cu, priority 0
@@ -103,35 +95,31 @@
     Local override; warning
     @(1.0000 mm, 1.0000 mm): Zone 'GND_L2' [GND] on In1.Cu, priority 0
     @(47.3550 mm, 83.5150 mm): PTH pad SH [GND] of J4
+[starved_thermal]: Thermal relief connection to zone incomplete (layer In4.Cu; zone min spoke count 2; actual 1)
+    Local override; warning
+    @(1.0000 mm, 1.0000 mm): Zone 'GND_L5' [GND] on In4.Cu, priority 0
+    @(47.3550 mm, 83.5150 mm): PTH pad SH [GND] of J4
 
-** Found 116 unconnected pads, as a tally per net **
-[unconnected_items]: 13 missing connection(s) on +3V3
+** Found 98 unconnected pads, as a tally per net **
+[unconnected_items]: 20 missing connection(s) on +3V3
 [unconnected_items]: 10 missing connection(s) on +5V_PORTS
-[unconnected_items]: 7 missing connection(s) on GND
+[unconnected_items]: 9 missing connection(s) on GND
 [unconnected_items]: 5 missing connection(s) on VBUS_IN
 [unconnected_items]: 4 missing connection(s) on /USB hub/PORT3_VBUS
 [unconnected_items]: 4 missing connection(s) on /USB hub/PORT4_VBUS
 [unconnected_items]: 3 missing connection(s) on +5V_TGT
+[unconnected_items]: 3 missing connection(s) on /USB hub/PORT1_VBUS
 [unconnected_items]: 3 missing connection(s) on /USB hub/PORT2_VBUS
-[unconnected_items]: 3 missing connection(s) on FTDI_VBUS
 [unconnected_items]: 2 missing connection(s) on /Relays/PSU_SENSE
 [unconnected_items]: 2 missing connection(s) on /Target I/O/+5V_TGT_OUT
-[unconnected_items]: 2 missing connection(s) on /USB hub/PORT1_VBUS
-[unconnected_items]: 2 missing connection(s) on HUB_RESET_N
+[unconnected_items]: 2 missing connection(s) on FTDI_VBUS
 [unconnected_items]: 2 missing connection(s) on Net-(U201-EXTAL32)
-[unconnected_items]: 2 missing connection(s) on PORT3_FAULT_N
-[unconnected_items]: 2 missing connection(s) on SWDIO
-[unconnected_items]: 1 missing connection(s) on +3V3_PRG
+[unconnected_items]: 2 missing connection(s) on Net-(U402-XTAL1/CLKIN)
 [unconnected_items]: 1 missing connection(s) on /Power/PD_SDA
 [unconnected_items]: 1 missing connection(s) on /Relays/PSU_SENSE_R
 [unconnected_items]: 1 missing connection(s) on /Relays/PSU_VP
-[unconnected_items]: 1 missing connection(s) on FTDI_FAULT_N
-[unconnected_items]: 1 missing connection(s) on GPIO2
 [unconnected_items]: 1 missing connection(s) on HUB_DN2_N
 [unconnected_items]: 1 missing connection(s) on HUB_DN2_P
-[unconnected_items]: 1 missing connection(s) on MDC
-[unconnected_items]: 1 missing connection(s) on MDIO
-[unconnected_items]: 1 missing connection(s) on Net-(J1-CC1)
 [unconnected_items]: 1 missing connection(s) on Net-(J10-LEDG_A)
 [unconnected_items]: 1 missing connection(s) on Net-(J10-LEDG_K)
 [unconnected_items]: 1 missing connection(s) on Net-(J10-LEDY_A)
@@ -142,35 +130,18 @@
 [unconnected_items]: 1 missing connection(s) on Net-(J10-RCT)
 [unconnected_items]: 1 missing connection(s) on Net-(J10-TCT)
 [unconnected_items]: 1 missing connection(s) on Net-(J11-Pin_1)
-[unconnected_items]: 1 missing connection(s) on Net-(J3-CC1)
-[unconnected_items]: 1 missing connection(s) on Net-(U201-NMI_b/PTA4)
+[unconnected_items]: 1 missing connection(s) on Net-(J3-CC2)
 [unconnected_items]: 1 missing connection(s) on Net-(U201-PTB19)
+[unconnected_items]: 1 missing connection(s) on Net-(U301-REXT)
 [unconnected_items]: 1 missing connection(s) on Net-(U301-XO)
-[unconnected_items]: 1 missing connection(s) on Net-(U402-LED_A1_N/PRT_SWP1)
 [unconnected_items]: 1 missing connection(s) on Net-(U402-LED_B3_N/GANG_EN)
-[unconnected_items]: 1 missing connection(s) on Net-(U402-RBIAS)
 [unconnected_items]: 1 missing connection(s) on Net-(U402-SCL/SMBCLK/CFG_SEL0)
-[unconnected_items]: 1 missing connection(s) on Net-(U402-SDA/SMBDATA/NON_REM1)
-[unconnected_items]: 1 missing connection(s) on Net-(U402-USBDN3_DM/PRT_DIS_M3)
 [unconnected_items]: 1 missing connection(s) on Net-(U402-USBDN3_DP/PRT_DIS_P3)
-[unconnected_items]: 1 missing connection(s) on Net-(U402-VBUS_DET)
-[unconnected_items]: 1 missing connection(s) on Net-(U402-XTAL1/CLKIN)
-[unconnected_items]: 1 missing connection(s) on Net-(U402-XTAL2)
-[unconnected_items]: 1 missing connection(s) on Net-(U407-ILIM)
-[unconnected_items]: 1 missing connection(s) on PD_PROG_DET
-[unconnected_items]: 1 missing connection(s) on PHY_INT_N
-[unconnected_items]: 1 missing connection(s) on PORT2_FAULT_N
-[unconnected_items]: 1 missing connection(s) on PORT3_EN
-[unconnected_items]: 1 missing connection(s) on PORT4_FAULT_N
+[unconnected_items]: 1 missing connection(s) on Net-(U402-VDD18PLL)
+[unconnected_items]: 1 missing connection(s) on Net-(U501-~{RESET})
 [unconnected_items]: 1 missing connection(s) on PSU_PRESENT_N
-[unconnected_items]: 1 missing connection(s) on RLY1_DRV
-[unconnected_items]: 1 missing connection(s) on RLY_PSU_DRV
 [unconnected_items]: 1 missing connection(s) on RMII_CRS_DV
-[unconnected_items]: 1 missing connection(s) on RMII_RXD0
-[unconnected_items]: 1 missing connection(s) on RMII_RXD1
-[unconnected_items]: 1 missing connection(s) on RMII_TXD1
 [unconnected_items]: 1 missing connection(s) on RMII_TXEN
-[unconnected_items]: 1 missing connection(s) on TGT_IMON
 
 ** Found 0 Footprint errors **
 

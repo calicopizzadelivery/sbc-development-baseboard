@@ -20,7 +20,7 @@ if __name__ == "__main__":
     if "--route" in sys.argv:                                     # then FreeRouting over the locked lanes (not reproducible: the board is the source of truth from here)
         import subprocess
         subprocess.run([sys.executable, os.path.join(os.path.dirname(placer.__file__), "autoroute.py"), os.path.join(out, "sbc-baseboard.kicad_pcb"),
-                        layout.FREEROUTING, "--passes", str(getattr(layout, "FREEROUTING_PASSES", 30)), "--timeout", str(getattr(layout, "FREEROUTING_TIMEOUT", 14400)),
+                        layout.FREEROUTING, "--passes", str(getattr(layout, "FREEROUTING_PASSES", 30)), "--timeout", str(getattr(layout, "FREEROUTING_TIMEOUT", 14400)), "--portfolio", str(getattr(layout, "FREEROUTING_PORTFOLIO", 1)),
                         "--plane-layers", *sorted({p[2] for p in layout.PLANES})], check=True)   # the router routes on no layer that carries a plane
     if "--copper" in sys.argv:                                    # then the ground floods and stitching over the routed board (idempotent)
         import subprocess

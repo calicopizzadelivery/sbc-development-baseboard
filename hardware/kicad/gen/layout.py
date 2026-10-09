@@ -219,6 +219,7 @@ ISOLATION_REGIONS = [{"name": "psu_iso", "note": "PSU passthrough isolation", "o
 FREEROUTING = "/home/flippy/Documents/claude/mythtv-porg/tools/freerouting/bin/freerouting"
 FREEROUTING_PASSES = 24   # the plateau came before 20 on four layers; the session is written only at the end
 FREEROUTING_TIMEOUT = 28800   # seconds: with three signal layers a pass takes twice as long (pass 17 at 3.5 h on 2026-10-09; the 4 h default cut the run)
+FREEROUTING_PORTFOLIO = 6     # instances side by side with different costs, the fewest unrouted taken: the router's passes are single-threaded and this machine has 64 cores
 # ---- the copper after routing (ecad-standards/tools/copper.py, layout.md 4 and 5): ground floods on both outer layers,
 # notched around the isolation region like the plane, the region's own ground inside it, and ground stitching at
 # about four vias per square centimetre, clear of the region by the creepage
