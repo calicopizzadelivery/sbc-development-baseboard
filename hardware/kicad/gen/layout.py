@@ -125,7 +125,7 @@ PLANES = [("GND_L2", "GND", "In1.Cu", GND_PLANE),
           ("GND_L5", "GND", "In4.Cu", GND_PLANE),
           # L4 rails as rectangles (FreeRouting cannot take a concave plane): every piece at its own priority (KiCad wants
           # touching zones distinct); same-net pieces touch or overlap and merge, and the engine's rails gate holds each rail
-          # to one piece. +3V3 stays routed (PWR_1A, 0.5 mm; three routing layers now): a +3V3 plane would take a signal layer,
+          # to one piece. +3V3 stays routed (PWR_1A, 0.6 mm; three routing layers now): a +3V3 plane would take a signal layer,
           # and on the rail layer the two 6 A rails and the 3 A inlet cut any +3V3 base into pieces
           ("VBUS_IN_L4", "VBUS_IN", "In3.Cu", [(3, 3), (50, 3), (50, 36), (3, 36)], 4),                        # inlet to the bucks' VIN pins...
           ("VBUS_IN_L4_pd", "VBUS_IN", "In3.Cu", [(3, 36), (27, 36), (27, 52), (3, 52)], 3),                   # ...and down to the PD controller's VBUS parts
@@ -204,7 +204,7 @@ ISOLATION_GROWN_RECTS = [(64, 60, 88, 100), (48, 80, 64, 100)]     # ISOLATION_P
 
 STACKUP = [  # Advanced Circuits standard 6-layer 0.062" (their drawing, 2026-10-09): 1 oz on all six layers, two 2116 sheets
     # between L1-L2, L3-L4 and L5-L6 (pressed 5.1 + 4.7 mil = 0.249 mm by their prepreg guide, er 4.3), a 0.014" core (er 4.6)
-    # between L2-L3 and L4-L5; 0.064" with the copper, inside their +/- 10 %. Their standard stackups are not guaranteed unless
+    # between L2-L3 and L4-L5; 0.066" with the copper (1.67 mm), inside their +/- 10 %. Their standard stackups are not guaranteed unless
     # the order says so: order it Custom / Controlled Dielectric with controlled impedance on the USB and ETH classes
     ("F.Cu", "copper", 0.035), ("dielectric 1", "prepreg", 0.249, 4.3), ("In1.Cu", "copper", 0.035),
     ("dielectric 2", "core", 0.356, 4.6), ("In2.Cu", "copper", 0.035), ("dielectric 3", "prepreg", 0.249, 4.3),

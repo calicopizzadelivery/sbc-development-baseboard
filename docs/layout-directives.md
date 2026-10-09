@@ -170,7 +170,8 @@ at y 78.5 to 80.5), across above the region to the DAPLink's VBUS, to the FTDI
 switch, down to the relays and to the switch behind J9; +5V_TGT from L102's
 output (and R125 at the back edge) down to the band at y 36–40, across it
 below the PHY to the right edge, down it to the eFuse and J14. +3V3 is
-routed, in its 0.5 mm `PWR_1A` class (2026-10-08; on six layers a plane for
+routed, in its 0.6 mm `PWR_1A` class (0.5 mm on four layers; an inner 1 oz
+track carries about half of an outer one; on six layers a plane for
 it would cost the third routing layer, so it stays routed): until then an
 +3V3 base lay under the rails in five pieces, and the other three rails cut it into
 three islands that no rail via or router track joined, with 16 of its 45
@@ -303,7 +304,7 @@ are in [layout-guidelines.md](layout-guidelines.md).
 
 ## Special considerations
 
-- **USB 2.0 pairs** (class `USB`, 0.35 mm / 0.20 mm, 90 Ω): on L1 over the
+- **USB 2.0 pairs** (class `USB`, 0.33 mm / 0.20 mm, 90 Ω on the six-layer stackup): on L1 over the
   L2 ground plane, routed as pairs, no stubs, length-matched within 1 mm,
   90 Ω end to end from the receptacle through the ESD array to the
   transceiver (standard 3.8). The USBLC6-2 arrays are flow-through: the

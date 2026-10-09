@@ -710,7 +710,7 @@ file.
 |---|---|---|---|---|
 | `PSU_3A` | PSU_VP, PSU_VOUT, PSU_GND (J18 → K803 → J19) | 3 A continuous | 2 mm or pour | two, 0.5 mm drill |
 | `USB_VBUS_3A` | VBUS_IN, PORT1–4_VBUS, FTDI_VBUS | 3 A each | 2 mm or pour | two, 0.5 mm drill |
-| `PWR_6A` | +5V_PORTS, +5V_TGT | 6 A | 4 mm or pour | two, 0.6 mm drill |
+| `PWR_6A` | +5V_PORTS, +5V_TGT, +5V_TGT_OUT | 6 A | 4 mm or pour | two, 0.6 mm drill |
 
 J1's and J3's VBUS carry no load (sense only) and are not classed.
 

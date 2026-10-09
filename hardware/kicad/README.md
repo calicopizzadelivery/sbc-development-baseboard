@@ -164,9 +164,10 @@ The pairs are laid by the engine as pair lanes (both members at the class's
 differential geometry, escapes, the USB-C bridges, two layer changes where
 a pair must pass under the port pairs, lengths matched by a bump), the ESD
 arrays and series parts anchored for it; the PSU passthrough is laid as
-single-net lanes; the rails are regions on L3 (+3V3 is routed, in its 0.6 mm
+single-net lanes; the rails are regions on L4 (+3V3 is routed, in its 0.6 mm
 `PWR_1A` class: on the one rail layer the two 6 A rails and the 3 A inlet cut
-any +3V3 plane into pieces, which the standard's rails gate refuses). What is left is routed by
+any +3V3 plane into pieces, which the standard's rails gate refuses; on six
+layers a plane for it would cost the third routing layer). What is left is routed by
 FreeRouting through the standard's `tools/autoroute.py` with all of that
 locked (`gen/pcb.py --route`; the directives' `FREEROUTING` setting names
 the binary), and the hand pass finishes from there. KiCad Routing Tools
@@ -204,15 +205,18 @@ symmetric legs), the two Ethernet pairs 2.5 mm apart over their 7.4 to
 classes at the 2 mm cap apart from the pad-entry necks; five segments run
 on at a pad's width more than a millimetre beyond the pad (three on +3V3,
 one each on +5V_PORTS and FTDI_VBUS) and are listed for the hand pass to
-widen. 98 of the 499 connections are left for the hand pass: 36 on
-ordinary signals (61 on four layers), 20 on +3V3, 21 on the port and FTDI
-VBUS nets, 15 on the 6 A rails and 9 on ground (pads with no room beside
-them for a rail via, the port and FTDI VBUS stubs), 6 on the passthrough's
-sense lines and the eFuse output, 1 on the passthrough. DRC reports no
+widen. 98 of the 499 connections
+are left for the hand pass: 27 on ordinary signals (61 on four layers), 2
+on the HUB_DN2 pair (its shunt capacitors, off the lane), 20 on +3V3, 21
+on the port and FTDI VBUS nets, 15 on the 6 A class (the eFuse output's 2
+among them), 9 on ground (3 of them the RJ45's ground pin and shield pegs,
+inside the magnetics void where no plane reaches), 3 on the passthrough's
+sense lines and 1 on the passthrough: the power ones mostly pads with no
+room beside them for a rail via, and the port and FTDI VBUS stubs. DRC reports no
 errors; its warnings are 23 starved thermals (10 at the three USB-C
 receptacles' outer ground pads, whose peg holes leave a flood one spoke,
-the rest IC and passive ground pads the routing crowds; the generator
-writes that check at warning severity) and one flood neck narrower than
+the rest IC, connector and passive ground pads the routing crowds; the
+generator writes that check at warning severity) and one flood neck narrower than
 the fab's minimum beside a ground via. From here the board file is the
 source of truth and is edited in KiCad; `gen/pcb.py` is not run again over
 it, except `--copper`, which adds only what is missing and saves the
@@ -224,8 +228,8 @@ derived UUIDs keep the footprints linked.
 **The router's settings were measured** (2026-10-08 and 09) on scratch
 copies of this placement, each routed from the same placed board with the
 standard's wrapper and given the copper pass; open connections after it:
-FreeRouting's own costs with the 10 µm clearance margin, 116 (the committed
-board); the margin removed and the small via allowed to every class, 122
+FreeRouting's own costs with the 10 µm clearance margin, 116 (the four-layer
+board of 2026-10-08); the margin removed and the small via allowed to every class, 122
 (noise: the router had been using the small via on the wide nets all
 along); the width cap at 1 mm, 111 (17 fewer on the wide nets, 10 more on
 the signals); the cap with via cost 25 and starting rip-up cost 200, 96;
@@ -234,7 +238,7 @@ the costs alone with the 2 mm cap, 99, the best on the signals (48 against
 made FreeRouting drop the rails as connections (888 open at its first
 pass) and run out of time. The costs are the wrapper's defaults from
 ecad-standards 743d3a5 on; the cap stays at 2 mm, the margin is gone. The
-committed board was routed before that and keeps its 116.
+six-layer board above was routed with them.
 
 The ICs' own layout rules, with sources, are in
 [docs/layout-guidelines.md](../../docs/layout-guidelines.md).
