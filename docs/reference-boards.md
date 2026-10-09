@@ -97,13 +97,13 @@ where it matters:
 | Blind or micro vias | none on any board | none |
 | Power track width, median / 90th percentile | 0.5 / 1.0 mm | 2 mm and 4 mm classes or pours, by current |
 | Track length on the bottom layer | 45 % (multilayer 39 %) | both outer layers route |
-| Track length on inner layers | 3 % (multilayer 12 %) | planes, a few crossings |
+| Track length on inner layers | 3 % (multilayer 12 %) | L3 routes; L2, L4, L5 are planes (six layers since 2026-10-09) |
 | Inner ground plane | every multilayer board; most on the layer under the top | GND_L2 on In1.Cu |
 | Ground vias per cm² | 3.3 (multilayer 4.2) | about 4, at routing |
 | Pads to zones | thermal reliefs on every zone, 0.5 mm gap and spoke | thermal, 0.5 / 0.5 |
 | Zone minimum width / clearance | 0.2 / 0.24 mm | 0.25 / 0.3 mm |
 | Ground pour share of the outer layers | 44 % | flood around the routing |
-| Pair gap / width in the copper | 0.15 / 0.13 mm | 0.20 / 0.35 mm from the stackup (90 Ω) |
+| Pair gap / width in the copper | 0.15 / 0.13 mm | 0.20 / 0.32 mm from the six-layer stackup (90 Ω) |
 | Pair length mismatch, median / 90th percentile | 0.8 / 1.4 mm | within 1 mm |
 | Pairs on a single layer | one in three, 3 vias per pair | one layer, no vias (the parent's rule, kept) |
 

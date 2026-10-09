@@ -117,25 +117,30 @@ ISOLATION_PLANE_HOLE = [(64, 60), (88, 60), (88, 100), (48, 100), (48, 80), (64,
 # the ground plane on L2 as one outline: the board less a 1 mm edge margin, notched by ISOLATION_PLANE_HOLE from the
 # front edge (a zone outline with a hole does not fill in KiCad; the notch is open to the edge, so none is needed)
 GND_PLANE = [(1, 1), (139, 1), (139, 99), (88, 99), (88, 60), (64, 60), (64, 80), (48, 80), (48, 99), (1, 99)]
+# layer roles on the six-layer board (2026-10-09; four layers until then): L1 and L6 route and carry the ground floods, L2 and
+# L5 (In1.Cu, In4.Cu) are the unbroken ground planes each outer layer and its pairs reference, L3 (In2.Cu) routes, L4 (In3.Cu)
+# carries the heavy rails as rectangles, referenced to L5 across the core. The router routes on L1, L3 and L6; the plane
+# layers are typed power for it (gen/pcb.py passes the layers of PLANES)
 PLANES = [("GND_L2", "GND", "In1.Cu", GND_PLANE),
-          # L3 rails as rectangles (FreeRouting cannot take a concave plane): every piece at its own priority (KiCad wants
+          ("GND_L5", "GND", "In4.Cu", GND_PLANE),
+          # L4 rails as rectangles (FreeRouting cannot take a concave plane): every piece at its own priority (KiCad wants
           # touching zones distinct); same-net pieces touch or overlap and merge, and the engine's rails gate holds each rail
-          # to one piece. +3V3 is routed (PWR_1A, 0.5 mm) since 2026-10-08: on the one rail layer the two 6 A rails and the
-          # 3 A inlet cut any +3V3 base into pieces, and the router does not join the pieces of a plane net
-          ("VBUS_IN_L3", "VBUS_IN", "In2.Cu", [(3, 3), (50, 3), (50, 36), (3, 36)], 4),                        # inlet to the bucks' VIN pins...
-          ("VBUS_IN_L3_pd", "VBUS_IN", "In2.Cu", [(3, 36), (27, 36), (27, 52), (3, 52)], 3),                   # ...and down to the PD controller's VBUS parts
-          ("5V_TGT_L3_l102", "+5V_TGT", "In2.Cu", [(56, 3), (70, 3), (70, 36), (56, 36)], 9),                  # L102's output (R125 at the back edge) down to the band...
-          ("5V_TGT_L3_band", "+5V_TGT", "In2.Cu", [(56, 36), (129, 36), (129, 40), (56, 40)], 5),              # ...across the board below the PHY...
-          ("5V_TGT_L3_right", "+5V_TGT", "In2.Cu", [(129, 8), (137, 8), (137, 97), (129, 97)], 6),             # ...down the right edge...
-          ("5V_TGT_L3_efuse", "+5V_TGT", "In2.Cu", [(108, 77), (137, 77), (137, 97), (108, 97)], 8),           # ...to the eFuse and J14
-          ("5V_PORTS_L3_l101", "+5V_PORTS", "In2.Cu", [(28, 10), (42, 10), (42, 40), (28, 40)], 10),            # L101's output down to the 3V3 buck...
-          ("5V_PORTS_L3_u105", "+5V_PORTS", "In2.Cu", [(36, 40), (62, 40), (62, 48), (36, 48)], 11),            # ...to the 3V3 buck's input...
-          ("5V_PORTS_L3_mid", "+5V_PORTS", "In2.Cu", [(48, 48), (64, 48), (64, 80), (48, 80)], 12),             # ...down beside the relay...
-          ("5V_PORTS_L3_band", "+5V_PORTS", "In2.Cu", [(10, 70), (48, 70), (48, 83), (10, 83)], 13),            # ...along the port switches (their pads at y 78.5 to 80.5)
-          ("5V_PORTS_L3_bridge", "+5V_PORTS", "In2.Cu", [(62, 45), (100, 45), (100, 57), (62, 57)], 15),        # ...across above the region to the DAPLink's VBUS...
-          ("5V_PORTS_L3_right", "+5V_PORTS", "In2.Cu", [(86, 52), (126, 52), (126, 57), (86, 57)], 14),        # ...to the FTDI switch...
-          ("5V_PORTS_L3_relays", "+5V_PORTS", "In2.Cu", [(88, 57), (108, 57), (108, 82), (88, 82)], 16),      # ...down to the relays...
-          ("5V_PORTS_L3_ftdi", "+5V_PORTS", "In2.Cu", [(108, 57), (126, 57), (126, 77), (108, 77)], 17)]       # ...and to the FTDI switch behind J9 (K802's coil pin at y 76.7)
+          # to one piece. +3V3 stays routed (PWR_1A, 0.5 mm; three routing layers now): a +3V3 plane would take a signal layer,
+          # and on the rail layer the two 6 A rails and the 3 A inlet cut any +3V3 base into pieces
+          ("VBUS_IN_L4", "VBUS_IN", "In3.Cu", [(3, 3), (50, 3), (50, 36), (3, 36)], 4),                        # inlet to the bucks' VIN pins...
+          ("VBUS_IN_L4_pd", "VBUS_IN", "In3.Cu", [(3, 36), (27, 36), (27, 52), (3, 52)], 3),                   # ...and down to the PD controller's VBUS parts
+          ("5V_TGT_L4_l102", "+5V_TGT", "In3.Cu", [(56, 3), (70, 3), (70, 36), (56, 36)], 9),                  # L102's output (R125 at the back edge) down to the band...
+          ("5V_TGT_L4_band", "+5V_TGT", "In3.Cu", [(56, 36), (129, 36), (129, 40), (56, 40)], 5),              # ...across the board below the PHY...
+          ("5V_TGT_L4_right", "+5V_TGT", "In3.Cu", [(129, 8), (137, 8), (137, 97), (129, 97)], 6),             # ...down the right edge...
+          ("5V_TGT_L4_efuse", "+5V_TGT", "In3.Cu", [(108, 77), (137, 77), (137, 97), (108, 97)], 8),           # ...to the eFuse and J14
+          ("5V_PORTS_L4_l101", "+5V_PORTS", "In3.Cu", [(28, 10), (42, 10), (42, 40), (28, 40)], 10),            # L101's output down to the 3V3 buck...
+          ("5V_PORTS_L4_u105", "+5V_PORTS", "In3.Cu", [(36, 40), (62, 40), (62, 48), (36, 48)], 11),            # ...to the 3V3 buck's input...
+          ("5V_PORTS_L4_mid", "+5V_PORTS", "In3.Cu", [(48, 48), (64, 48), (64, 80), (48, 80)], 12),             # ...down beside the relay...
+          ("5V_PORTS_L4_band", "+5V_PORTS", "In3.Cu", [(10, 70), (48, 70), (48, 83), (10, 83)], 13),            # ...along the port switches (their pads at y 78.5 to 80.5)
+          ("5V_PORTS_L4_bridge", "+5V_PORTS", "In3.Cu", [(62, 45), (100, 45), (100, 57), (62, 57)], 15),        # ...across above the region to the DAPLink's VBUS...
+          ("5V_PORTS_L4_right", "+5V_PORTS", "In3.Cu", [(86, 52), (126, 52), (126, 57), (86, 57)], 14),        # ...to the FTDI switch...
+          ("5V_PORTS_L4_relays", "+5V_PORTS", "In3.Cu", [(88, 57), (108, 57), (108, 82), (88, 82)], 16),      # ...down to the relays...
+          ("5V_PORTS_L4_ftdi", "+5V_PORTS", "In3.Cu", [(108, 57), (126, 57), (126, 77), (108, 77)], 17)]       # ...and to the FTDI switch behind J9 (K802's coil pin at y 76.7)
 ISO_GAP = 2.0
 # ---- lanes (ecad-standards/layout.md sections 1 and 5): a corridor reserved for one routed path, from pad to pad
 # through axis-aligned legs ("x"/"y" items move along one axis to a coordinate or to another pad's coordinate),
@@ -197,13 +202,16 @@ PAIR_CLASSES = {"USB"}
 ISOLATION_RECTS = [(66, 62, 86, 100), (50, 82, 66, 100)]           # ISOLATION as rectangles, for the placer
 ISOLATION_GROWN_RECTS = [(64, 60, 88, 100), (48, 80, 64, 100)]     # ISOLATION_PLANE_HOLE likewise: board-net parts stay out              # creepage between PSU_3A nets and board nets
 
-STACKUP = [  # Advanced Circuits standard 4-layer 0.062"
-    ("F.Cu", "copper", 0.035), ("dielectric 1", "prepreg", 0.3048, 4.6), ("In1.Cu", "copper", 0.035),
-    ("dielectric 2", "core", 0.7112, 4.7), ("In2.Cu", "copper", 0.035), ("dielectric 3", "prepreg", 0.3048, 4.6), ("B.Cu", "copper", 0.035)]
+STACKUP = [  # Advanced Circuits standard 6-layer 0.062" (their drawing, 2026-10-09): 1 oz on all six layers, two 2116 sheets
+    # (0.009", er 4.3) between L1-L2, L3-L4 and L5-L6, a 0.014" core (er 4.6) between L2-L3 and L4-L5; 0.0634" with the copper
+    ("F.Cu", "copper", 0.035), ("dielectric 1", "prepreg", 0.229, 4.3), ("In1.Cu", "copper", 0.035),
+    ("dielectric 2", "core", 0.356, 4.6), ("In2.Cu", "copper", 0.035), ("dielectric 3", "prepreg", 0.229, 4.3),
+    ("In3.Cu", "copper", 0.035), ("dielectric 4", "core", 0.356, 4.6), ("In4.Cu", "copper", 0.035),
+    ("dielectric 5", "prepreg", 0.229, 4.3), ("B.Cu", "copper", 0.035)]
 # the isolated regions the engine enforces (placement, rule areas, .kicad_dru rules, the region's own island)
 ISOLATION_REGIONS = [{"name": "psu_iso", "note": "PSU passthrough isolation", "outline": ISOLATION, "rects": ISOLATION_RECTS,
                       "grown": ISOLATION_GROWN_RECTS, "nets": r"(^|/)PSU_(VP|VOUT|GND|SENSE)", "classes": ("PSU_3A", "PSU_ISO"),
-                      "gap": ISO_GAP, "island": ("PSU_GND_L2", "PSU_GND", "In1.Cu", ISOLATION)}]
+                      "gap": ISO_GAP, "islands": [("PSU_GND_L2", "PSU_GND", "In1.Cu", ISOLATION), ("PSU_GND_L5", "PSU_GND", "In4.Cu", ISOLATION)]}]
 # the bulk router for gen/pcb.py --route (ecad-standards/tools/autoroute.py): FreeRouting 2.4.1, one thread
 FREEROUTING = "/home/flippy/Documents/claude/mythtv-porg/tools/freerouting/bin/freerouting"
 FREEROUTING_PASSES = 24   # the plateau comes before 20 on this board; the session is written only at the end

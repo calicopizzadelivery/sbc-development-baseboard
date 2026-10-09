@@ -15,10 +15,14 @@ top-left corner, X to the right, Y down, in millimetres, as KiCad draws it.
   routed 140 × 80 board was discarded with the change and stays in history).
   Components on **both sides** by the rule under Sides below (2026-10-06; top
   side only before that).
-- Advanced Circuits standard 4-layer 0.062": L1 signal (1 oz), 0.012"
-  prepreg, L2 **ground plane** (1 oz), 0.028" core, L3 power / signal (1 oz),
-  0.012" prepreg, L4 signal (1 oz). State it in the fab notes and ask for
-  controlled impedance on the `USB` class.
+- Advanced Circuits standard 6-layer 0.062" (their drawing, 2026-10-09;
+  four layers until then: the router left 116 connections open on two
+  routing layers, 99 with its costs tuned, and the wall was the layer
+  count): 1 oz on all six layers; L1 signal and ground flood, two 2116
+  sheets (≈ 0.009"), L2 **ground plane**, 0.014" core, L3 signal, two 2116
+  sheets, L4 **rails**, 0.014" core, L5 **ground plane**, two 2116 sheets,
+  L6 signal and ground flood. State it in the fab notes and ask for
+  controlled impedance on the `USB` and `ETH` classes.
 
 ## Mounting holes
 
@@ -150,8 +154,10 @@ USB 2.0 pairs get their lanes when the pairs are placed (standard, section
 
 ## Planes
 
-L2 (In1.Cu) is the ground plane, one outline notched around the isolation
-region. L3 (In2.Cu) carries the three heavy rails as rectangles (the
+L2 (In1.Cu) and L5 (In4.Cu) are the ground planes, one outline each
+notched around the isolation region, which holds its own PSU_GND island on
+both; L3 (In2.Cu) routes with the outer layers. L4 (In3.Cu) carries the
+three heavy rails as rectangles, referenced to L5 across the core (the
 autorouter's DSN reader takes no concave plane), each at its own priority,
 every rail one piece (the standard's rails gate rasterises each rail with
 the others carving it and stops on a rail in pieces): VBUS_IN in the inlet
@@ -162,8 +168,9 @@ at y 78.5 to 80.5), across above the region to the DAPLink's VBUS, to the FTDI
 switch, down to the relays and to the switch behind J9; +5V_TGT from L102's
 output (and R125 at the back edge) down to the band at y 36–40, across it
 below the PHY to the right edge, down it to the eFuse and J14. +3V3 is
-routed, in its 0.5 mm `PWR_1A` class (2026-10-08): until then an +3V3 base
-lay under the rails in five pieces, and the other three rails cut it into
+routed, in its 0.5 mm `PWR_1A` class (2026-10-08; on six layers a plane for
+it would cost the third routing layer, so it stays routed): until then an
++3V3 base lay under the rails in five pieces, and the other three rails cut it into
 three islands that no rail via or router track joined, with 16 of its 45
 rail vias standing in copper another rail had carved away; on one rail
 layer the two 6 A trees and the 3 A inlet leave no planar room for a fourth

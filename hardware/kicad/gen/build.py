@@ -35,16 +35,16 @@ def netclass(name, **kw):
 
 def net_settings():
     # USB 2.0 pairs: every net named <base>_P / <base>_N (J1_D, J3_D, PORTn_D on the connector side; K64_USB, FTDI_USB at the chips; HUB_UP, HUB_DNn at the hub)
-    # 90 ohm differential microstrip on Advanced Circuits' standard 4-layer 62 mil stackup: 1 oz outer
-    # copper over a 12 mil prepreg (er 4.6) to the L2 ground plane -> 0.35 mm traces, 0.20 mm gap
-    # (edge-coupled microstrip estimate, ~91 ohm); the fab's impedance calculator has the last word
+    # 90 ohm differential microstrip on Advanced Circuits' standard 6-layer 62 mil stackup (2026-10-09): 1 oz outer
+    # copper over two 2116 sheets (9 mil, er 4.3) to the L2 / L5 ground planes -> 0.32 mm traces, 0.20 mm gap; the ETH
+    # pairs 100 ohm -> 0.29 mm, 0.25 mm gap (edge-coupled microstrip estimate); the fab's impedance calculator has the last word
     # current-carrying classes, the current in the name (1 oz outer copper, 10 C rise: 3 A ~ 1.5 mm, 6 A ~ 3.6 mm)
-    return {"classes": [netclass("Default", clearance=0.15), netclass("USB", priority=0, diff_pair_width=0.35, diff_pair_gap=0.2, track_width=0.35),
+    return {"classes": [netclass("Default", clearance=0.15), netclass("USB", priority=0, diff_pair_width=0.32, diff_pair_gap=0.2, track_width=0.32),
                         netclass("PSU_3A", priority=1, track_width=2.0, clearance=0.3, via_diameter=1.0, via_drill=0.5),
                         netclass("USB_VBUS_3A", priority=2, track_width=2.0, via_diameter=1.0, via_drill=0.5),
                         netclass("PWR_6A", priority=3, track_width=4.0, via_diameter=1.2, via_drill=0.6),
                         netclass("PSU_ISO", priority=4, track_width=0.25),
-                        netclass("ETH", priority=5, diff_pair_width=0.28, diff_pair_gap=0.25, track_width=0.28),
+                        netclass("ETH", priority=5, diff_pair_width=0.29, diff_pair_gap=0.25, track_width=0.29),
                         netclass("PWR_1A", priority=6, track_width=0.5, clearance=0.15)],   # +3V3, routed: no room for a plane of it on L3 among the 6 A rails; the default clearance, since it reaches 0.5 mm pitch pins   # 100 ohm MDI pairs on the same stackup (estimate; the fab's calculator rules)               # the opto's sense nets: isolated like PSU_3A, thin "meta": {"version": 4}, "net_colors": None,
             "netclass_assignments": None,
             "netclass_patterns": [{"netclass": "USB", "pattern": p} for p in ("*_USB_?", "*_D_?", "*HUB_UP_?", "*HUB_DN?_?")]   # sheet-local nets carry their sheet path: the leading * matches it

@@ -90,8 +90,9 @@ the full hierarchical name, so a sheet-local net such as `/USB hub/PORT1_VBUS`
 is matched only by a pattern that starts with `*` (the port VBUS nets sat in
 `Default` until 2026-10-08 for want of that star, and the standard's engine
 now stops on a class that no net resolves to). Its differential width and
-gap are 0.35 / 0.20 mm, 90 Ω on the chosen stackup (the fab's calculator
-rules when the stackup is confirmed). Route each pair as a pair, no stubs,
+gap are 0.32 / 0.20 mm, 90 Ω over the ground plane beside each outer layer on
+the six-layer stackup (the fab's calculator rules when the stackup is
+confirmed); the `ETH` class 0.29 / 0.25 mm for 100 Ω. Route each pair as a pair, no stubs,
 over an unbroken reference plane.
 
 **Builds are reproducible.** Every UUID in the generated files is derived,
@@ -127,9 +128,9 @@ called from `gen/pcb.py`, from the schematic's netlist, the project file and
 the directives in `gen/layout.py`, which are
 [docs/layout-directives.md](../../docs/layout-directives.md) as data. It
 carries the 140 × 100 mm outline with 2 mm corners, the four M3 holes on GND
-7 mm from the corners with their corner keep-outs, Advanced Circuits' 4-layer
-stackup, every footprint with its nets, the L2 ground plane with the isolated
-PSU_GND island, and `sbc-baseboard.kicad_dru` with the passthrough's
+7 mm from the corners with their corner keep-outs, Advanced Circuits' 6-layer
+stackup, every footprint with its nets, the L2 and L5 ground planes with the
+isolated PSU_GND islands, and `sbc-baseboard.kicad_dru` with the passthrough's
 isolation rules.
 
 The placement follows
