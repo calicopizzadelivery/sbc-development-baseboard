@@ -222,6 +222,21 @@ until 2026-10-08 the pass stripped them, so the renders showed bare laminate
 where the floods are). The schematic generator stays usable: its
 derived UUIDs keep the footprints linked.
 
+**The router's settings were measured** (2026-10-08 and 09) on scratch
+copies of this placement, each routed from the same placed board with the
+standard's wrapper and given the copper pass; open connections after it:
+FreeRouting's own costs with the 10 µm clearance margin, 116 (the committed
+board); the margin removed and the small via allowed to every class, 122
+(noise: the router had been using the small via on the wide nets all
+along); the width cap at 1 mm, 111 (17 fewer on the wide nets, 10 more on
+the signals); the cap with via cost 25 and starting rip-up cost 200, 96;
+the costs alone with the 2 mm cap, 99, the best on the signals (48 against
+61) and on +3V3 (9 against 13). Opening the rail layer to signal routing
+made FreeRouting drop the rails as connections (888 open at its first
+pass) and run out of time. The costs are the wrapper's defaults from
+ecad-standards 743d3a5 on; the cap stays at 2 mm, the margin is gone. The
+committed board was routed before that and keeps its 116.
+
 The ICs' own layout rules, with sources, are in
 [docs/layout-guidelines.md](../../docs/layout-guidelines.md).
 
