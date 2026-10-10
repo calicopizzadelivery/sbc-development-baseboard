@@ -13,7 +13,7 @@ EDGE_GAP = 1.0             # between neighbouring edge connectors' bodies
 # edge connectors are locked at the positions the first board settled (x, y, rotation); the mating
 # rule that placed them: a horizontal connector's solder pins sit at the rear, so it mates toward the
 # end of its body farthest from the pad rows; a pin header mates where its pins point
-CONNECTORS = {"J1": (3.1, 74.0, -90), "J2": (13.9, 30.0, 0), "J3": (136.9, 19.345, 90), "J4": (37.285, 83.865, 0),
+CONNECTORS = {"J1": (3.1, 64.0, -90), "J2": (13.9, 30.0, 0), "J3": (136.9, 19.345, 90), "J4": (37.285, 83.865, 0),
               "J5": (19.095, 83.865, 0), "J9": (129.435, 65.045, 0), "J10": (60.08, 20.23, 90), "J11": (87.745, 91.475, 0),
               "J12": (101.805, 91.475, 0), "J13": (131.475, 49.165, 90), "J14": (116.845, 89.475, 0), "J18": (56.445, 89.475, 0),
               "J19": (70.665, 89.475, 0)}   # J18/J19 2 mm right (2026-10-08): J4's shield pads 2.6 mm from the passthrough region (their copper still enters its 2 mm band by 0.9 mm; the fills keep the creepage)
@@ -41,7 +41,7 @@ ANCHORS = {
     "U701": (112.0, 46.5, 0),     # console UART shifter (TXB0104) near J13 (J13 10 mm down the edge on 2026-10-07; the shifters follow, clear of the HUB_DN2 leg at x 112)
     "U703": (123.0, 46.5, 0),     # 
     # ESD arrays at their receptacles, in line with the pair, and the series parts of the K20 and FTDI pairs
-    "U401": (10.3, 74.0, 0),       # J1 upstream array, pins 1/3 toward J1
+    "U401": (10.3, 64.0, 0),       # J1 upstream array, pins 1/3 toward J1 (J1 and the array 10 mm up the edge toward the middle on 2026-10-10)
     "U202": (129.7, 19.34, 180),   # J3 array
     "U408": (40.78, 79.0, -90),    # J4 front row (port 1) -> hub DN4, straight above its pads
     "U409": (45.5, 77.4, -90),     # J4 back row (port 2) -> hub DN5, reached on the bottom around the pin rows

@@ -47,7 +47,7 @@ the spec accepted).
 
 | Edge | Connectors, in order from the back corner to the front | Faces | Courtyards (measured) |
 |---|---|---|---|
-| Left (x = 0), 74 mm usable | J2 barrel power in (Kycon KLDX-0202-BC, 2.5 × 5.5 mm, through-hole, horizontal, centre positive: origin y = 30, its front face at the edge and its body 14.5 mm inboard, pins at y 30 and 34.7; a USB-C PD receptacle until 2026-10-10) · J1 USB-C upstream (centred y = 74), split around the middle | adapter / workstation | 11.2 + 10.6 = 21.8 mm |
+| Left (x = 0), 74 mm usable | J2 barrel power in (Kycon KLDX-0202-BC, 2.5 × 5.5 mm, through-hole, horizontal, centre positive: origin y = 30, its front face at the edge and its body 14.5 mm inboard, pins at y 30 and 34.7; a USB-C PD receptacle until 2026-10-10) · J1 USB-C upstream (centred y = 64; y = 74 until 2026-10-10, when it moved 10 mm up the edge toward the middle), split around the middle | adapter / workstation | 11.2 + 10.6 = 21.8 mm |
 | Back (y = 0), 114 mm usable | J10 RJ45, from x = 55 (from x = 14 until 2026-10-07, when the PD inlet's two 5 V bucks took the back-edge corner beside J2; from x = 71 until 2026-10-10, when the bucks had gone and the jack and its PHY moved 16 mm back toward the corner to open the K64's side) | workstation | 19.0 mm wide, 22.4 mm deep |
 | Right (x = 140), 74 mm usable | J3 USB-C HID (centred y = 19.3) · J13 console (origin y = 49.2) · J9 FTDI right-angle (origin y = 65.0), J13 moved 10 mm and J9 20 mm down the edge on 2026-10-07, leaving 11 mm between courtyards (they were packed 1.5 mm apart in the back half) | target | 10.6 + 16.5 + 16.3 = 43.4 mm |
 | Front (y = 100), left end | J5, J4 USB-A stacks (J5 at x = 19, J4 at x = 37: swapped on 2026-10-06 so each stack's pairs reach the hub row they are wired to without crossing) · J18 PSU in (x = 56.4) · J19 PSU out (x = 70.7), both 2 mm right since 2026-10-08 so J4's shield pads stand 2.6 mm from the passthrough region (their copper still enters its 2 mm creepage band by 0.9 mm; the fills keep the creepage, DRC agrees) | bench / PSU | 17.2 + 17.2 + 13.2 + 13.2 = 60.8 mm |
@@ -279,7 +279,7 @@ are the knobs.
 | U702 | (118, 29, 0) | GPIO level shifter (TXB0108) near J15 |
 | U701 | (112, 46.5, 0) | console UART shifter (TXB0104) behind J13, which moved 10 mm down the edge; clear of the HUB_DN2 leg at x = 112 |
 | U703 | (123, 46.5, 0) |  |
-| U401 | (10.3, 74, 0) | J1 upstream array at its receptacle, in line with the pair, pins 1/3 toward J1 |
+| U401 | (10.3, 64, 0) | J1 upstream array at its receptacle (10 mm up the edge with J1 on 2026-10-10), in line with the pair, pins 1/3 toward J1 |
 | U202 | (129.7, 19.34, 180) | J3 array |
 | U408 | (40.78, 79, -90) | J4 front row (port 1) -> hub DN4, straight above its pads |
 | U409 | (45.5, 77.4, -90) | J4 back row (port 2) -> hub DN5, reached on the bottom around the pin rows |

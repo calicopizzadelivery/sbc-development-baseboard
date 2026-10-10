@@ -7655,13 +7655,14 @@
 		(descr "Capacitor SMD 1206 (3216 Metric), square (rectangular) end terminal, IPC-7351 nominal, (Body size source: IPC-SM-782 page 76, https://www.pcb-3d.com/wordpress/wp-content/uploads/ipc-sm-782a_amendment_1_and_2.pdf)")
 		(tags "capacitor")
 		(property "Reference" "C418"
-			(at 1 -2.1236 90)
+			(at 2 2.73 90)
 			(layer "F.SilkS")
+			(hide yes)
 			(uuid "ad99f670-d614-5a5f-92f0-47e7200d22ba")
 			(effects
 				(font
-					(size 0.8 0.8)
-					(thickness 0.12)
+					(size 0.7 0.7)
+					(thickness 0.1)
 				)
 			)
 		)
@@ -8105,7 +8106,7 @@
 		(descr "Capacitor SMD 0603 (1608 Metric), square (rectangular) end terminal, IPC-7351 nominal, (Body size source: IPC-SM-782 page 76, https://www.pcb-3d.com/wordpress/wp-content/uploads/ipc-sm-782a_amendment_1_and_2.pdf)")
 		(tags "capacitor")
 		(property "Reference" "C421"
-			(at 0 1.7036 0)
+			(at 0 -1.7036 0)
 			(layer "F.SilkS")
 			(uuid "672b825b-2c14-5f38-a7d0-9ec89299d21b")
 			(effects
@@ -8251,7 +8252,7 @@
 		(descr "Capacitor SMD 1206 (3216 Metric), square (rectangular) end terminal, IPC-7351 nominal, (Body size source: IPC-SM-782 page 76, https://www.pcb-3d.com/wordpress/wp-content/uploads/ipc-sm-782a_amendment_1_and_2.pdf)")
 		(tags "capacitor")
 		(property "Reference" "C422"
-			(at 3.2736 0 0)
+			(at 3.2736 0.5 0)
 			(layer "F.SilkS")
 			(uuid "cfc2861b-a5fd-5d3b-888e-fb9516f6788f")
 			(effects
@@ -14070,11 +14071,11 @@
 	(footprint "LED_0603_1608Metric"
 		(layer "F.Cu")
 		(uuid "6e0849bc-d0a9-5f4b-aa23-cfcde7a4ce6e")
-		(at 22.095 72.009999 -90)
+		(at 15.094999 72.785 -90)
 		(descr "LED SMD 0603 (1608 Metric), square (rectangular) end terminal, IPC-7351 nominal, (Body size source: http://www.tortai-tech.com/upload/download/2011102023233369053.pdf)")
 		(tags "LED")
 		(property "Reference" "D403"
-			(at -2.4536 0 0)
+			(at -2.4536 0.5 0)
 			(layer "F.SilkS")
 			(uuid "95ec0419-148e-5eb6-ba49-e7258b1cad69")
 			(effects
@@ -14265,11 +14266,11 @@
 	(footprint "LED_0603_1608Metric"
 		(layer "F.Cu")
 		(uuid "82830325-e564-5e70-a9fe-1f7e05fd7f89")
-		(at 27.981165 75.32548 -90)
+		(at 22.12 71.815 -90)
 		(descr "LED SMD 0603 (1608 Metric), square (rectangular) end terminal, IPC-7351 nominal, (Body size source: http://www.tortai-tech.com/upload/download/2011102023233369053.pdf)")
 		(tags "LED")
 		(property "Reference" "D404"
-			(at -2.453601 -0.499999 0)
+			(at -2.4536 0.000001 0)
 			(layer "F.SilkS")
 			(uuid "b7e003c3-87ff-52b5-a922-c2a24148c485")
 			(effects
@@ -19561,7 +19562,7 @@
 	(footprint "USB_C_Receptacle_GCT_USB4105-xx-A_16P_TopMnt_Horizontal_PegClear"
 		(layer "F.Cu")
 		(uuid "ef382ab4-6a61-56a4-a9b3-a2c13bd27ad1")
-		(at 3.1 74 -90)
+		(at 3.1 64 -90)
 		(descr "USB 2.0 Type C Receptacle, GCT USB4105, 16P, top mounted, horizontal, 5A: KiCad's footprint of GCT's recommended layout (https://gct.co/files/drawings/usb4105.pdf) with the outer ground pads A1, A12, B1, B12 shortened 1.15 to 1.05 mm at the end facing the 0.65 mm board-lock peg holes: hole to copper 0.29 mm instead of 0.19 mm, for a 0.25 mm fab minimum")
 		(tags "USB C Type-C Receptacle SMD USB 2.0 16P 16C USB4105-15-A USB4105-15-A-060 USB4105-15-A-120 USB4105-GF-A USB4105-GF-A-060 USB4105-GF-A-120 peg clearance")
 		(property "Reference" "J1"
@@ -21234,7 +21235,7 @@
 		(descr "Stacked USB A connector http://katalog.we-online.de/em/datasheet/61400826021.pdf")
 		(tags "Wuerth stacked USB_A")
 		(property "Reference" "J5"
-			(at 11 -3.3236 0)
+			(at 9 -3.3236 0)
 			(layer "F.SilkS")
 			(uuid "018a4bcd-6e46-5ae4-aa04-056f151774be")
 			(effects
@@ -34182,7 +34183,7 @@
 	(footprint "R_0603_1608Metric"
 		(layer "B.Cu")
 		(uuid "e36ac399-73e3-5902-a0e8-646470f419f7")
-		(at 9.585 74 180)
+		(at 9.585 64 180)
 		(descr "Resistor SMD 0603 (1608 Metric), square (rectangular) end terminal, IPC-7351 nominal, (Body size source: IPC-SM-782 page 72, https://www.pcb-3d.com/wordpress/wp-content/uploads/ipc-sm-782a_amendment_1_and_2.pdf)")
 		(tags "resistor")
 		(property "Reference" "R402"
@@ -35534,14 +35535,13 @@
 		(descr "Resistor SMD 0603 (1608 Metric), square (rectangular) end terminal, IPC-7351 nominal, (Body size source: IPC-SM-782 page 72, https://www.pcb-3d.com/wordpress/wp-content/uploads/ipc-sm-782a_amendment_1_and_2.pdf)")
 		(tags "resistor")
 		(property "Reference" "R411"
-			(at 1.5 2.31 90)
+			(at 0 -1.7036 90)
 			(layer "F.SilkS")
-			(hide yes)
 			(uuid "05eaa138-6f1a-5fb8-9f84-d164bbabf0e5")
 			(effects
 				(font
-					(size 0.7 0.7)
-					(thickness 0.1)
+					(size 0.8 0.8)
+					(thickness 0.12)
 				)
 			)
 		)
@@ -37198,11 +37198,11 @@
 	(footprint "R_0603_1608Metric"
 		(layer "B.Cu")
 		(uuid "9edff5ec-7e6f-5de5-bb68-767d51170775")
-		(at 9.585 72.25)
+		(at 9.585 62.25)
 		(descr "Resistor SMD 0603 (1608 Metric), square (rectangular) end terminal, IPC-7351 nominal, (Body size source: IPC-SM-782 page 72, https://www.pcb-3d.com/wordpress/wp-content/uploads/ipc-sm-782a_amendment_1_and_2.pdf)")
 		(tags "resistor")
 		(property "Reference" "R422"
-			(at 0 -1.703601 0)
+			(at 0 -1.7036 0)
 			(layer "B.SilkS")
 			(uuid "69829f0d-96d2-5e94-96fd-ad4ce73be972")
 			(effects
@@ -37350,7 +37350,7 @@
 	(footprint "R_0603_1608Metric"
 		(layer "B.Cu")
 		(uuid "4d64132d-ebbe-5c2d-89d1-0db9446f5c94")
-		(at 9.585 75.75)
+		(at 9.585 65.75)
 		(descr "Resistor SMD 0603 (1608 Metric), square (rectangular) end terminal, IPC-7351 nominal, (Body size source: IPC-SM-782 page 72, https://www.pcb-3d.com/wordpress/wp-content/uploads/ipc-sm-782a_amendment_1_and_2.pdf)")
 		(tags "resistor")
 		(property "Reference" "R423"
@@ -37502,18 +37502,17 @@
 	(footprint "R_0603_1608Metric"
 		(layer "F.Cu")
 		(uuid "24ab57a6-c391-5e7f-baa7-4bbc42c63505")
-		(at 32.4225 74.284999 -90)
+		(at 30.9225 75.989999 -90)
 		(descr "Resistor SMD 0603 (1608 Metric), square (rectangular) end terminal, IPC-7351 nominal, (Body size source: IPC-SM-782 page 72, https://www.pcb-3d.com/wordpress/wp-content/uploads/ipc-sm-782a_amendment_1_and_2.pdf)")
 		(tags "resistor")
 		(property "Reference" "R424"
-			(at -1.5 -2.31 90)
+			(at -0.5 1.7036 90)
 			(layer "F.SilkS")
-			(hide yes)
 			(uuid "202a8733-e905-5b34-b773-2707553e7147")
 			(effects
 				(font
-					(size 0.7 0.7)
-					(thickness 0.1)
+					(size 0.8 0.8)
+					(thickness 0.12)
 				)
 			)
 		)
@@ -38399,11 +38398,11 @@
 	(footprint "R_0603_1608Metric"
 		(layer "F.Cu")
 		(uuid "fa28b19c-67bb-52a3-91bf-96693599bdb2")
-		(at 11.732499 83.794999)
+		(at 13.232499 75.989999 -90)
 		(descr "Resistor SMD 0603 (1608 Metric), square (rectangular) end terminal, IPC-7351 nominal, (Body size source: IPC-SM-782 page 72, https://www.pcb-3d.com/wordpress/wp-content/uploads/ipc-sm-782a_amendment_1_and_2.pdf)")
 		(tags "resistor")
 		(property "Reference" "R430"
-			(at 0 1.703599 0)
+			(at 0 1.7036 90)
 			(layer "F.SilkS")
 			(uuid "a1c35378-aab7-5155-b192-f83fa51d9c51")
 			(effects
@@ -38414,7 +38413,7 @@
 			)
 		)
 		(property "Value" "10k"
-			(at 0 1.43 0)
+			(at 0 1.43 270)
 			(layer "F.Fab")
 			(uuid "feb63a43-7c37-528d-9337-67422f13a8cf")
 			(effects
@@ -38425,7 +38424,7 @@
 			)
 		)
 		(property "Datasheet" ""
-			(at 0 0 0)
+			(at 0 0 270)
 			(layer "F.Fab")
 			(hide yes)
 			(uuid "26b4db98-e225-5755-9ae5-337e59236e62")
@@ -38436,7 +38435,7 @@
 			)
 		)
 		(property "Description" ""
-			(at 0 0 0)
+			(at 0 0 270)
 			(layer "F.Fab")
 			(hide yes)
 			(uuid "1145784d-3cb6-56bc-8cc1-7c41a489ebc9")
@@ -38447,7 +38446,7 @@
 			)
 		)
 		(property "KiLib_Generator" "SMD_2terminal_chip_molded"
-			(at 0 0 0)
+			(at 0 0 270)
 			(layer "F.SilkS")
 			(hide yes)
 			(uuid "3561bf93-a7e4-5a47-947e-7cf0be5918e8")
@@ -38461,8 +38460,8 @@
 		(attr smd)
 		(duplicate_pad_numbers_are_jumpers no)
 		(fp_line
-			(start -0.237258 -0.5225)
-			(end 0.237258 -0.5225)
+			(start -0.237258 0.5225)
+			(end 0.237258 0.5225)
 			(stroke
 				(width 0.12)
 				(type solid)
@@ -38471,8 +38470,8 @@
 			(uuid "b99ffa78-f7ae-5b3f-a856-d99254853d65")
 		)
 		(fp_line
-			(start -0.237258 0.5225)
-			(end 0.237258 0.5225)
+			(start -0.237258 -0.5225)
+			(end 0.237258 -0.5225)
 			(stroke
 				(width 0.12)
 				(type solid)
@@ -38503,7 +38502,7 @@
 			(uuid "7eabe7f8-e9ad-5945-b4d2-833b2114f2a4")
 		)
 		(fp_text user "${REFERENCE}"
-			(at 0 0 0)
+			(at 0 0 270)
 			(layer "F.Fab")
 			(uuid "0e1baafb-6a75-5fb4-91be-ea7ead87494e")
 			(effects
@@ -38514,7 +38513,7 @@
 			)
 		)
 		(pad "1" smd roundrect
-			(at -0.825 0)
+			(at -0.825 0 270)
 			(size 0.8 0.95)
 			(layers "F.Cu" "F.Mask" "F.Paste")
 			(roundrect_rratio 0.25)
@@ -38522,7 +38521,7 @@
 			(uuid "0e842d2a-5e06-5989-b2e3-914daeee6b61")
 		)
 		(pad "2" smd roundrect
-			(at 0.825 0)
+			(at 0.825 0 270)
 			(size 0.8 0.95)
 			(layers "F.Cu" "F.Mask" "F.Paste")
 			(roundrect_rratio 0.25)
@@ -38697,17 +38696,18 @@
 	(footprint "R_0603_1608Metric"
 		(layer "F.Cu")
 		(uuid "567aaf37-f30d-5ced-95da-1865c4751c2d")
-		(at 22.095 75.215 90)
+		(at 15.094999 75.99 90)
 		(descr "Resistor SMD 0603 (1608 Metric), square (rectangular) end terminal, IPC-7351 nominal, (Body size source: IPC-SM-782 page 72, https://www.pcb-3d.com/wordpress/wp-content/uploads/ipc-sm-782a_amendment_1_and_2.pdf)")
 		(tags "resistor")
 		(property "Reference" "R432"
-			(at 0.5 -1.7036 90)
+			(at 1.5 2.31 90)
 			(layer "F.SilkS")
+			(hide yes)
 			(uuid "2ab30706-1d00-52c5-b04b-d12e06ca08e6")
 			(effects
 				(font
-					(size 0.8 0.8)
-					(thickness 0.12)
+					(size 0.7 0.7)
+					(thickness 0.1)
 				)
 			)
 		)
@@ -39147,17 +39147,17 @@
 	(footprint "R_0603_1608Metric"
 		(layer "F.Cu")
 		(uuid "e1770683-a875-50f7-8645-abe3fead2b15")
-		(at 27.981165 78.53048 90)
+		(at 22.12 75.02 90)
 		(descr "Resistor SMD 0603 (1608 Metric), square (rectangular) end terminal, IPC-7351 nominal, (Body size source: IPC-SM-782 page 72, https://www.pcb-3d.com/wordpress/wp-content/uploads/ipc-sm-782a_amendment_1_and_2.pdf)")
 		(tags "resistor")
 		(property "Reference" "R435"
-			(at 0.5 1.61 90)
+			(at 0 -1.7036 90)
 			(layer "F.SilkS")
 			(uuid "63541160-b3d1-5e37-a4fe-1cc0e9f8bc1f")
 			(effects
 				(font
-					(size 0.7 0.7)
-					(thickness 0.1)
+					(size 0.8 0.8)
+					(thickness 0.12)
 				)
 			)
 		)
@@ -47523,11 +47523,11 @@
 	(footprint "SOT-23-6"
 		(layer "F.Cu")
 		(uuid "3d858f29-c61b-502a-91df-f31971ecf5ba")
-		(at 10.3 74)
+		(at 10.3 64)
 		(descr "SOT, 6 Pin (JEDEC MO-178 Var AB https://www.jedec.org/document_search?search_api_views_fulltext=MO-178)")
 		(tags "SOT TO_SOT_SMD")
 		(property "Reference" "U401"
-			(at 0 -2.673601 0)
+			(at 0 -2.6736 0)
 			(layer "F.SilkS")
 			(uuid "0931edc6-1b79-5f04-a81b-ed758ca2459a")
 			(effects
@@ -49628,7 +49628,7 @@
 		(descr "SOT, 6 Pin (JEDEC MO-178 Var AB https://www.jedec.org/document_search?search_api_views_fulltext=MO-178)")
 		(tags "SOT TO_SOT_SMD")
 		(property "Reference" "U405"
-			(at 1 2.6736 0)
+			(at 4.006905 0 0)
 			(layer "F.SilkS")
 			(uuid "cc4fa1ec-77ae-5db9-a888-6d41b357c25b")
 			(effects
@@ -51674,7 +51674,7 @@
 		(descr "SOT, 6 Pin (JEDEC MO-178 Var AB https://www.jedec.org/document_search?search_api_views_fulltext=MO-178)")
 		(tags "SOT TO_SOT_SMD")
 		(property "Reference" "U411"
-			(at -5.487179 0.375334 0)
+			(at -0.5 -3.656905 0)
 			(layer "F.SilkS")
 			(uuid "330154f1-018e-50a9-b885-b3bd8d879d22")
 			(effects
@@ -55947,8 +55947,8 @@
 		(uuid "b3647c47-5da2-5e10-bdfc-6e391f3e3e83")
 	)
 	(segment
-		(start 10.41 72.25)
-		(end 13.035 72.25)
+		(start 10.41 62.25)
+		(end 13.035 62.25)
 		(width 0.2)
 		(locked yes)
 		(layer "B.Cu")
@@ -55956,8 +55956,8 @@
 		(uuid "99c81a30-3487-5c63-80d0-629682fd5aee")
 	)
 	(segment
-		(start 10.41 75.75)
-		(end 13.035 75.75)
+		(start 10.41 65.75)
+		(end 13.035 65.75)
 		(width 0.2)
 		(locked yes)
 		(layer "B.Cu")
@@ -56460,8 +56460,8 @@
 		(uuid "adf118f1-ee82-5b25-aeaa-e26c9d79213e")
 	)
 	(segment
-		(start 12 73.05)
-		(end 13.2 73.735)
+		(start 12 63.05)
+		(end 13.2 63.735)
 		(width 0.2)
 		(locked yes)
 		(layer "F.Cu")
@@ -56469,8 +56469,8 @@
 		(uuid "8600db54-71b6-5d7c-8258-77051676551a")
 	)
 	(segment
-		(start 12 74.95)
-		(end 13.2 74.265)
+		(start 12 64.95)
+		(end 13.2 64.265)
 		(width 0.2)
 		(locked yes)
 		(layer "F.Cu")
@@ -56829,8 +56829,8 @@
 		(uuid "38abb631-728b-5723-b0aa-897697597a30")
 	)
 	(segment
-		(start 13.2 73.735)
-		(end 14 73.735)
+		(start 13.2 63.735)
+		(end 14 63.735)
 		(width 0.33)
 		(locked yes)
 		(layer "F.Cu")
@@ -56838,8 +56838,8 @@
 		(uuid "dcf0abe2-2aaf-5aa4-bf56-4f6e75906519")
 	)
 	(segment
-		(start 13.2 74.265)
-		(end 14 74.265)
+		(start 13.2 64.265)
+		(end 14 64.265)
 		(width 0.33)
 		(locked yes)
 		(layer "F.Cu")
@@ -57054,8 +57054,8 @@
 		(uuid "26dc19a0-b77e-5ee0-b5a4-fff396833ec8")
 	)
 	(segment
-		(start 14 73.735)
-		(end 14.55 73.55)
+		(start 14 63.735)
+		(end 14.55 63.55)
 		(width 0.33)
 		(locked yes)
 		(layer "F.Cu")
@@ -57063,8 +57063,8 @@
 		(uuid "31639407-3763-5add-bc9f-e49bd45c1b9a")
 	)
 	(segment
-		(start 14 74.265)
-		(end 15.45 74.45)
+		(start 14 64.265)
+		(end 15.45 64.45)
 		(width 0.33)
 		(locked yes)
 		(layer "F.Cu")
@@ -57072,8 +57072,8 @@
 		(uuid "8f4344c6-b5b0-5221-88a3-3d962fde5c18")
 	)
 	(segment
-		(start 14.55 73.55)
-		(end 14.735 73)
+		(start 14.55 63.55)
+		(end 14.735 63)
 		(width 0.33)
 		(locked yes)
 		(layer "B.Cu")
@@ -57090,7 +57090,7 @@
 		(uuid "e21ef459-2f0a-511f-b49e-cbad72c4f989")
 	)
 	(segment
-		(start 14.735 73)
+		(start 14.735 63)
 		(end 14.735 59.835)
 		(width 0.33)
 		(locked yes)
@@ -57099,22 +57099,31 @@
 		(uuid "108243b8-5390-5979-b363-ac01f8954058")
 	)
 	(segment
+		(start 15.094999 71.9975)
+		(end 15.094999 70.8725)
+		(width 0.2)
+		(locked yes)
+		(layer "F.Cu")
+		(net "GND")
+		(uuid "09c33b96-780e-5203-806a-6c1500f4e7d2")
+	)
+	(segment
 		(start 15.265 60.365)
 		(end 30.5 60.365)
 		(width 0.33)
 		(locked yes)
 		(layer "B.Cu")
 		(net "/USB hub/HUB_UP_P")
-		(uuid "09c33b96-780e-5203-806a-6c1500f4e7d2")
+		(uuid "5ec790cc-9007-5980-ac15-d0016d07e659")
 	)
 	(segment
-		(start 15.265 73)
+		(start 15.265 63)
 		(end 15.265 60.365)
 		(width 0.33)
 		(locked yes)
 		(layer "B.Cu")
 		(net "/USB hub/HUB_UP_P")
-		(uuid "5ec790cc-9007-5980-ac15-d0016d07e659")
+		(uuid "3f9a205e-49b6-58ac-a9d1-917529dc5b97")
 	)
 	(segment
 		(start 15.4 23.525)
@@ -57123,16 +57132,16 @@
 		(locked yes)
 		(layer "F.Cu")
 		(net "GND")
-		(uuid "3f9a205e-49b6-58ac-a9d1-917529dc5b97")
+		(uuid "fdcab56b-01b3-5ea8-b76a-63d752ea0791")
 	)
 	(segment
-		(start 15.45 74.45)
-		(end 15.265 73)
+		(start 15.45 64.45)
+		(end 15.265 63)
 		(width 0.33)
 		(locked yes)
 		(layer "B.Cu")
 		(net "/USB hub/HUB_UP_P")
-		(uuid "fdcab56b-01b3-5ea8-b76a-63d752ea0791")
+		(uuid "12bb458f-5d71-591a-8253-d0cf8eb576a9")
 	)
 	(segment
 		(start 16.69715 27.22215)
@@ -57141,7 +57150,7 @@
 		(locked yes)
 		(layer "F.Cu")
 		(net "+5V")
-		(uuid "12bb458f-5d71-591a-8253-d0cf8eb576a9")
+		(uuid "72c67172-64fc-5694-af4e-983a0171a925")
 	)
 	(segment
 		(start 16.95 23.525)
@@ -57150,7 +57159,7 @@
 		(locked yes)
 		(layer "F.Cu")
 		(net "+5V")
-		(uuid "72c67172-64fc-5694-af4e-983a0171a925")
+		(uuid "33867114-74a5-5bd1-8c0d-f37eae836f93")
 	)
 	(segment
 		(start 17 37.675)
@@ -57159,7 +57168,7 @@
 		(locked yes)
 		(layer "F.Cu")
 		(net "+5V")
-		(uuid "33867114-74a5-5bd1-8c0d-f37eae836f93")
+		(uuid "dc7f7eb9-2ed4-5e01-ab16-ecf55da500b7")
 	)
 	(segment
 		(start 17.25 30.975)
@@ -57168,7 +57177,7 @@
 		(locked yes)
 		(layer "B.Cu")
 		(net "GND")
-		(uuid "dc7f7eb9-2ed4-5e01-ab16-ecf55da500b7")
+		(uuid "aa85e50d-7539-5617-86f3-2eee9a1f6358")
 	)
 	(segment
 		(start 17.595 72.92)
@@ -57177,7 +57186,7 @@
 		(locked yes)
 		(layer "F.Cu")
 		(net "GND")
-		(uuid "aa85e50d-7539-5617-86f3-2eee9a1f6358")
+		(uuid "08fed6fe-a355-5bd0-b4c4-409fbc7d77da")
 	)
 	(segment
 		(start 17.6516 28.176599)
@@ -57186,7 +57195,7 @@
 		(locked yes)
 		(layer "F.Cu")
 		(net "+5V")
-		(uuid "08fed6fe-a355-5bd0-b4c4-409fbc7d77da")
+		(uuid "29918c1a-10a9-5986-a4bf-3cd8b270d1ea")
 	)
 	(segment
 		(start 18.275 23.525)
@@ -57195,7 +57204,7 @@
 		(locked yes)
 		(layer "F.Cu")
 		(net "+5V")
-		(uuid "29918c1a-10a9-5986-a4bf-3cd8b270d1ea")
+		(uuid "fae637cc-64ec-5124-97cf-d4d0e6f5396b")
 	)
 	(segment
 		(start 18.325 37.675)
@@ -57204,7 +57213,7 @@
 		(locked yes)
 		(layer "F.Cu")
 		(net "+5V")
-		(uuid "fae637cc-64ec-5124-97cf-d4d0e6f5396b")
+		(uuid "3c489e70-b041-518d-bf2d-08c4f86317d5")
 	)
 	(segment
 		(start 18.5 29.025)
@@ -57213,7 +57222,7 @@
 		(locked yes)
 		(layer "F.Cu")
 		(net "+5V")
-		(uuid "3c489e70-b041-518d-bf2d-08c4f86317d5")
+		(uuid "d7d83965-9214-58a3-be09-f96b46a910c4")
 	)
 	(segment
 		(start 19.05 77.3)
@@ -57222,7 +57231,7 @@
 		(locked yes)
 		(layer "F.Cu")
 		(net "/USB hub/HUB_DN6_N")
-		(uuid "d7d83965-9214-58a3-be09-f96b46a910c4")
+		(uuid "406a53e4-ddcf-5409-af4f-195c4aea72f6")
 	)
 	(segment
 		(start 19.05 80.7)
@@ -57231,7 +57240,7 @@
 		(locked yes)
 		(layer "F.Cu")
 		(net "/USB hub/PORT3_D_N")
-		(uuid "406a53e4-ddcf-5409-af4f-195c4aea72f6")
+		(uuid "f6c18fd1-e149-526c-946f-8486de3f6af6")
 	)
 	(segment
 		(start 19.625 23.525)
@@ -57240,7 +57249,7 @@
 		(locked yes)
 		(layer "F.Cu")
 		(net "+5V")
-		(uuid "f6c18fd1-e149-526c-946f-8486de3f6af6")
+		(uuid "fe0402b0-e427-547c-8572-e6e2a7912b3a")
 	)
 	(segment
 		(start 19.675 37.675)
@@ -57249,7 +57258,7 @@
 		(locked yes)
 		(layer "F.Cu")
 		(net "+5V")
-		(uuid "fe0402b0-e427-547c-8572-e6e2a7912b3a")
+		(uuid "3f214251-60a3-5890-989b-82fce42e7ab9")
 	)
 	(segment
 		(start 19.735 58.140233)
@@ -57258,7 +57267,7 @@
 		(locked yes)
 		(layer "F.Cu")
 		(net "/USB hub/HUB_DN6_N")
-		(uuid "3f214251-60a3-5890-989b-82fce42e7ab9")
+		(uuid "a857a32d-8750-585c-bbff-efdd1605cb06")
 	)
 	(segment
 		(start 19.735 76.1)
@@ -57267,7 +57276,7 @@
 		(locked yes)
 		(layer "F.Cu")
 		(net "/USB hub/HUB_DN6_N")
-		(uuid "a857a32d-8750-585c-bbff-efdd1605cb06")
+		(uuid "d616e816-6e15-51c2-9db4-a00fbadb71de")
 	)
 	(segment
 		(start 19.898789 81.919215)
@@ -57276,7 +57285,7 @@
 		(locked yes)
 		(layer "F.Cu")
 		(net "/USB hub/PORT3_D_N")
-		(uuid "d616e816-6e15-51c2-9db4-a00fbadb71de")
+		(uuid "f0bbfd61-e520-51ca-b036-c56457244bab")
 	)
 	(segment
 		(start 20.265 58.359766)
@@ -57285,7 +57294,7 @@
 		(locked yes)
 		(layer "F.Cu")
 		(net "/USB hub/HUB_DN6_P")
-		(uuid "f0bbfd61-e520-51ca-b036-c56457244bab")
+		(uuid "205e29b4-f86a-56e3-b41c-250966216bb6")
 	)
 	(segment
 		(start 20.265 66.479883)
@@ -57294,7 +57303,7 @@
 		(locked yes)
 		(layer "F.Cu")
 		(net "/USB hub/HUB_DN6_P")
-		(uuid "205e29b4-f86a-56e3-b41c-250966216bb6")
+		(uuid "982fd832-f507-5f25-a206-fa1d8f0c90e5")
 	)
 	(segment
 		(start 20.265 67.979883)
@@ -57303,7 +57312,7 @@
 		(locked yes)
 		(layer "F.Cu")
 		(net "/USB hub/HUB_DN6_P")
-		(uuid "982fd832-f507-5f25-a206-fa1d8f0c90e5")
+		(uuid "d356ded6-a268-53c6-8f9a-06df37536a53")
 	)
 	(segment
 		(start 20.265 76.1)
@@ -57312,7 +57321,7 @@
 		(locked yes)
 		(layer "F.Cu")
 		(net "/USB hub/HUB_DN6_P")
-		(uuid "d356ded6-a268-53c6-8f9a-06df37536a53")
+		(uuid "37c2eaec-e45c-5211-a3ad-b4f31d183e2f")
 	)
 	(segment
 		(start 20.690233 57.185)
@@ -57321,7 +57330,7 @@
 		(locked yes)
 		(layer "F.Cu")
 		(net "/USB hub/HUB_DN6_N")
-		(uuid "37c2eaec-e45c-5211-a3ad-b4f31d183e2f")
+		(uuid "35c9cd6a-f5c3-57b3-b5e0-d5c36878c9fc")
 	)
 	(segment
 		(start 20.70469 66.479883)
@@ -57330,7 +57339,7 @@
 		(locked yes)
 		(layer "F.Cu")
 		(net "/USB hub/HUB_DN6_P")
-		(uuid "35c9cd6a-f5c3-57b3-b5e0-d5c36878c9fc")
+		(uuid "090d555e-2343-5483-9c1a-35d6ec4da372")
 	)
 	(segment
 		(start 20.70469 67.979883)
@@ -57339,7 +57348,7 @@
 		(locked yes)
 		(layer "F.Cu")
 		(net "/USB hub/HUB_DN6_P")
-		(uuid "090d555e-2343-5483-9c1a-35d6ec4da372")
+		(uuid "4659720b-1185-592d-8cf1-ce623ad0e9e8")
 	)
 	(segment
 		(start 20.795103 82.716015)
@@ -57348,7 +57357,7 @@
 		(locked yes)
 		(layer "F.Cu")
 		(net "/USB hub/PORT3_D_N")
-		(uuid "4659720b-1185-592d-8cf1-ce623ad0e9e8")
+		(uuid "67c7c8c0-663e-5e1b-b3f5-4c2351b3bfeb")
 	)
 	(segment
 		(start 20.909766 57.715)
@@ -57357,7 +57366,7 @@
 		(locked yes)
 		(layer "F.Cu")
 		(net "/USB hub/HUB_DN6_P")
-		(uuid "67c7c8c0-663e-5e1b-b3f5-4c2351b3bfeb")
+		(uuid "c6b66951-51fa-592b-8381-a0626e9713ed")
 	)
 	(segment
 		(start 20.95 77.3)
@@ -57366,7 +57375,7 @@
 		(locked yes)
 		(layer "F.Cu")
 		(net "/USB hub/HUB_DN6_P")
-		(uuid "c6b66951-51fa-592b-8381-a0626e9713ed")
+		(uuid "5eee07dd-0a7b-5e26-819d-b81259f97aba")
 	)
 	(segment
 		(start 21.023645 83.044296)
@@ -57375,7 +57384,7 @@
 		(locked yes)
 		(layer "F.Cu")
 		(net "/USB hub/PORT3_D_N")
-		(uuid "5eee07dd-0a7b-5e26-819d-b81259f97aba")
+		(uuid "e0cba1cd-0465-53ee-bf10-bdc700e5798f")
 	)
 	(segment
 		(start 21.178541 81.028281)
@@ -57384,7 +57393,7 @@
 		(locked yes)
 		(layer "F.Cu")
 		(net "/USB hub/PORT3_D_P")
-		(uuid "e0cba1cd-0465-53ee-bf10-bdc700e5798f")
+		(uuid "7e807c18-f6a9-587b-8b04-30e6968b9094")
 	)
 	(segment
 		(start 21.3 34)
@@ -57393,7 +57402,7 @@
 		(locked yes)
 		(layer "F.Cu")
 		(net "GND")
-		(uuid "7e807c18-f6a9-587b-8b04-30e6968b9094")
+		(uuid "b0e4f61b-bdcb-56d1-97c7-70882a44eafa")
 	)
 	(segment
 		(start 21.595 83.865)
@@ -57402,7 +57411,7 @@
 		(locked yes)
 		(layer "F.Cu")
 		(net "/USB hub/PORT3_D_N")
-		(uuid "b0e4f61b-bdcb-56d1-97c7-70882a44eafa")
+		(uuid "670a1de5-0e43-5791-bbef-22b9f45b5ff5")
 	)
 	(segment
 		(start 21.595 84.92)
@@ -57411,7 +57420,7 @@
 		(locked yes)
 		(layer "B.Cu")
 		(net "/USB hub/PORT4_D_N")
-		(uuid "670a1de5-0e43-5791-bbef-22b9f45b5ff5")
+		(uuid "5bec6fd3-06e9-5464-ad5a-bf0d20bc961f")
 	)
 	(segment
 		(start 21.595 86.485)
@@ -57420,7 +57429,7 @@
 		(locked yes)
 		(layer "B.Cu")
 		(net "/USB hub/PORT4_D_N")
-		(uuid "5bec6fd3-06e9-5464-ad5a-bf0d20bc961f")
+		(uuid "cae2b15e-4b3b-52e2-acac-7afc478a8a78")
 	)
 	(segment
 		(start 21.8675 59.48228)
@@ -57429,7 +57438,7 @@
 		(locked yes)
 		(layer "B.Cu")
 		(net "/USB hub/HUB_UP_N")
-		(uuid "cae2b15e-4b3b-52e2-acac-7afc478a8a78")
+		(uuid "74cce4d4-5f6b-5fb8-92da-3f90ff4294e1")
 	)
 	(segment
 		(start 21.8675 59.835)
@@ -57438,16 +57447,16 @@
 		(locked yes)
 		(layer "B.Cu")
 		(net "/USB hub/HUB_UP_N")
-		(uuid "74cce4d4-5f6b-5fb8-92da-3f90ff4294e1")
+		(uuid "f0aa85e5-edfa-5523-94a6-ddf1569b5bff")
 	)
 	(segment
-		(start 22.095 71.222499)
-		(end 22.095 70.097499)
+		(start 22.12 71.0275)
+		(end 22.12 69.9025)
 		(width 0.2)
 		(locked yes)
 		(layer "F.Cu")
 		(net "GND")
-		(uuid "f0aa85e5-edfa-5523-94a6-ddf1569b5bff")
+		(uuid "cb030313-375c-5ef2-aa69-60ff2ed9e426")
 	)
 	(segment
 		(start 22.14221 81.77819)
@@ -57456,7 +57465,7 @@
 		(locked yes)
 		(layer "F.Cu")
 		(net "/USB hub/PORT3_D_P")
-		(uuid "cb030313-375c-5ef2-aa69-60ff2ed9e426")
+		(uuid "8a936592-e33e-5244-a95a-bc235b8d5fa0")
 	)
 	(segment
 		(start 22.370752 82.106471)
@@ -57465,7 +57474,7 @@
 		(locked yes)
 		(layer "F.Cu")
 		(net "/USB hub/PORT3_D_P")
-		(uuid "8a936592-e33e-5244-a95a-bc235b8d5fa0")
+		(uuid "582c4de4-f11e-57be-9274-a02a9f5a5f21")
 	)
 	(segment
 		(start 23.3675 59.48228)
@@ -57474,7 +57483,7 @@
 		(locked yes)
 		(layer "B.Cu")
 		(net "/USB hub/HUB_UP_N")
-		(uuid "582c4de4-f11e-57be-9274-a02a9f5a5f21")
+		(uuid "2b96aa56-f396-5c47-aa30-c743b26ccd72")
 	)
 	(segment
 		(start 23.3675 59.835)
@@ -57483,7 +57492,7 @@
 		(locked yes)
 		(layer "B.Cu")
 		(net "/USB hub/HUB_UP_N")
-		(uuid "2b96aa56-f396-5c47-aa30-c743b26ccd72")
+		(uuid "43302af2-d835-563f-93e2-83d0ede1dfde")
 	)
 	(segment
 		(start 23.595 83.865)
@@ -57492,7 +57501,7 @@
 		(locked yes)
 		(layer "F.Cu")
 		(net "/USB hub/PORT3_D_P")
-		(uuid "43302af2-d835-563f-93e2-83d0ede1dfde")
+		(uuid "3e191d4a-3e1a-53fc-9dfd-de57dba1e411")
 	)
 	(segment
 		(start 23.595 85.43)
@@ -57501,7 +57510,7 @@
 		(locked yes)
 		(layer "B.Cu")
 		(net "/USB hub/PORT4_D_P")
-		(uuid "3e191d4a-3e1a-53fc-9dfd-de57dba1e411")
+		(uuid "73404ea9-4718-5ab8-b110-959231f3336c")
 	)
 	(segment
 		(start 23.595 86.485)
@@ -57510,7 +57519,7 @@
 		(locked yes)
 		(layer "B.Cu")
 		(net "/USB hub/PORT4_D_P")
-		(uuid "73404ea9-4718-5ab8-b110-959231f3336c")
+		(uuid "5ffac71e-192b-5174-bcea-070c8c419c74")
 	)
 	(segment
 		(start 24.25 77.3)
@@ -57519,7 +57528,7 @@
 		(locked yes)
 		(layer "F.Cu")
 		(net "/USB hub/HUB_DN7_N")
-		(uuid "5ffac71e-192b-5174-bcea-070c8c419c74")
+		(uuid "25cce3b4-1dd6-50b6-a3bd-a28b10d0907a")
 	)
 	(segment
 		(start 24.84 81.7)
@@ -57528,7 +57537,7 @@
 		(locked yes)
 		(layer "F.Cu")
 		(net "/USB hub/PORT4_D_N")
-		(uuid "25cce3b4-1dd6-50b6-a3bd-a28b10d0907a")
+		(uuid "b5858334-39a9-56db-930e-7b65042f226c")
 	)
 	(segment
 		(start 24.84 84.92)
@@ -57537,7 +57546,7 @@
 		(locked yes)
 		(layer "B.Cu")
 		(net "/USB hub/PORT4_D_N")
-		(uuid "b5858334-39a9-56db-930e-7b65042f226c")
+		(uuid "0a097842-c8e1-5cb2-951e-de02a56b5586")
 	)
 	(segment
 		(start 24.935 59.340233)
@@ -57546,7 +57555,7 @@
 		(locked yes)
 		(layer "F.Cu")
 		(net "/USB hub/HUB_DN7_N")
-		(uuid "0a097842-c8e1-5cb2-951e-de02a56b5586")
+		(uuid "d1fb164f-da7f-5b84-9bfb-6a76097669c8")
 	)
 	(segment
 		(start 24.935 76.1)
@@ -57555,7 +57564,7 @@
 		(locked yes)
 		(layer "F.Cu")
 		(net "/USB hub/HUB_DN7_N")
-		(uuid "d1fb164f-da7f-5b84-9bfb-6a76097669c8")
+		(uuid "9324c185-ec91-5f82-93a0-05c5351e6bfb")
 	)
 	(segment
 		(start 25.465 59.559766)
@@ -57564,7 +57573,7 @@
 		(locked yes)
 		(layer "F.Cu")
 		(net "/USB hub/HUB_DN7_P")
-		(uuid "9324c185-ec91-5f82-93a0-05c5351e6bfb")
+		(uuid "1adc729c-ce6d-52de-ba77-125fc5cfe79d")
 	)
 	(segment
 		(start 25.465 67.079883)
@@ -57573,7 +57582,7 @@
 		(locked yes)
 		(layer "F.Cu")
 		(net "/USB hub/HUB_DN7_P")
-		(uuid "1adc729c-ce6d-52de-ba77-125fc5cfe79d")
+		(uuid "1eb1d3e9-63ea-5889-93e7-b508187d4a2f")
 	)
 	(segment
 		(start 25.465 68.579883)
@@ -57582,7 +57591,7 @@
 		(locked yes)
 		(layer "F.Cu")
 		(net "/USB hub/HUB_DN7_P")
-		(uuid "1eb1d3e9-63ea-5889-93e7-b508187d4a2f")
+		(uuid "4382c16f-bb96-5ce4-8135-1b4ef2e3707f")
 	)
 	(segment
 		(start 25.465 76.1)
@@ -57591,7 +57600,7 @@
 		(locked yes)
 		(layer "F.Cu")
 		(net "/USB hub/HUB_DN7_P")
-		(uuid "4382c16f-bb96-5ce4-8135-1b4ef2e3707f")
+		(uuid "96c2d31b-640d-5cdc-8819-c14bdb32091f")
 	)
 	(segment
 		(start 25.890233 58.385)
@@ -57600,7 +57609,7 @@
 		(locked yes)
 		(layer "F.Cu")
 		(net "/USB hub/HUB_DN7_N")
-		(uuid "96c2d31b-640d-5cdc-8819-c14bdb32091f")
+		(uuid "6a174d8b-272e-5a06-9e6b-f7173bebe608")
 	)
 	(segment
 		(start 25.902205 67.079883)
@@ -57609,7 +57618,7 @@
 		(locked yes)
 		(layer "F.Cu")
 		(net "/USB hub/HUB_DN7_P")
-		(uuid "6a174d8b-272e-5a06-9e6b-f7173bebe608")
+		(uuid "fc7a6187-fd7a-563c-b571-0c3f3fc9c4a3")
 	)
 	(segment
 		(start 25.902205 68.579883)
@@ -57618,7 +57627,7 @@
 		(locked yes)
 		(layer "F.Cu")
 		(net "/USB hub/HUB_DN7_P")
-		(uuid "fc7a6187-fd7a-563c-b571-0c3f3fc9c4a3")
+		(uuid "8e3d56d6-4970-5290-afa4-b3f0d62adb01")
 	)
 	(segment
 		(start 26.109766 58.915)
@@ -57627,7 +57636,7 @@
 		(locked yes)
 		(layer "F.Cu")
 		(net "/USB hub/HUB_DN7_P")
-		(uuid "8e3d56d6-4970-5290-afa4-b3f0d62adb01")
+		(uuid "7977d03c-ef47-5be5-87e9-2e74befe2d61")
 	)
 	(segment
 		(start 26.15 77.3)
@@ -57636,7 +57645,7 @@
 		(locked yes)
 		(layer "F.Cu")
 		(net "/USB hub/HUB_DN7_P")
-		(uuid "7977d03c-ef47-5be5-87e9-2e74befe2d61")
+		(uuid "4f4cf5b9-d415-5931-bea1-2754fe5c5bf8")
 	)
 	(segment
 		(start 27.25 81.7)
@@ -57645,7 +57654,7 @@
 		(locked yes)
 		(layer "F.Cu")
 		(net "/USB hub/PORT4_D_P")
-		(uuid "4f4cf5b9-d415-5931-bea1-2754fe5c5bf8")
+		(uuid "e8137630-4377-581e-a624-2be426f2dd99")
 	)
 	(segment
 		(start 27.25 85.43)
@@ -57654,7 +57663,7 @@
 		(locked yes)
 		(layer "B.Cu")
 		(net "/USB hub/PORT4_D_P")
-		(uuid "e8137630-4377-581e-a624-2be426f2dd99")
+		(uuid "d6f680e5-edef-514a-ba0b-8122166adcee")
 	)
 	(segment
 		(start 27.475 65.105)
@@ -57663,7 +57672,7 @@
 		(locked yes)
 		(layer "F.Cu")
 		(net "GND")
-		(uuid "d6f680e5-edef-514a-ba0b-8122166adcee")
+		(uuid "086c0cee-16f2-5a49-8fd8-51381d0a9613")
 	)
 	(segment
 		(start 27.619999 25.975)
@@ -57672,7 +57681,7 @@
 		(locked yes)
 		(layer "F.Cu")
 		(net "GND")
-		(uuid "086c0cee-16f2-5a49-8fd8-51381d0a9613")
+		(uuid "25208aa8-a168-51ac-a07a-595910859b26")
 	)
 	(segment
 		(start 27.619999 33.375)
@@ -57681,7 +57690,7 @@
 		(locked yes)
 		(layer "F.Cu")
 		(net "+5V")
-		(uuid "25208aa8-a168-51ac-a07a-595910859b26")
+		(uuid "1dcabb06-5962-59da-9e9f-104953db60f7")
 	)
 	(segment
 		(start 27.619999 36.425)
@@ -57690,20 +57699,11 @@
 		(locked yes)
 		(layer "F.Cu")
 		(net "+5V")
-		(uuid "1dcabb06-5962-59da-9e9f-104953db60f7")
+		(uuid "c0ae52a7-50e0-5728-9a98-b44e22b15dec")
 	)
 	(segment
 		(start 27.625 62.4)
 		(end 26.5 62.4)
-		(width 0.2)
-		(locked yes)
-		(layer "F.Cu")
-		(net "GND")
-		(uuid "c0ae52a7-50e0-5728-9a98-b44e22b15dec")
-	)
-	(segment
-		(start 27.981165 74.53798)
-		(end 27.981165 73.41298)
 		(width 0.2)
 		(locked yes)
 		(layer "F.Cu")
@@ -57892,7 +57892,7 @@
 	)
 	(segment
 		(start 33.284999 77.34)
-		(end 31.734999 77.34)
+		(end 32.189149 78.43585)
 		(width 0.2)
 		(locked yes)
 		(layer "F.Cu")
@@ -58287,8 +58287,8 @@
 		(uuid "fd46b631-ee83-5891-a384-cb8708d334df")
 	)
 	(segment
-		(start 4.705 73.5)
-		(end 4.705 75.55)
+		(start 4.705 63.5)
+		(end 4.705 65.55)
 		(width 0.2)
 		(locked yes)
 		(layer "B.Cu")
@@ -58665,8 +58665,8 @@
 		(uuid "278e2bca-c7e2-58e0-80b1-a93589f34fe9")
 	)
 	(segment
-		(start 5.505 72.9)
-		(end 5.505 74.3)
+		(start 5.505 62.9)
+		(end 5.505 64.3)
 		(width 0.2)
 		(locked yes)
 		(layer "B.Cu")
@@ -58944,8 +58944,8 @@
 		(uuid "c6f9d82d-fe4f-56b3-a293-be04d03a9aec")
 	)
 	(segment
-		(start 6.005 73.25)
-		(end 5.505 72.9)
+		(start 6.005 63.25)
+		(end 5.505 62.9)
 		(width 0.2)
 		(locked yes)
 		(layer "F.Cu")
@@ -58953,8 +58953,8 @@
 		(uuid "43ef219b-e6b1-59b6-afe9-1ecf78a9fcd9")
 	)
 	(segment
-		(start 6.005 73.75)
-		(end 4.705 73.5)
+		(start 6.005 63.75)
+		(end 4.705 63.5)
 		(width 0.2)
 		(locked yes)
 		(layer "F.Cu")
@@ -58962,8 +58962,8 @@
 		(uuid "d2bfa597-f482-5f57-82de-43e4ad9e0c79")
 	)
 	(segment
-		(start 6.005 74.25)
-		(end 5.505 74.3)
+		(start 6.005 64.25)
+		(end 5.505 64.3)
 		(width 0.2)
 		(locked yes)
 		(layer "F.Cu")
@@ -58971,8 +58971,8 @@
 		(uuid "542cae72-4d09-51e4-bb0b-37d951186ef1")
 	)
 	(segment
-		(start 6.005 74.75)
-		(end 4.705 75.55)
+		(start 6.005 64.75)
+		(end 4.705 65.55)
 		(width 0.2)
 		(locked yes)
 		(layer "F.Cu")
@@ -58980,8 +58980,8 @@
 		(uuid "0bbdcba6-2387-51e2-9430-07068cdc633a")
 	)
 	(segment
-		(start 6.305 73.25)
-		(end 6.005 73.25)
+		(start 6.305 63.25)
+		(end 6.005 63.25)
 		(width 0.2)
 		(locked yes)
 		(layer "F.Cu")
@@ -58989,8 +58989,8 @@
 		(uuid "cd8e8c57-2fe1-530a-9f3e-8e246dabf650")
 	)
 	(segment
-		(start 6.305 73.75)
-		(end 6.005 73.75)
+		(start 6.305 63.75)
+		(end 6.005 63.75)
 		(width 0.2)
 		(locked yes)
 		(layer "F.Cu")
@@ -58998,8 +58998,8 @@
 		(uuid "6b27149a-9a50-5808-be2d-6ea32731c824")
 	)
 	(segment
-		(start 6.305 74.25)
-		(end 6.005 74.25)
+		(start 6.305 64.25)
+		(end 6.005 64.25)
 		(width 0.2)
 		(locked yes)
 		(layer "F.Cu")
@@ -59007,8 +59007,8 @@
 		(uuid "ee96a03c-f62a-52c4-bb4c-202688a075da")
 	)
 	(segment
-		(start 6.305 74.75)
-		(end 6.005 74.75)
+		(start 6.305 64.75)
+		(end 6.005 64.75)
 		(width 0.2)
 		(locked yes)
 		(layer "F.Cu")
@@ -59016,8 +59016,8 @@
 		(uuid "6a68f0f2-d31f-51b0-8aad-364f9cd67beb")
 	)
 	(segment
-		(start 6.83 70.8)
-		(end 7.660725 69.969275)
+		(start 6.83 60.8)
+		(end 7.660725 59.969274)
 		(width 0.2)
 		(locked yes)
 		(layer "F.Cu")
@@ -59025,8 +59025,8 @@
 		(uuid "54114c2a-09de-5940-9db4-9f34411eac44")
 	)
 	(segment
-		(start 6.83 77.2)
-		(end 7.660725 78.030725)
+		(start 6.83 67.2)
+		(end 7.660725 68.030725)
 		(width 0.2)
 		(locked yes)
 		(layer "F.Cu")
@@ -59349,8 +59349,8 @@
 		(uuid "74a23179-beb4-5f42-9a20-82c7977d611b")
 	)
 	(segment
-		(start 7.255 73.25)
-		(end 7.655 73.25)
+		(start 7.255 63.25)
+		(end 7.655 63.25)
 		(width 0.2)
 		(locked yes)
 		(layer "F.Cu")
@@ -59358,8 +59358,8 @@
 		(uuid "d6067fbf-06a2-56df-af4b-9bc4b02c6065")
 	)
 	(segment
-		(start 7.255 73.75)
-		(end 7.655 73.75)
+		(start 7.255 63.75)
+		(end 7.655 63.75)
 		(width 0.2)
 		(locked yes)
 		(layer "F.Cu")
@@ -59367,8 +59367,8 @@
 		(uuid "f1f778cd-9f50-58c9-9291-9edfb9c402cc")
 	)
 	(segment
-		(start 7.655 73.25)
-		(end 8.199999 73.05)
+		(start 7.655 63.25)
+		(end 8.199999 63.05)
 		(width 0.2)
 		(locked yes)
 		(layer "F.Cu")
@@ -59376,8 +59376,8 @@
 		(uuid "c298339a-bf0c-5ab9-9bec-4d15993bbc09")
 	)
 	(segment
-		(start 7.655 73.75)
-		(end 8.199999 74.95)
+		(start 7.655 63.75)
+		(end 8.199999 64.95)
 		(width 0.2)
 		(locked yes)
 		(layer "F.Cu")
@@ -59484,8 +59484,8 @@
 		(uuid "ddb58ccc-99ca-531e-9c4a-cb5078a84e8d")
 	)
 	(segment
-		(start 8.199999 73.05)
-		(end 8.6 73.05)
+		(start 8.199999 63.05)
+		(end 8.6 63.05)
 		(width 0.2)
 		(locked yes)
 		(layer "F.Cu")
@@ -59493,8 +59493,8 @@
 		(uuid "00152ab2-b0ff-56cf-ae79-04c464080e40")
 	)
 	(segment
-		(start 8.199999 74.95)
-		(end 8.6 74.95)
+		(start 8.199999 64.95)
+		(end 8.6 64.95)
 		(width 0.2)
 		(locked yes)
 		(layer "F.Cu")
@@ -60474,7 +60474,7 @@
 		(uuid "2e272f51-3bf2-5c99-93e3-bb7e25f5732a")
 	)
 	(via
-		(at 13.035 72.25)
+		(at 13.035 62.25)
 		(size 0.6)
 		(drill 0.3)
 		(layers "F.Cu" "B.Cu")
@@ -60483,7 +60483,7 @@
 		(uuid "6e4077d2-34eb-52a6-af88-8457f9ded163")
 	)
 	(via
-		(at 13.035 75.75)
+		(at 13.035 65.75)
 		(size 0.6)
 		(drill 0.3)
 		(layers "F.Cu" "B.Cu")
@@ -60582,7 +60582,7 @@
 		(uuid "5aeb955b-dd38-569e-aaf9-534f3af95ae0")
 	)
 	(via
-		(at 14.55 73.55)
+		(at 14.55 63.55)
 		(size 0.6)
 		(drill 0.3)
 		(layers "F.Cu" "B.Cu")
@@ -60591,7 +60591,7 @@
 		(uuid "d842d258-1c48-5dbe-aa1d-d4b87231544c")
 	)
 	(via
-		(at 15.4 24.65)
+		(at 15.094999 70.8725)
 		(size 0.6)
 		(drill 0.3)
 		(layers "F.Cu" "B.Cu")
@@ -60600,13 +60600,22 @@
 		(uuid "1eeb93fa-8ac0-5ae1-a872-8e175d99cfd3")
 	)
 	(via
-		(at 15.45 74.45)
+		(at 15.4 24.65)
+		(size 0.6)
+		(drill 0.3)
+		(layers "F.Cu" "B.Cu")
+		(locked yes)
+		(net "GND")
+		(uuid "5a770982-d5b0-5d0e-b016-bd2ee1a668b7")
+	)
+	(via
+		(at 15.45 64.45)
 		(size 0.6)
 		(drill 0.3)
 		(layers "F.Cu" "B.Cu")
 		(locked yes)
 		(net "/USB hub/HUB_UP_P")
-		(uuid "5a770982-d5b0-5d0e-b016-bd2ee1a668b7")
+		(uuid "d617fd8e-5877-5f27-abb8-0343dcc0665d")
 	)
 	(via
 		(at 15.7427 26.267699)
@@ -60615,7 +60624,7 @@
 		(layers "F.Cu" "B.Cu")
 		(locked yes)
 		(net "+5V")
-		(uuid "d617fd8e-5877-5f27-abb8-0343dcc0665d")
+		(uuid "9071dbd9-9b9e-5f52-a487-dc92e5a8e9d2")
 	)
 	(via
 		(at 16.125 30.975)
@@ -60624,7 +60633,7 @@
 		(layers "F.Cu" "B.Cu")
 		(locked yes)
 		(net "GND")
-		(uuid "9071dbd9-9b9e-5f52-a487-dc92e5a8e9d2")
+		(uuid "824a96a3-6c7c-578f-b687-8db4135d9136")
 	)
 	(via
 		(at 16.69715 27.22215)
@@ -60633,7 +60642,7 @@
 		(layers "F.Cu" "B.Cu")
 		(locked yes)
 		(net "+5V")
-		(uuid "824a96a3-6c7c-578f-b687-8db4135d9136")
+		(uuid "1de1b2c7-82c2-54b0-91c9-05dfe61ecaf9")
 	)
 	(via
 		(at 17.595 71.37)
@@ -60642,7 +60651,7 @@
 		(layers "F.Cu" "B.Cu")
 		(locked yes)
 		(net "GND")
-		(uuid "1de1b2c7-82c2-54b0-91c9-05dfe61ecaf9")
+		(uuid "2ba5e8bd-30e5-5056-9335-299315eedb2e")
 	)
 	(via
 		(at 17.6516 28.176599)
@@ -60651,7 +60660,7 @@
 		(layers "F.Cu" "B.Cu")
 		(locked yes)
 		(net "+5V")
-		(uuid "2ba5e8bd-30e5-5056-9335-299315eedb2e")
+		(uuid "429675ea-6d89-5b80-a470-6dc9dc799cc9")
 	)
 	(via
 		(at 18.275 23.525)
@@ -60660,7 +60669,7 @@
 		(layers "F.Cu" "B.Cu")
 		(locked yes)
 		(net "+5V")
-		(uuid "429675ea-6d89-5b80-a470-6dc9dc799cc9")
+		(uuid "da87224d-fc33-54c9-b78a-a064906dfe8d")
 	)
 	(via
 		(at 18.325 37.675)
@@ -60669,7 +60678,7 @@
 		(layers "F.Cu" "B.Cu")
 		(locked yes)
 		(net "+5V")
-		(uuid "da87224d-fc33-54c9-b78a-a064906dfe8d")
+		(uuid "9c10bc7f-4c4a-5017-8c69-5110ff17886c")
 	)
 	(via
 		(at 19.625 23.525)
@@ -60678,7 +60687,7 @@
 		(layers "F.Cu" "B.Cu")
 		(locked yes)
 		(net "+5V")
-		(uuid "9c10bc7f-4c4a-5017-8c69-5110ff17886c")
+		(uuid "6b0b267c-ba10-51a0-a788-3cd49ff290b8")
 	)
 	(via
 		(at 19.675 37.675)
@@ -60687,7 +60696,7 @@
 		(layers "F.Cu" "B.Cu")
 		(locked yes)
 		(net "+5V")
-		(uuid "6b0b267c-ba10-51a0-a788-3cd49ff290b8")
+		(uuid "7e56498a-ebe0-5822-bbfb-ea45af6adf26")
 	)
 	(via
 		(at 20.975 23.525)
@@ -60696,7 +60705,7 @@
 		(layers "F.Cu" "B.Cu")
 		(locked yes)
 		(net "+5V")
-		(uuid "7e56498a-ebe0-5822-bbfb-ea45af6adf26")
+		(uuid "3cef0d7a-3be7-578f-b694-6392b8742430")
 	)
 	(via
 		(at 21.025 37.675)
@@ -60705,19 +60714,10 @@
 		(layers "F.Cu" "B.Cu")
 		(locked yes)
 		(net "+5V")
-		(uuid "3cef0d7a-3be7-578f-b694-6392b8742430")
-	)
-	(via
-		(at 22.095 70.097499)
-		(size 0.6)
-		(drill 0.3)
-		(layers "F.Cu" "B.Cu")
-		(locked yes)
-		(net "GND")
 		(uuid "6589a17d-4cd5-56c5-b7ee-1800933f59c3")
 	)
 	(via
-		(at 23.2 34)
+		(at 22.12 69.9025)
 		(size 0.6)
 		(drill 0.3)
 		(layers "F.Cu" "B.Cu")
@@ -60726,13 +60726,22 @@
 		(uuid "c698e6bf-88c5-5388-880a-608872de5b1a")
 	)
 	(via
+		(at 23.2 34)
+		(size 0.6)
+		(drill 0.3)
+		(layers "F.Cu" "B.Cu")
+		(locked yes)
+		(net "GND")
+		(uuid "325e26f0-eb55-5404-95a7-b0b7da832a7a")
+	)
+	(via
 		(at 24.84 81.7)
 		(size 0.6)
 		(drill 0.3)
 		(layers "F.Cu" "B.Cu")
 		(locked yes)
 		(net "/USB hub/PORT4_D_N")
-		(uuid "325e26f0-eb55-5404-95a7-b0b7da832a7a")
+		(uuid "c38ff668-539c-548c-9dff-d9e7f9485b5b")
 	)
 	(via
 		(at 26.5 62.4)
@@ -60741,7 +60750,7 @@
 		(layers "F.Cu" "B.Cu")
 		(locked yes)
 		(net "GND")
-		(uuid "c38ff668-539c-548c-9dff-d9e7f9485b5b")
+		(uuid "53d69dd0-31df-5828-aeb2-6c20944c1496")
 	)
 	(via
 		(at 26.679625 65.900375)
@@ -60750,7 +60759,7 @@
 		(layers "F.Cu" "B.Cu")
 		(locked yes)
 		(net "GND")
-		(uuid "53d69dd0-31df-5828-aeb2-6c20944c1496")
+		(uuid "60cab642-b803-5d0a-a1f9-0edac4e9fd0c")
 	)
 	(via
 		(at 26.99 55.75)
@@ -60759,7 +60768,7 @@
 		(layers "F.Cu" "B.Cu")
 		(locked yes)
 		(net "GND")
-		(uuid "60cab642-b803-5d0a-a1f9-0edac4e9fd0c")
+		(uuid "213774fc-dfee-56d3-be78-f0a5603a11c9")
 	)
 	(via
 		(at 27.25 81.7)
@@ -60768,7 +60777,7 @@
 		(layers "F.Cu" "B.Cu")
 		(locked yes)
 		(net "/USB hub/PORT4_D_P")
-		(uuid "213774fc-dfee-56d3-be78-f0a5603a11c9")
+		(uuid "f83aef31-c5ec-54bc-8233-debd8850d550")
 	)
 	(via
 		(at 27.35 66.81)
@@ -60777,7 +60786,7 @@
 		(layers "F.Cu" "B.Cu")
 		(locked yes)
 		(net "GND")
-		(uuid "f83aef31-c5ec-54bc-8233-debd8850d550")
+		(uuid "95ff1cab-28bc-5c5d-926a-2a1dbe59f865")
 	)
 	(via
 		(at 27.425 68.765)
@@ -60786,7 +60795,7 @@
 		(layers "F.Cu" "B.Cu")
 		(locked yes)
 		(net "GND")
-		(uuid "95ff1cab-28bc-5c5d-926a-2a1dbe59f865")
+		(uuid "6c71f941-43d3-5960-b790-64bf2c2ba610")
 	)
 	(via
 		(at 27.619999 23.125)
@@ -60795,7 +60804,7 @@
 		(layers "F.Cu" "B.Cu")
 		(locked yes)
 		(net "GND")
-		(uuid "6c71f941-43d3-5960-b790-64bf2c2ba610")
+		(uuid "4093fb9f-a83c-576e-8966-7e8d66abeeef")
 	)
 	(via
 		(at 27.619999 36.425)
@@ -60804,7 +60813,7 @@
 		(layers "F.Cu" "B.Cu")
 		(locked yes)
 		(net "+5V")
-		(uuid "4093fb9f-a83c-576e-8966-7e8d66abeeef")
+		(uuid "ac287b02-171c-55a5-93f3-82bdcd2449bd")
 	)
 	(via
 		(at 27.619999 37.775)
@@ -60813,15 +60822,6 @@
 		(layers "F.Cu" "B.Cu")
 		(locked yes)
 		(net "+5V")
-		(uuid "ac287b02-171c-55a5-93f3-82bdcd2449bd")
-	)
-	(via
-		(at 27.981165 73.41298)
-		(size 0.6)
-		(drill 0.3)
-		(layers "F.Cu" "B.Cu")
-		(locked yes)
-		(net "GND")
 		(uuid "cec64ad9-45db-5988-aad1-fe7dad919a78")
 	)
 	(via
@@ -60888,7 +60888,7 @@
 		(uuid "f007a8f4-9108-5e19-8033-bb60310201cd")
 	)
 	(via
-		(at 31.734999 77.34)
+		(at 32.189149 78.43585)
 		(size 0.6)
 		(drill 0.3)
 		(layers "F.Cu" "B.Cu")
@@ -61005,7 +61005,7 @@
 		(uuid "35f167b4-2a3d-581f-be91-7bee36a55a0e")
 	)
 	(via
-		(at 4.705 73.5)
+		(at 4.705 63.5)
 		(size 0.6)
 		(drill 0.3)
 		(layers "F.Cu" "B.Cu")
@@ -61014,7 +61014,7 @@
 		(uuid "dcba9475-7a68-5f28-aa6d-635fc0b12d4c")
 	)
 	(via
-		(at 4.705 75.55)
+		(at 4.705 65.55)
 		(size 0.6)
 		(drill 0.3)
 		(layers "F.Cu" "B.Cu")
@@ -61140,7 +61140,7 @@
 		(uuid "72b1b9f7-274a-5d89-a668-4848b427d160")
 	)
 	(via
-		(at 5.505 72.9)
+		(at 5.505 62.9)
 		(size 0.6)
 		(drill 0.3)
 		(layers "F.Cu" "B.Cu")
@@ -61149,7 +61149,7 @@
 		(uuid "232ca591-f724-5d85-b78e-9aa8613f6045")
 	)
 	(via
-		(at 5.505 74.3)
+		(at 5.505 64.3)
 		(size 0.6)
 		(drill 0.3)
 		(layers "F.Cu" "B.Cu")
@@ -61311,7 +61311,7 @@
 		(uuid "05f4d4dd-3a28-5dcf-9d3a-4d7a1e16322d")
 	)
 	(via
-		(at 7.660725 69.969275)
+		(at 7.660725 59.969274)
 		(size 0.6)
 		(drill 0.3)
 		(layers "F.Cu" "B.Cu")
@@ -61320,7 +61320,7 @@
 		(uuid "b77830be-4ff4-50cf-87b9-ce2138e0e26b")
 	)
 	(via
-		(at 7.660725 78.030725)
+		(at 7.660725 68.030725)
 		(size 0.6)
 		(drill 0.3)
 		(layers "F.Cu" "B.Cu")
@@ -63353,7 +63353,7 @@
 		)
 		(polygon
 			(pts
-				(xy 12.395 73.12) (xy 15.88 73.12) (xy 15.88 74.88) (xy 12.395 74.88)
+				(xy 12.395 63.12) (xy 15.88 63.12) (xy 15.88 64.879999) (xy 12.395 64.879999)
 			)
 		)
 	)
@@ -63384,7 +63384,7 @@
 		)
 		(polygon
 			(pts
-				(xy 14.12 59.22) (xy 15.88 59.22) (xy 15.88 74.88) (xy 14.12 74.88)
+				(xy 14.12 59.22) (xy 15.88 59.22) (xy 15.88 64.879999) (xy 14.12 64.879999)
 			)
 		)
 	)
