@@ -95,7 +95,7 @@ where it matters:
 | Clearance in the boards' rules | 0.15 mm (multilayer 0.13) | 0.15 mm, fab minimum 0.127 |
 | Via diameter / drill | 0.6 / 0.4 mm (multilayer 0.56 / 0.3) | 0.6 / 0.3 mm |
 | Blind or micro vias | none on any board | none |
-| Power track width, median / 90th percentile | 0.5 / 1.0 mm | 2 mm and 4 mm classes or pours, by current |
+| Power track width, median / 90th percentile | 0.5 / 1.0 mm | 2 mm and 2.5 mm classes or pours, by current (2 and 4 mm until 2026-10-10) |
 | Track length on the bottom layer | 45 % (multilayer 39 %) | both outer layers route |
 | Track length on inner layers | 3 % (multilayer 12 %) | L3 routes; L2, L4, L5 are planes (six layers since 2026-10-09) |
 | Inner ground plane | every multilayer board; most on the layer under the top | GND_L2 on In1.Cu |

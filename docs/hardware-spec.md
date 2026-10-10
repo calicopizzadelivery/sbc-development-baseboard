@@ -26,8 +26,7 @@ flowchart LR
     direction TB
     J1["J1 USB-C<br/>upstream data"]
     J10["J10 RJ45<br/>10/100"]
-    J2["J2 USB-C<br/>PD power in"]
-    J17["J17 JST SH<br/>PD programming"]
+    J2["J2 barrel jack<br/>5 V 4 A in"]
     J18["J18<br/>PSU in"]
   end
 
@@ -37,11 +36,11 @@ flowchart LR
     DAP["MK20DX128<br/>DAPLink<br/>SWD + CDC + MSD"]
     MCU["MK64FN1M0VLL12<br/>Cortex-M4F 120 MHz"]
     PHY["KSZ8081RNA<br/>RMII"]
-    PD["STUSB4500<br/>PD sink"]
-    BUF["PCA9517A<br/>I2C buffer"]
+    INL["SMAJ5.0A + DMP3013SFV<br/>clamp, reverse polarity"]
+    B33["TPS62823<br/>+3V3"]
     SW["5x TPS2553<br/>4 ports + FT231X"]
     FTDI["FT231X<br/>USB-UART, 3.3 V"]
-    TSW["TPS26630 eFuse<br/>+5V_TGT"]
+    TSW["TPS26630 eFuse<br/>+5V_TGT, 3 A"]
     RLY["2x SPDT<br/>signal relay"]
     PT["passthrough<br/>SPDT power relay, 5 A NO"]
     LT["TXB0104 / TXB0108<br/>TXS0102"]
@@ -65,9 +64,12 @@ flowchart LR
   HUB -->|"port 1, unswitched"| DAP
   DAP -->|"SWD + UART"| MCU
   J10 --> PHY --> MCU
-  J2 --> PD
-  J17 -->|"I2C + VSYS"| PD
-  PD <-->|I2C| BUF <-->|I2C| MCU
+  J2 --> INL
+  INL -.->|"+5V"| SW
+  INL -.->|"+5V"| TSW
+  INL -.->|"+5V"| RLY
+  INL -.->|"+5V"| PT
+  INL -.->|"+5V"| B33
 
   MCU -->|"6x EN + 6x /FAULT"| SW
   MCU -->|"USB FS device"| J3
@@ -95,7 +97,7 @@ host is attached and whether or not the host agrees.
 | Ref | Type | Faces | Purpose |
 |---|---|---|---|
 | J1 | USB-C receptacle | workstation | Hub upstream data. USB 2.0 only, UFP (5.1 kΩ Rd on both CC). |
-| J2 | USB-C receptacle | charger | PD sink, power in. No data. |
+| J2 | 2.5 × 5.5 mm barrel jack | adapter | 5 V 4 A (20 W) power in, centre positive: Kycon KLDX-0202-BC, through-hole, horizontal. No data. (2026-10-10; a USB-C PD sink until then.) |
 | J3 | USB-C receptacle | target | K64 USB FS device port — HID keyboard/mouse. UFP, **VBUS sense-only**. |
 | J4, J5 | USB-A, 2× double-stacked | bench | Hub ports 1–4, two per receptacle, each individually switched. Hub port 5 is unconnected. |
 | J9 | 6-pin 0.1″ header | target | FT231X UART on hub port 6. Standard FTDI pinout: GND, CTS, VCC, TXD, RXD, RTS/DTR. **3.3 V levels.** |
@@ -105,7 +107,6 @@ host is attached and whether or not the host agrees.
 | J14 | 2-pos pluggable 5.08 mm | target | Switched +5V_TGT and GND. |
 | J15 | 2×6 header, 2.54 mm | target | 6× level-shifted GPIO, I2C SDA/SCL, VREF, GND. |
 | J16 | 10-pin Cortex debug | you | Direct SWD to the K64, bypassing DAPLink. |
-| J17 | 4-pin JST SH, 1.0 mm | you | STUSB4500 NVM programming. Qwiic / STEMMA QT pinout: GND, 3.3 V, SDA, SCL. |
 | J18 | 2-pos pluggable 5.08 mm | PSU | Target passthrough in: V+, GND. 0–30 VDC, 5 A. Isolated from every board net. |
 | J19 | 2-pos pluggable 5.08 mm | target | Target passthrough out: V+ through the relay's **NO** contact, GND on the copper bus. Unpowered until commanded. |
 
@@ -114,26 +115,41 @@ as a unit and reinstalled the same way, which fixed screw terminals do not give
 you. Phoenix MC 1,5/n-G-3,5 headers with MC 1,5/n-ST-3,5 plugs; MKDS 1,5/n-5,08
 if you would rather have fixed terminals and do not mind rewiring.
 
-### Why two USB-C inlets
+### Why a barrel jack
 
-The brief asked for one. It does not work, for a reason worth stating plainly.
+The brief asked for one USB-C. It cannot be the one, for a reason worth
+stating plainly: a USB-C receptacle is a data role and a power role at once.
+The board has to be a **UFP** for data, because the hub's upstream port is the
+device side of the link to the workstation, and a workstation port that
+presents data sources 5 V at 0.9 A, or 15 W if it does PD — enough for the
+MCU, not for four switched ports, a bridge and a target rail. Power Role Swap
+could in principle ask the workstation for more, but what you get back
+depends entirely on the host, which makes the board's capability a property
+of whatever it is plugged into. That is not a bench tool. So **J1 is data,
+J2 is power**, and J2 carries no data.
 
-A USB-C receptacle is a data role and a power role at once. The board needs to
-be a **UFP** for data, because the hub's upstream port is the device side of the
-link to the workstation. It also needs to be a **sink** for roughly 60 W. Those
-two are individually fine — UFP + sink is what a bus-powered hub is — but the
-sources differ: a 65 W PD charger presents no data at all, and a workstation
-port that presents data sources 5 V at 0.9 A, or 15 W if it does PD. Neither one
-alone runs four switched ports, a bridge and a target rail.
+Until 2026-10-10 J2 was a second USB-C receptacle: a PD sink negotiating
+60 W from a charger into two 5 V bucks, one for the ports and one for the
+target, so that every port at its limit plus a 5 A target fitted at once. It
+went for the layout's sake. The inlet and its bucks were 69 of the
+board's 339 parts (270 since), and the inlet's 3 A rail competed with two 6 A rails for the
+one rail layer — the four-layer board plateaued at 116 open connections
+after FreeRouting (99 with tuned costs), and six layers reached 98. The 60 W
+rationale is withdrawn with them. J2 is now a 2.5 mm barrel jack for a
+5 V 4 A adapter, and **the board is budgeted at 20 W**.
 
-Power Role Swap could in principle ask the workstation for more, but what you
-get back depends entirely on the host, which makes the board's capability a
-property of whatever it is plugged into. That is not a bench tool.
+What 20 W means: the limiters on the board — four port switches at 1.1 A,
+the eFuse at 3 A, the board's own 0.5 to 0.7 A — add up to about twice what
+the adapter supplies, and the adapter is the only limit on the sum. Firmware
+keeps the budget, refusing to enable more load than 20 W allows (§4). The
+typical bench — ports at 2 A, a target at 1 to 2 A, the board at 0.5 A — is
+the adapter; every port at its limit and a 3 A target at once is not, and is
+no longer a case the board is built for.
 
-So: **J1 is data, J2 is power.** The consequence is a feature rather than a
-cost. With J2 alone the MCU, the relays, the PHY and the target rail are all
-live, so the board can power-cycle the whole USB tree — including J1, the path
-back to the workstation — and come back. A single-inlet board cannot cut its own
+The split is still a feature rather than a cost. With J2 alone the MCU, the
+relays, the PHY and the target rail are all live, so the board can
+power-cycle the whole USB tree — including J1, the path back to the
+workstation — and come back. A single-inlet board cannot cut its own
 upstream without cutting itself.
 
 ### J9, the FTDI header
@@ -214,22 +230,24 @@ So the short edges carry the primary cable connectors, and the rest go on the
 **front** long edge at the end that matches their direction — your things at
 the left end, the target's at the right. The back edge was to carry nothing,
 so the board could sit against a wall or a DIN rail; at layout (2026-10-06)
-the RJ45 moved there, alone, so the two USB-C inlets could spread along the
-left edge. The wall and the rail are given up.
+the RJ45 moved there, alone, so the two left-edge connectors (both USB-C until 2026-10-10)
+could spread along the left edge. The wall and the rail are given up.
 
 | Edge | Connectors | Bodies |
 |---|---|---|
-| Left, 54 mm usable | J2 PD in · J1 upstream, split around the middle (J17 programming inboard) | 21 mm |
+| Left, 74 mm usable | J2 power in · J1 upstream, split around the middle | 22 mm |
 | Back, 114 mm usable | J10 RJ45 | 19 mm |
-| Right, 54 mm usable | J3 HID · J13 console · J19 PSU out | 37 mm |
+| Right, 74 mm usable | J3 HID · J13 console · J19 PSU out | 37 mm |
 | Front, left end | J4, J5 USB-A stacks · J18 PSU in | 39 mm |
 | Front, right end | J9 FTDI (right-angle) · J11, J12 relays · J14 +5V_TGT | 52 mm |
 | Inboard, vertical | J16 Cortex debug · J15 GPIO header | — |
 
 Revised at layout (2026-10-06), see [layout-directives.md](layout-directives.md):
-the RJ45 measures 22 mm, so J17 became a top-entry part inboard, and the RJ45
-itself went to the back edge; J19 moved beside J18 so the isolated
-passthrough is one region; J9 took the right edge.
+the RJ45 measures 22 mm, so it went to the back edge; J19 moved beside J18
+so the isolated passthrough is one region; J9 took the right edge. The
+barrel jack (2026-10-10) took the USB-C PD receptacle's place on the left
+edge: its front face at the edge, its body 14.5 mm inboard, the
+reverse-polarity FET and the clamp behind it.
 
 J16 and J15 are pin headers that take a ribbon or jumpers from any direction,
 so they earn no edge. J9 is right-angle because that is what an FTDI header is.
@@ -255,16 +273,15 @@ The mechanical inset on the block diagram is to scale.
 | USB-A receptacles, 2× | double-stacked USB 2.0 Type-A, through-hole | Würth WR-COM dual-port class (61400826021). Two ports per body, shield tabs to chassis. Four ports on two bodies rather than five with one on its own. |
 | USB-UART bridge | **FT231XS** | SSOP-20 (`FT231XQ` for QFN). Bus-powered from hub port 6; `3V3OUT` feeds `VCCIO`. CBUS0/1 drive TX/RX LEDs. |
 | FTDI header | 6-pin 0.1″, right-angle, board edge | J9. Two solder jumpers: pin 6 RTS#/DTR#, pin 3 VCC. 470 Ω series on TXD and pin 6. |
-| Target rail switch | **TPS26630RGE** | 4.5–60 V, 0.6–6 A eFuse, in the KiCad library (TPS25940 is not). ILIM 3.65 kΩ → 5 A, UVLO 4.3 V, `/FLT` to the K64, IMON into a K64 ADC pin for target current. |
-| Bucks 1 and 2 | **TPS54560BDDA** | 4.5–60 V, 5 A, non-synchronous, 400 kHz; in the library where LM61460 is not. At four ports 5 A is enough (§4). EN gated by the STUSB4500's VBUS_EN_SNK, so there is no series VBUS FET. |
-| Buck 3 | **TPS62823DLC** | 3 A synchronous, +5V_PORTS → +3V3. |
+| Target rail switch | **TPS26630RGE** | 4.5–60 V, 0.6–6 A eFuse, in the KiCad library (TPS25940 is not). ILIM 6.04 kΩ 1 % → 3 A, the datasheet's RILIM = 18 kΩ·A / IOL (3.65 kΩ → 5 A until 2026-10-10, when the 20 W inlet set the budget); UVLO 196k/75k → 4.3 V; `/FLT` to the K64; IMON 20 kΩ, about 1.7 V at 3 A, into a K64 ADC pin for target current. Its input is +5V, its output the switched target rail +5V_TGT. |
+| Power inlet | **Kycon KLDX-0202-BC** | J2: 2.5 mm centre pin, 5.5 mm sleeve, centre positive, through-hole, horizontal, for a 5 V 4 A (20 W) adapter. KiCad's `Barrel_Jack_Switch` symbol, the switch contact (pin 3) unused. (2026-10-10; a USB-C PD receptacle with an STUSB4500 sink and two TPS54560B 5 V bucks until then — §2.) |
+| Inlet clamp | **SMAJ5.0A** | D101, SMA, from the jack's centre pin to GND. |
+| Reverse-polarity protection | **DMP3013SFV** | Q101, P-channel, PowerDI3333-8: −30 V, 12 A, 9.5 mΩ. Drain at the jack, source on +5V, gate to GND through R102 100 kΩ, body diode toward the rail. 2 × 47 µF + 100 µF/10 V 1210 and 100 nF on +5V behind it, and the rail's amber LED. No series fuse: the adapter limits the inlet, the eFuse the target rail, the TPS2553s the ports. |
+| 3V3 buck | **TPS62823DLC** | U105. 3 A synchronous, +5V → +3V3. ("Buck 3" until 2026-10-10, when bucks 1 and 2 went with the PD inlet.) |
 | Magjack | **Kycon G7LX-A88S7-BP-GY** | 10/100 with LEDs. Chosen over the Würth part because its library symbol names the LED pins. |
-| PD sink | **STUSB4500** | Autonomous — negotiates from NVM-stored PDOs with no MCU involvement, so the board is powered before firmware runs. I2C readback lets the MCU learn the contract. Alternate: Infineon CYPD3177. |
-| PD programming header | **JST SM04B-SRSS-TB** | The Qwiic / STEMMA QT connector, side entry; `BM04B-SRSS-TB` if placement wants top entry. Stock cables fit either. |
-| PD bus buffer | **PCA9517A** | Isolates the K64 from the PD sink's I2C whenever the board is unpowered or a programmer is on J17. See §4. |
 | Relays, 2× | **Omron G6K-1F-Y**, 5 V coil | 1 Form C (SPDT), gold-clad contacts, 1 A / 30 VDC, ~30 mA coil. |
 | Power relay | **Panasonic JW1FSN-DC5V** | 1 Form C, load on the **NO** contact: 10 A at 30 VDC resistive, AgSnO2, sealed. 530 mW coil, 106 mA at 5 V. Alternates: Omron G2R-1 DC5, G5LE-1 DC5. Ratings in §4. |
-| Relay drivers, 3× | AO3400 + 1N4148 flyback | One FET for all three coils. Gate pulldown to ground — see §5. |
+| Relay drivers, 3× | 2N7002 (signal relays), AO3400A (power relay) + 1N4148W flyback each | One FET per coil (Q801, Q802, Q803), gate pulldown to ground — see §5. |
 | PSU presence detect | LTV-817-class optocoupler | Optional. The only component that touches the passthrough, across an isolation barrier — see §4. |
 | UART translation | **TXB0104** | Auto-direction, push-pull. `VCCA` from J13's VREF pin. |
 | I2C translation | **TXS0102** | Open-drain auto-direction with internal pull-ups. Chosen over PCA9306 because a 3.3 V target makes VREF equal to the K64 rail, and PCA9306 needs VREF2 > VREF1. Range 1.65–3.6 V. **Do not** use a TXB part for I2C. |
@@ -297,7 +314,7 @@ console. Colour says which kind:
 | Colour | Means | On | Count |
 |---|---|---|---|
 | **Green** | a switched output is live | PORT 1–4 switched VBUS · FT231X switched VBUS · +5V_TGT at the eFuse output | 6 |
-| **Amber** | a rail is up | VBUS_IN · +5V_PORTS · +5V_TGT · +3V3 · +3V3_PD | 5 |
+| **Amber** | a rail is up | +5V at the inlet · +3V3 | 2 |
 | **Red** | a coil is energized | relay 1 · relay 2 · passthrough relay | 3 |
 | RGB | heartbeat | K64 — firmware alive, which profile | 1 |
 | Green ×2 | TX / RX | FT231X CBUS, beside J9 | 2 |
@@ -307,8 +324,7 @@ The output and coil LEDs sit **on the net, not on an MCU pin**: a port LED
 hangs off the switched VBUS, a coil LED sits across the coil and is driven by
 the FET. They show the actual state rather than the commanded one — a switch
 that has tripped on overcurrent goes dark even though firmware thinks it is on
-— and they cost no pins. About 25 mA in total; not budgeted separately. The
-VBUS_IN LED sees 5–20 V and is sized for 20 V.
+— and they cost no pins. About 25 mA in total; not budgeted separately.
 
 **No LED on the passthrough.** J18 and J19 carry whatever the target's PSU is,
 5 to 30 V, and an indicator sized for one end of that range is wrong at the
@@ -323,115 +339,73 @@ sized for the whole range. `psu=present` on the console is the indicator.
 ### Tree
 
 ```
-J2 ──> STUSB4500 ──> VBUS_IN (5-20 V) ──┬──> buck 1 ──> +5V_PORTS ──┬──> 4x TPS2553 ──> J4, J5
-        TVS; EN-gated bucks             │                            ├──> 1x TPS2553 ──> FT231X
-                                        │                            ├──> relay coils
-                                        │                            └──> buck 3 ──> +3V3
-                                        └──> buck 2 ──> +5V_TGT ──> switch ──> J14
+J2 ──> D101 ──> Q101 ──> +5V ──┬──> 4x TPS2553 ──> J4, J5
+     SMAJ5.0A   DMP3013SFV     ├──> 1x TPS2553 ──> FT231X
+     to GND     reverse        ├──> 3x relay coil
+                polarity       ├──> TPS62823 ──> +3V3
+                               └──> TPS26630 eFuse ──> +5V_TGT ──> J14
 ```
 
-Two separate 5 V bucks, not one. A target's inrush at power-on is large and
-poorly characterised — you do not know what is on the other end of J14 — and if
-it shares a rail with the hub ports, that inrush browns out every attached
-device including the console adapter you are watching the boot on. Separating
-them costs one converter and removes a whole class of confusing failure.
+One 5 V rail, straight from the adapter (2026-10-10; a USB-C PD inlet, an
+STUSB4500 sink and two TPS54560B 5 V bucks — one for the ports, one for the
+target — until then). The inlet is a clamp and a pass FET. D101, an SMAJ5.0A,
+clamps the jack's centre pin to ground. Q101, a DMP3013SFV P-channel MOSFET, passes
+it to the rail: drain at the jack, source on +5V, gate held at ground by
+R102 100 kΩ, body diode toward the rail. A reversed adapter leaves the FET
+off and the body diode reverse-biased; a correct one turns it on through
+9.5 mΩ, about 40 mV at 4 A. Behind it C101 and C102, 47 µF/10 V, C103, 100 µF/10 V electrolytic (the hub's
+downstream ports want 120 µF of bulk on their rail), and C104,
+100 nF, are the rail's bulk capacitance, and D102, amber, shows the rail.
 
-`+3V3` hangs off `+5V_PORTS` rather than `VBUS_IN` so the logic supply sees a
-pre-regulated input and a narrow conversion ratio.
+There is no series fuse: the adapter limits the inlet, the eFuse limits the
+target rail and the TPS2553s limit the ports.
 
-There is no series FET on VBUS. The STUSB4500's `VBUS_EN_SNK` (open drain,
-low once a sink contract — or plain Type-C 5 V — is valid) drives a small
-inverter on the bucks' EN pins, so the rails only come up when the inlet is
-happy, and nothing in the 5 A path is a FET dropping volts.
+The second buck used to keep a target's inrush — large and poorly
+characterised, since you do not know what is on the other end of J14 — off
+the rail the hub ports share. The eFuse does that now: +5V_TGT is behind its
+3 A current limit, so the target cannot pull more than that from the shared
+rail at any instant. What the ports and the board draw beside it is the
+budget below.
 
-The target passthrough (J18 → J19) is deliberately absent from this tree. It is
-not a board rail and draws nothing from the PD contract; see below.
+`+3V3` is the TPS62823, U105, from `+5V`: a regulated input and a narrow
+conversion ratio for the logic supply.
+
+The target passthrough (J18 → J19) is deliberately absent from this tree. It
+is not a board rail and draws nothing from the adapter; see below.
 
 ### Budget
 
-| Rail | Load | Typical | Worst case |
+| Rail | Load | Typical | At the limiters |
 |---|---|---|---|
-| +5V_PORTS | 4× USB-A | 4 × 0.5 A = 2.0 A | 4 × 1.0 A = 4.0 A |
+| +5V | 4× USB-A, each TPS2553 at 1.1 A | 4 × 0.5 A = 2.0 A | 4 × 1.1 A = 4.4 A |
 | | FT231X, and J9 VCC if jumpered | 10 mA | 60 mA |
 | | 3× relay coil — 2× G6K at 30 mA, JW1FSN at 106 mA | 170 mA | 170 mA |
-| +5V_TGT | target SBC | 2.0 A | 5.0 A |
+| +5V_TGT | target SBC, behind the 3 A eFuse | 1.0–2.0 A | 3.0 A |
 | +3V3 | K64 ~100 mA, KSZ8081 ~60 mA, USB2517 ~250 mA, DAPLink ~30 mA, translators ~20 mA | 0.30 A | 0.50 A |
-| **Total at 5 V** | | **≈4.5 A (22 W)** | **≈9.7 A (49 W)** |
+| **Total at 5 V** | | **≈4 A (20 W)** | **≈8 A (40 W)** |
 
-With conversion losses, worst case draws roughly 56 W at the inlet. So:
-
-- **20 V / 3 A (60 W)** — covers the full worst case, every port at its limit
-  plus a 5 A target, with a few watts spare. This is the common charger, and
-  going from six ports to four is what brought the board inside it.
-- **20 V / 5 A (100 W)** — headroom.
-- **15 V / 3 A (45 W)** — typical load, not worst case.
-- **5 V / 3 A (15 W)** — degraded. Board runs, MCU and Ethernet and relays are
-  fine, but ports must be budgeted tightly.
-
-Which means the MCU has to know the contract. `STUSB4500` reports the negotiated
-RDO over I2C, so firmware reads it at boot and **refuses to enable more load
-than the contract supports**, reporting `ERR POWER BUDGET` rather than browning
-out the rail and dropping every device at once. This is the single most
-load-bearing argument for the MCU owning port power rather than the hub: the hub
-has no idea what the inlet negotiated.
+The adapter is 5 V at 4 A, and it is the only limit on the sum: the port
+switches, the eFuse and the board can together ask for about twice what it
+gives, and nothing on the board — no inlet fuse, no contract — stops them.
+So **firmware keeps the budget**. It refuses to enable more load than 20 W
+allows, reporting `ERR POWER BUDGET` rather than browning out the rail and
+dropping every device at once; `POWER` reports the rail's presence and the
+eFuse's `IMON` current, the one measurement the board has, and there is no
+contract to read (2026-10-10; until then the STUSB4500's negotiated RDO set
+the budget). This is the single most load-bearing argument for the MCU
+owning port power rather than the hub: the hub has no idea what the inlet
+can give. The typical bench — ports at 2 A, a target at 1 to 2 A, the board
+at 0.5 A — is the adapter. Every port at its limit plus a 3 A target is
+twice it.
 
 Per-port limit is set to ~1.1 A by the `ILIM` resistor: a 500 mA device plus
 inrush headroom, and well under what a single port could otherwise pull from a
 shared rail.
 
-### Programming the PD sink
-
-The STUSB4500 negotiates from PDOs stored in its NVM, and the NVM is written
-over I2C. Rather than depend on K64 firmware for that, J17 brings the sink's
-I2C out on a 4-pin 1.0 mm JST — the Qwiic / STEMMA QT footprint, pinned to that
-standard: **1 GND, 2 3.3 V, 3 SDA, 4 SCL** (black, red, blue, yellow on the
-stock cables). Any Qwiic-equipped dev board running SparkFun's STUSB4500 library
-programs it, as does ST's own tool.
-
-The connector is nothing. What it has to survive is this: if the NVM is ever
-written badly enough that the sink stops attaching, VBUS never arrives, the
-board never powers, and nothing on the board can fix the NVM. That is a bricked
-board unless the sink can be powered from somewhere other than the charger.
-
-So the header's 3.3 V pin feeds the STUSB4500's `VSYS` — its optional external
-supply — and **nothing else**. Not the board's +3V3 rail. The sink then runs
-from the programmer alone, with no charger attached and the bucks dark, and the
-programmer's 3.3 V never back-drives a rail. A 100 kΩ pull-down holds `VSYS` at
-0 V when nothing is plugged in.
-
-That creates the second problem. The K64 also has to reach the STUSB4500, to
-read the negotiated contract. With the board unpowered and a programmer
-attached, a dead K64 on the same bus clamps SDA and SCL through its protection
-diodes, and pull-ups to a dead +3V3 rail are pull-downs. With the board powered,
-a programmer and the K64 are two masters on one bus with nothing arbitrating.
-
-Both go away with one part: a **PCA9517A** I2C buffer between the board bus
-(K64, hub) and the PD segment (STUSB4500, J17).
-
-- The PD segment's pull-ups, and the buffer's B side and `EN` pull-up, go to
-  `+3V3_PD`: a BAT54C diode-OR of board +3V3 and header VCC, live from
-  whichever is present.
-- The buffer isolates its two sides whenever `EN` is low. Header VCC drives a
-  2N7002 that pulls `EN` low, so **a programmer on J17 disconnects the K64 in
-  hardware**. No multi-master case, and nothing for firmware to get right.
-- With the board unpowered, `+3V3_PD` comes only from the programmer, whose
-  presence is what pulls `EN` low — so the two cases that need isolation are
-  the two cases that get it.
-- Header VCC also reaches a K64 GPIO, `PD_PROG_DET`, through 100 kΩ — so
-  firmware knows why it cannot see the sink and says so, and a programmer on
-  a dead board pushes microamps into the K64, not milliamps.
-
-A TVS array on SDA/SCL, since the header will be hot-plugged, and 1 µF on
-`VSYS`.
-
-The minimum alternative is a 2-pin jumper that disconnects the K64. It saves
-one IC and it is the kind of thing this bench has been removing: a step a human
-has to remember, whose failure mode looks like a broken bus.
-
 ### Target passthrough
 
 Not every target runs from 5 V. An Xavier AGX ships with a 19 V / 3 A supply,
-and the board's own +5V_TGT rail — inside the PD budget, behind a 5 A eFuse — is
+and the board's own +5V_TGT rail — inside the 20 W budget, behind a 3 A eFuse — is
 the wrong tool for it. So J18 and J19 pass an external PSU straight through,
 the board's only involvement being one relay contact in the high side.
 
@@ -514,14 +488,6 @@ isolation, and it is the only component on the board that touches the
 passthrough at all. It is the difference between "the target is not booting"
 and "the PSU is not plugged in".
 
-### Buck 1, settled
-
-Buck 1 feeds four ports, the FT231X, the relay coils and buck 3, from a
-4.5–21 V input: about 5.1 A continuous with every port at its 1.1 A limit. A
-6 A part (LM61460 class) fits with margin. This was open question 1 — at six
-ports it sat exactly on the number — and going to four closed it without
-touching the per-port limit.
-
 ---
 
 ## 5. Safe states
@@ -587,20 +553,20 @@ during capture.
 | PSU presence — optocoupler | 1 |
 | Target UART — TXD, RXD | 2 |
 | DAPLink CDC UART — TXD, RXD | 2 |
-| I2C — hub, PD sink (shared bus) | 2 |
 | I2C — target breakout (separate bus) | 2 |
 | GPIO breakout | 6 |
-| Hub `RESET_N`, PD `ATTACH`/alert | 2 |
-| `PD_PROG_DET` — programmer on J17 | 1 |
+| Hub `RESET_N`, PHY interrupt | 2 |
 | SWD — SWCLK, SWDIO, `RESET_b` | 3 |
 | Status — RGB heartbeat; every other LED is on its net, §3 | 3 |
-| **Total signal** | **53** |
+| **Total signal** | **50** |
 
-Comfortable in a 100-LQFP after power and analogue pins. Two things to note: the
-target's I2C is a **separate bus** from the hub and PD controller's, because a
-target that hangs SDA low must not take out the board's own configuration path;
-and the port LEDs can move behind a shift register if layout wants the pins
-back, since their timing does not matter.
+Comfortable in a 100-LQFP after power and analogue pins, and five pins freer
+than it was (2026-10-10: the PD sink's I2C0 and its three status lines went
+with the PD inlet; 53 signal pins until then). Two things to note: the
+target's I2C is on its own bus, I2C1, so a target that hangs SDA low takes
+out nothing of the board's — I2C0 is free and the hub's SMBus is not
+connected; and the port LEDs can move behind a shift register if layout
+wants the pins back, since their timing does not matter.
 
 ### Allocation (as captured)
 
@@ -611,17 +577,16 @@ back, since their timing does not matter.
 | PTA0, PTA3, RESET_b | SWD (J16 and DAPLink) |
 | PTB16, PTB17 | UART0 to the DAPLink CDC |
 | PTC3, PTC4 | UART1 to the target console (J13) |
-| PTE24, PTE25 | I2C0 to the PD segment through the PCA9517A |
 | PTC10, PTC11 | I2C1 to the target (J15) through the TXS0102 |
 | PTC0, PTC1, PTC2, PTC5 / PTC6–PTC9 | PORT1–4 EN / FAULT |
 | PTC12, PTC13 | FTDI EN / FAULT |
 | PTC14, PTC15, PTB2 | TGT_EN, TGT_FAULT, TGT_IMON (ADC0_SE12) |
 | PTC16, PTC17, PTC18 | relay 1, relay 2, passthrough coil |
-| PTB3, PTB9, PTB10, PTB11 | PSU_PRESENT, PD_ATTACH, PD_ALERT, PD_PROG_DET |
+| PTB3 | PSU_PRESENT |
 | PTB18, PTB22 | HUB_RESET, PHY_INT |
 | PTB19, PTB20, PTB21 | heartbeat RGB |
 | PTD0–PTD5, PTD6 | GPIO1–6 to J15, J3 VBUS sense |
-| spare | PTA1, PTA2, PTB23, PTD7, PTE0–6, PTE26, the ADC/DAC pins |
+| spare | PTA1, PTA2, PTB23, PTD7, PTE0–6, PTE26, the ADC/DAC pins; PTE24, PTE25 (I2C0) and PTB9, PTB10, PTB11 (pins 31, 32, 57, 58, 59), no-connect since the PD inlet went (2026-10-10) |
 
 ---
 
@@ -635,7 +600,7 @@ Three transports, one parser:
 
 | Transport | Path | For |
 |---|---|---|
-| USB CDC | DAPLink on hub port 7 → J1 | Local work, bring-up, and whenever the network is the thing that is broken |
+| USB CDC | DAPLink on hub port 1 → J1 | Local work, bring-up, and whenever the network is the thing that is broken |
 | TCP | Ethernet → J10 | Remote management, the normal case |
 | SWD | DAPLink → J16 | Debugging the baseboard itself |
 
@@ -656,24 +621,24 @@ firmware is running and its loop is not wedged.
 
 | # | Question | Blocks |
 |---|---|---|
-| 1 | ~~Per-port current limit — 0.75 A or 1.1 A?~~ **Resolved** at four ports: 1.1 A, and a 6 A buck 1 fits with margin. See §4. | — |
+| 1 | ~~Per-port current limit — 0.75 A or 1.1 A?~~ **Resolved** at four ports: 1.1 A. See §4. | — |
 | 2 | ~~Clock tree~~ **Resolved** from Zephyr's `frdm_k64f` board file (`rmii-25MHz`): 25 MHz crystal on the PHY, its 50 MHz REF_CLK into the K64. Captured that way. | — |
 | 3 | DAPLink board ID and MSD volume name. A custom DAPLink build can name the volume anything; `frdm-k64f-hid/scripts/flash.sh` already reads `LABEL=${MBED_LABEL:-MBED}`, so agreeing with it is one environment variable rather than a change. Decide the name. | Firmware tooling |
 | 4 | USB VID/PID. **Deferred indefinitely, by decision (2026-10-03).** `frdm-k64f-hid` ships `2fe3:0001`, the Zephyr project's VID, and the hub and DAPLink will want identifiers too; all of it stays as-is on the bench. Revisit only if a board leaves the lab. | — |
 | 5 | K64 lead time. If it is bad, the fallback is an RP2350 + W5500, which costs the Zephyr board port and the FRDM tooling. | BOM |
-| 6 | ~~Does J14 need a raw `VBUS_IN` pass-through for 12 V targets?~~ **Resolved** by J18/J19: any PSU passes through, isolated. J14 stays for 5 V targets that want to live inside the PD budget without a PSU of their own. | — |
+| 6 | ~~Does J14 need a raw inlet pass-through for 12 V targets?~~ **Resolved** by J18/J19: any PSU passes through, isolated. J14 stays for 5 V targets that want to live inside the 20 W budget without a PSU of their own. | — |
 | 7 | ~~Form factor and mounting~~ **Resolved:** 140 × 100 mm (140 × 80 until 2026-10-07), four M3 at 7 mm from each corner (10 mm until the first placement pass), you on the left edge, the target on the right, overflow to the front edge. §2. | — |
 | 8 | Authentication on the TCP transport. Today anything that can reach the port can cut the target's power and assert its recovery pins. A trusted segment is the assumption; decide whether that is good enough. | Remote management outside the lab |
-| 9 | Should the K64 be able to rewrite the STUSB4500 NVM itself, over the buffered bus? Then J17 is bring-up and recovery only, and PDO changes become a console command. | Firmware scope |
 | 14 | ~~DAPLink k20dx HIC pin assignments~~ **Resolved** (2026-10-06) against DAPLink's `k20dx/IO_Config.h` and `uart.c` and the FRDM-K64F OpenSDA schematic: SWCLK PTC5, SWDIO out PTC6 **and SWDIO in PTC7** (both on the SWDIO net, as on the FRDM), nRESET PTB1, LED PTD4, UART1 PTC3 RX / PTC4 TX. The FRDM's 33 Ω series resistors on the K20's USB D+/D− are now fitted. PTD6 (POWER_EN) and PTD7 (VTRG_FAULT_B) stay unconnected: nothing here for them to switch or sense. | — |
-| 15 | Component values around every IC follow its datasheet typical application or evaluation board; the comparison and the deliberate deviations are in [reference-design-review.md](reference-design-review.md). Still to confirm at bring-up: crystal load capacitors against the crystals ordered, TPS26630 MODE/OVP strapping, TPS62823 inductor saturation, a load-step check of the TPS54560B compensation, JW1FSN pad mapping. | power / hub / target sheets |
-| 10 | Verify at bring-up, against the datasheets: the STUSB4500 runs and answers I2C from `VSYS` alone with no VBUS; what it asks of an unused `VSYS`; and the PCA9517A's B side with `VCCA` at 0 V. The J17 circuit assumes all three. | J17 circuit |
+| 15 | Component values around every IC follow its datasheet typical application or evaluation board; the comparison and the deliberate deviations are in [reference-design-review.md](reference-design-review.md). Still to confirm at bring-up: crystal load capacitors against the crystals ordered, TPS26630 MODE/OVP strapping and ILIM (6.04 kΩ → 3 A), TPS62823 inductor saturation, the inlet FET's drop at 4 A, JW1FSN pad mapping. | power / hub / target sheets |
 | 11 | ~~Power relay NC rating~~ **Resolved** against the datasheets: Panasonic JW1FSN-DC5V, 10 A at 30 VDC on the form C with no NC derate, AgSnO2. G2R-1 and G5LE-1 also pass; G5Q-1, at 3 A NC, does not. The load has since moved to the NO contact, where the headline figure applies. Table in §4. | — |
 | 12 | ~~J9 pin 3 as a VREF input~~ **Resolved** (2026-10-06): J9 mirrors the Adafruit FTDI Friend, whose pin 3 is a VCC *output*. Pinout GND, CTS, VCC, TX, RX, RTS; VCC = 5 V by default (JP502 A–C bridged) or 3.3 V (B–C); pin 6 = RTS by default (JP501 A–C bridged) or DTR; 3.3 V logic. No VREF-input position; 1.8 V consoles use J13. | — |
 | 13 | ~~Passthrough at boot~~ **Resolved:** restore the last commanded state. A watchdog reset must not strand a remote target. The G2RK-1 latching relay stays unfitted unless the reset gap proves to matter. | — |
 
 Item 4 is deferred on purpose. It only becomes expensive if a board leaves the
 lab, and a VID has lead time of its own, so that is the moment to start it.
+Items 9 and 10 were about the PD sink's NVM and its programming circuit, and
+went with the PD inlet (2026-10-10).
 
 ---
 
@@ -687,9 +652,10 @@ and L4, and L5 and L6, a 0.014" core between L2 and L3 and between L4 and
 L5; 0.062" ± 10 %. Their standard stackups are not guaranteed unless the
 order specifies them: order the board as Custom / Controlled Dielectric,
 and confirm at quote time that both cores are 0.014" (one of their pages
-shows 0.005" for the second core; if that is what they build, the rails
+shows 0.005" for the second core; if that is what they build, the rail
 and the inner routing layer swap places). L2 and L5 are the
-ground planes, L3 routes, L4 carries the power rails. The USB 2.0 pairs run
+ground planes, L3 routes, L4 carries the +5V rail, drawn as rectangles
+(the three power rails until 2026-10-10). The USB 2.0 pairs run
 on the outer layers as 90 Ω edge-coupled microstrip over the ground plane
 beside them: **0.33 mm traces, 0.20 mm gap** (centred on 90 Ω across the
 Kirschning-Jansen and IPC-2141 estimates for a 0.249 mm dielectric at
@@ -702,15 +668,20 @@ impedance calculator has the last word on the width and gap.
 ### Current pathways
 
 Laid out for the current in the class name, on 1 oz outer copper at a
-10 °C rise (IPC-2221: 3 A ≈ 1.4 mm, 6 A ≈ 3.6 mm), rounded up. Each class
+10 °C rise (IPC-2221: 3 A ≈ 1.4 mm, 4 A ≈ 2.3 mm), rounded up. Each class
 is a net class directive flag on the schematic and a pattern in the project
 file.
 
 | Class | Nets | Current | Width | Vias per layer change |
 |---|---|---|---|---|
 | `PSU_3A` | PSU_VP, PSU_VOUT, PSU_GND (J18 → K803 → J19) | 3 A continuous | 2 mm or pour | two, 0.5 mm drill |
-| `USB_VBUS_3A` | VBUS_IN, PORT1–4_VBUS, FTDI_VBUS | 3 A each | 2 mm or pour | two, 0.5 mm drill |
-| `PWR_6A` | +5V_PORTS, +5V_TGT, +5V_TGT_OUT | 6 A | 4 mm or pour | two, 0.6 mm drill |
+| `USB_VBUS_3A` | PORT1–4_VBUS, FTDI_VBUS | 3 A each | 2 mm or pour | two, 0.5 mm drill |
+| `PWR_4A` | +5V, +5V_TGT | 4 A (+5V_TGT 3 A, at the eFuse) | 2.5 mm or pour; +5V is rectangles on L4 | two, 1.0 mm vias on a 0.5 mm drill; three rail vias beside each pad |
+| `PWR_1A` | +3V3 | 1 A | 0.6 mm, routed on an inner layer | one |
+
+`PWR_4A` replaced `PWR_6A` (4 mm, +5V_PORTS and +5V_TGT at 6 A) on
+2026-10-10, when the one 4 A inlet rail replaced the two buck rails, and
+VBUS_IN left `USB_VBUS_3A` with the PD inlet.
 
 J1's and J3's VBUS carry no load (sense only) and are not classed.
 
@@ -719,8 +690,8 @@ J1's and J3's VBUS carry no load (sense only) and are not classed.
 Captured 2026-10-04 in KiCad 10, under
 [`hardware/kicad/sbc-baseboard/`](../hardware/kicad/sbc-baseboard/): a root
 sheet and eight sub-sheets (power, MCU, Ethernet, hub, FTDI, DAPLink, target
-I/O, relays and passthrough), 331 parts, 354 nets, **ERC clean at every
-severity**, with
+I/O, relays and passthrough), 331 parts and 354 nets at capture, 270 parts
+since the PD inlet went (2026-10-10), **ERC clean at every severity**, with
 [`sbc-baseboard.pdf`](../hardware/kicad/sbc-baseboard/sbc-baseboard.pdf) for
 review and a BOM. Reference designators are numbered by sheet (1xx power …
 7xx target I/O, 8xx relays).
@@ -737,7 +708,7 @@ and the rule that the KiCad files become the source of truth the moment they
 are hand-edited, is in [`hardware/kicad/README.md`](../hardware/kicad/README.md).
 
 Two part-level details settled during capture, worth knowing when reading
-the sheets: the single-line ESD diodes on the console, FTDI and PD I2C lines
+the sheets: the single-line ESD diodes on the console and FTDI lines
 are PESD5V0S1UL in SOD-882, drawn with KiCad's own symbol so the cathode is
 on the line and the anode on GND; and the stacked USB-A receptacles J4/J5 use
 a two-unit project symbol, one unit per port, so each port block (switch,

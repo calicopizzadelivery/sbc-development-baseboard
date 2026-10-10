@@ -157,7 +157,7 @@ is disabled, and `GPIO` returns `ERR NO VREF` rather than pretending.
 | Command | Effect |
 |---|---|
 | `STATE` | Every channel, in one line |
-| `POWER` | The negotiated PD contract and the current budget |
+| `POWER` | The +5V rail, the target rail's current from the eFuse's IMON, and the 20 W budget |
 | `INFO` | Identity, firmware, USB state, SoC serial |
 | `ID` / `SETID <text>` | Read / persist this board's name, 1–8 characters |
 | `VERSION`, `HELP` | |
@@ -168,7 +168,7 @@ is disabled, and `GPIO` returns `ERR NO VREF` rather than pretending.
 > STATE
 STATE PORT 1=ON 2=ON 3=OFF 4=ON(pulse 480ms) FTDI=ON RELAY 1=OFF 2=OFF TGT 5V=ON PSU=ON(present)
 > POWER
-OK POWER contract=20V/3.0A/60W src=pd budget=60W used=14W headroom=46W
+OK POWER rail=present tgt=1.3A budget=20W used=14W headroom=6W
 > INFO
 OK INFO id=bench-1 fw=sbc-baseboard ver=0.1.0 usb=ready eth=up serial=FFFFFFFF4E45805140040019
 ```
@@ -179,42 +179,27 @@ across a firmware update.
 
 ### Power budget refusals
 
-The MCU reads the negotiated PD contract at boot and will not enable more load
-than it supports:
+The board is powered by a 5 V 4 A adapter on the barrel jack J2 and budgeted
+at its 20 W ([spec §4](hardware-spec.md#4-power); 2026-10-10, a USB-C PD
+inlet until then, whose negotiated contract the MCU read at boot and budgeted
+against). The four ports at their 1.1 A limits, the target rail at the
+eFuse's 3 A and the board itself add up to more than 4 A, and nothing in
+hardware limits the sum but the adapter, so firmware will not enable more
+load than the budget allows:
 
 ```
-> PORT 5 ON
-ERR POWER BUDGET need=5W have=2W contract=5V/3.0A/15W
+> PORT 3 ON
+ERR POWER BUDGET need=5W have=2W budget=20W
 ```
 
 Better than the alternative, which is a rail that sags and drops every attached
 device at once — including whichever one you were watching to work out what went
 wrong.
 
-A programmer on J17 disconnects the MCU from the PD sink in hardware
-([spec §4](hardware-spec.md#4-power)), so the contract cannot be re-read while
-one is attached. The contract does not change just because a programmer is
-plugged in — a new NVM only takes effect when the charger re-attaches — so the
-last reading stays in force and is marked:
-
-```
-> POWER
-OK POWER contract=20V/3.0A/60W src=pd stale=prog-attached budget=60W used=14W headroom=46W
-```
-
-If the board *boots* with a programmer attached there is no last reading. Then
-the budget is unknown, and unknown means **anything may be turned off and
-nothing may be turned on** — the rails are already in their resistor-set boot
-state, and firmware will not add load it cannot account for:
-
-```
-> POWER
-OK POWER contract=unknown reason=prog-attached budget=unknown
-> PORT 3 ON
-ERR POWER BUDGET unknown, programmer attached on J17
-```
-
-Firmware re-reads the contract the moment the programmer is removed.
+The budget is a constant of the hardware, not a reading, so there is nothing
+to re-read and no unknown state. `POWER` reports it with what is allocated
+from it, and the target rail's actual draw from the eFuse's IMON — the one
+current the board measures.
 
 ### Events
 
@@ -223,9 +208,7 @@ line out. With `EVENTS ON`, unsolicited lines start `EVT`:
 
 ```
 EVT OC PORT 3 limit=1.1A
-EVT PD contract=5V/3.0A/15W was=20V/3.0A/60W
-EVT PD PROG attached
-EVT PD PROG removed contract=20V/3.0A/60W
+EVT TGT FAULT limit=3.0A
 EVT TGT UNDERVOLT 4.62V
 EVT PSU absent
 ```

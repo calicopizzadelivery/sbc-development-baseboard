@@ -18,7 +18,7 @@ is replugged.
 |---|---|
 | Type at the target | USB HID keyboard + mouse from the K64's device port |
 | Cut power to any USB device | Four USB-A ports on two stacked receptacles, each with its own current-limited switch |
-| Hard power-cycle the target | Switched +5V_TGT rail up to 5 A, or any PSU up to 30 V / 5 A through an isolated relay |
+| Hard power-cycle the target | Switched +5V_TGT rail up to 3 A behind an eFuse, or any PSU up to 30 V / 5 A through an isolated relay |
 | Toggle target I/O — FORCE_RECOVERY and friends | Two SPDT relays, dry contacts, Phoenix terminals |
 | Read the target's serial console | MCU-owned UART, auto level translation 1.2–3.6 V |
 | Read it from the workstation directly | FT231X on an internal hub port, standard 6-pin FTDI header, 3.3 V |
@@ -39,20 +39,27 @@ workstation ──USB-C──> hub ──> 4x USB-A (switched)     ──> whate
             ──RJ45───> K64 ──> USB-C device port       ──> target's USB host port
                            ──> UART + VREF             ──> target's console
                            ──> 2x SPDT dry contacts    ──> target's recovery/reset pins
-                           ──> switched +5V, 5 A       ──> target's supply
+                           ──> switched +5V, 3 A       ──> target's supply
  target PSU ──Phoenix──> isolated relay, NO, 5 A       ──> target's supply, any voltage
- PD charger ──USB-C──> PD sink ──> 5 V rails
+ 5 V adapter ──barrel──> +5V, one rail, 4 A, 20 W      ──> everything but the passthrough
 ```
 
 140 × 100 mm, four M3 corner holes. Your connectors leave the left edge, the
 target's the right; an LED on every rail, every switched output and every relay
 coil, and none on the passthrough, whose voltage is whatever you plugged in.
 
-Two USB-C inlets, not one. A charger that offers 60 W carries no data, and a
-workstation port that carries data offers 15 W at best — and four switched ports
-plus a target rail needs more than that. Splitting them also means the board
-stays alive when the workstation link is down, so the MCU can power-cycle the
-entire USB tree including its own path back to you.
+One USB-C for the workstation and a barrel jack for power (2026-10-10; two
+USB-C inlets, a PD charger beside the workstation port, until then). A
+workstation port that carries data offers 15 W at best, and four switched ports
+plus a target rail need more than that, so power has its own connector: a
+5 V 4 A adapter on a 2.5 mm barrel jack, 20 W, which firmware budgets across
+the ports and the target rail. A USB-C PD sink feeding two 5 V bucks did that
+job first, and went because of what it cost the board rather than the bench:
+339 parts became 270, and the one rail layer no longer carries a 3 A inlet
+beside two 6 A rails, which is where the router stalled at 98 open connections
+on six layers. Keeping power off the workstation link also means the board stays
+alive when that link is down, so the MCU can power-cycle the entire USB tree
+including its own path back to you.
 
 ## Where the design came from
 
@@ -83,14 +90,17 @@ preferences. They are written up in full in
 ## Status
 
 Specification, a generated schematic (KiCad 10, a root sheet and eight sub-sheets, ERC clean) and
-a generated, placed and autorouted board, both in
+a generated, placed six-layer board, both in
 [`hardware/kicad/sbc-baseboard/`](hardware/kicad/sbc-baseboard/) with a
 [PDF](hardware/kicad/sbc-baseboard/sbc-baseboard.pdf) of the schematic for
 review. The board is placed and bulk-routed by the house standard's engine
-(see [hardware/kicad/README.md](hardware/kicad/README.md)); the hand pass
-that finishes the routing is open. No firmware.
+(see [hardware/kicad/README.md](hardware/kicad/README.md)) and is being
+routed again for the barrel-jack inlet (2026-10-10; the board routed before
+it, with the PD inlet and the two bucks, stopped at 98 open connections on
+six layers and 116 on four); the hand pass that finishes the routing is open.
+No firmware.
 
-Next: the hand pass on the board, then firmware.
+Next: the routing and the hand pass on the board, then firmware.
 
 ## Layout
 

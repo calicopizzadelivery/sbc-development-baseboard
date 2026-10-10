@@ -100,30 +100,23 @@ e(f'<text x="326" y="1052" font-size="12" font-weight="600" fill="{C["iso"]}">IS
 box(50, 90, 200, 60, "J1  USB-C", "upstream data · USB 2.0", "conn")
 box(50, 290, 200, 60, "J10  RJ45", "10/100 Ethernet", "conn")
 box(50, 400, 200, 60, "J16  Cortex debug", "SWD, bypasses DAPLink", "conn")
-box(50, 520, 200, 60, "J2  USB-C", "PD power in · no data", "conn")
-box(50, 610, 200, 60, "J17  JST SH 1.0 mm", "PD programming · Qwiic", "conn")
+box(50, 520, 200, 60, "J2  2.5 mm barrel", "5 V 4 A in · centre positive", "conn")
 box(50, 950, 200, 70, "J18  Phoenix 5.08", ["PSU in", "0–30 VDC · 5 A"], "conn")
 
 # ---------- center-left devices
 box(330, 85, 200, 75, "USB2517", "7-port USB 2.0 HS · strap mode · port 3 n/c")
 box(330, 195, 200, 60, "MK20DX128  DAPLink", "SWD · CDC · MSD")
 box(330, 290, 200, 60, "KSZ8081RNA", "RMII PHY")
-box(330, 520, 200, 150, "STUSB4500", ["USB-PD sink", "autonomous, NVM PDOs", "I2C readback"], "pwr")
-box(580, 565, 130, 60, "PCA9517A", "I2C buffer")
-e(f'<text x="645" y="645" text-anchor="middle" font-size="11" fill="{C["mute"]}">EN low while J17 powered</text>')
-e(f'<text x="645" y="659" text-anchor="middle" font-size="11" fill="{C["mute"]}">→ K64 disconnected in hardware</text>')
+# inlet protection (2026-10-10; a STUSB4500 PD sink with its I2C buffer and two TPS54560B 5 V bucks until then)
+box(330, 505, 200, 90, "inlet protection", ["SMAJ5.0A TVS clamp", "DMP3013SFV P-FET", "reverse polarity · no fuse"], "pwr")
 
-# power tree
-box(330, 735, 200, 45, "buck 1 · TPS54560B", "+5V_PORTS · 5 A", "pwr")
-box(330, 800, 200, 45, "buck 3 · TPS62823", "+3V3 · 3 A", "pwr")
-box(330, 865, 200, 45, "buck 2 · TPS54560B", "+5V_TGT · 5 A", "pwr")
-path([(430, 670), (430, 735)], width=2.4, color=C["power"])
-path([(430, 705), (310, 705), (310, 887), (330, 887)], width=2.4, color=C["power"])
-e(f'<text x="446" y="700" font-size="11.5" font-weight="600" fill="{C["power"]}">VBUS_IN 5–20 V</text>')
-path([(430, 780), (430, 800)], width=2.4, color=C["power"])
-tag(540, 757, "+5V_PORTS → switches, coils")
-tag(540, 822, "+3V3 → logic")
-tag(540, 887, "+5V_TGT → eFuse")
+# power tree: the one +5V rail from the jack, the 3V3 buck off it
+path([(430, 595), (430, 735)], width=2.4, color=C["power"])
+e(f'<text x="446" y="625" font-size="11.5" font-weight="600" fill="{C["power"]}">+5V · 4 A</text>')
+path([(430, 660), (530, 660)], width=2.4, color=C["power"], arrow="none")
+tag(540, 660, "+5V → switches, coils, eFuse")
+box(330, 735, 200, 45, "3V3 buck · TPS62823", "+3V3 · 3 A", "pwr")
+tag(540, 757, "+3V3 → logic")
 
 # opto, straddling the barrier
 e(f'<rect x="690" y="900" width="150" height="70" rx="6" fill="{C["dev"]}" stroke="{C["dev_edge"]}" stroke-width="1.6"/>')
@@ -137,17 +130,17 @@ box(780, 180, 200, 580, "MK64FN1M0VLL12", ["Cortex-M4F · 120 MHz", "1 MB flash 
 # ---------- center-right devices
 box(1090, 85, 220, 50, "FT231X", "USB-UART · 3.3 V I/O · TX/RX LEDs")
 box(1090, 155, 220, 50, "5× TPS2553", "4× USB-A at 1.1 A · 1× FT231X")
-tag(1215, 221, "+5V_PORTS")
+tag(1215, 221, "+5V")
 path([(1200, 155), (1200, 135)], width=2.4, color=C["power"])
 box(1090, 345, 220, 55, "TXB0104", "UART level shift · VREF from target")
 box(1090, 415, 220, 55, "TXB0108 + TXS0102", "GPIO push-pull · I2C open-drain")
 box(1090, 490, 220, 55, "2× Omron G6K-1F-Y", "SPDT signal relay · gold contacts · 1 A")
-box(1090, 565, 220, 55, "TPS26630 eFuse", "+5V_TGT · 5 A · /FAULT · IMON")
+box(1090, 565, 220, 55, "TPS26630 eFuse", "+5V_TGT · 3 A · /FAULT · IMON")
 tag(1095, 635, "+5V_TGT")
 # power relay straddling the barrier
 e(f'<rect x="1090" y="880" width="220" height="120" rx="6" fill="{C["dev"]}" stroke="{C["dev_edge"]}" stroke-width="1.6"/>')
 e(f'<text x="1200" y="903" text-anchor="middle" font-size="14" font-weight="600" fill="{C["ink"]}">JW1FSN power relay</text>')
-e(f'<text x="1200" y="922" text-anchor="middle" font-size="12.5" fill="{C["mute"]}">coil: +5V_PORTS · FET + flyback</text>')
+e(f'<text x="1200" y="922" text-anchor="middle" font-size="12.5" fill="{C["mute"]}">coil: +5V · FET + flyback</text>')
 e(f'<line x1="1092" y1="935" x2="1308" y2="935" stroke="{C["iso_edge"]}" stroke-width="1.4" stroke-dasharray="7 5"/>')
 e(f'<text x="1200" y="962" text-anchor="middle" font-size="12.5" fill="{C["mute"]}">NO · 10 A at 30 VDC · AgSnO2</text>')
 e(f'<text x="1200" y="980" text-anchor="middle" font-size="12.5" fill="{C["mute"]}">COM → NO when energized</text>')
@@ -159,13 +152,12 @@ box(1470, 270, 240, 55, "J3  USB-C", "HID kbd + mouse · VBUS sense-only", "conn
 box(1470, 345, 240, 55, "J13  Phoenix 3.5", "console: VREF · TXD · RXD · GND", "conn")
 box(1470, 415, 240, 55, "J15  2×6 header", "6× GPIO · I2C · VREF · GND", "conn")
 box(1470, 490, 240, 55, "J11, J12  Phoenix 3.5", "COM · NO · NC, per relay", "conn")
-box(1470, 565, 240, 55, "J14  Phoenix 5.08", "+5V_TGT out · 5 A", "conn")
+box(1470, 565, 240, 55, "J14  Phoenix 5.08", "+5V_TGT out · 3 A", "conn")
 box(1470, 950, 240, 70, "J19  Phoenix 5.08", ["PSU out", "V+ via NO · GND via bus"], "conn")
 
 # ---------- indicator LEDs (on the net, not on a pin)
 led(1298, 95, "out"); led(1298, 165, "out"); led(1298, 575, "out")          # FT231X VBUS, port switches, eFuse out
-led(518, 745, "rail"); led(518, 810, "rail"); led(518, 875, "rail")          # +5V_PORTS, +3V3, +5V_TGT
-led(560, 696, "rail"); led(698, 575, "rail")                                 # VBUS_IN, +3V3_PD
+led(518, 515, "rail"); led(518, 745, "rail")                                 # +5V at the inlet, +3V3 at the buck
 led(1298, 500, "coil"); led(1298, 890, "coil")                               # signal relays, passthrough coil
 rgb(944, 192)                                                                # heartbeat
 
@@ -181,11 +173,8 @@ path([(250, 320), (330, 320)])
 path([(530, 320), (780, 320)], "RMII", (655, 314))
 path([(250, 430), (780, 430)], "SWD, direct", (515, 424))
 
-# PD + programming
-path([(250, 550), (330, 550)], "VBUS", (290, 544), width=2.4, color=C["power"])
-path([(250, 640), (330, 640)], "I2C + VSYS", (290, 634))
-path([(530, 595), (580, 595)], arrow="both")
-path([(710, 595), (780, 595)], "I2C", (745, 589), arrow="both")
+# power in
+path([(250, 550), (330, 550)], "5 V", (290, 544), width=2.4, color=C["power"])
 
 # MCU outputs
 path([(980, 230), (1200, 230), (1200, 205)], "5× EN · 5× /FAULT", (1090, 224))
@@ -193,7 +182,7 @@ path([(980, 297), (1470, 297)], "USB FS device", (1225, 291))
 path([(980, 372), (1090, 372)], "UART", (1035, 366)); path([(1310, 372), (1470, 372)])
 path([(980, 442), (1090, 442)], "GPIO · I2C", (1035, 436)); path([(1310, 442), (1470, 442)])
 path([(980, 517), (1090, 517)], "2× FET + flyback", (1035, 511)); path([(1310, 517), (1470, 517)], "dry contacts", (1390, 511))
-path([(980, 592), (1090, 592)], "EN · /FAULT", (1035, 586)); path([(1310, 592), (1470, 592)], "5 A", (1390, 586), width=2.4, color=C["power"])
+path([(980, 592), (1090, 592)], "EN · /FAULT", (1035, 586)); path([(1310, 592), (1470, 592)], "3 A", (1390, 586), width=2.4, color=C["power"])
 path([(980, 700), (1200, 700), (1200, 880)], "coil drive · FET + flyback", (1212, 800), anchor="start")
 
 # passthrough
@@ -234,13 +223,14 @@ def conn(edge, a, L, label, depth=DEPTH):
         x, y = mm(a, 100-DEPTH)
         e(f'<rect x="{x}" y="{y}" width="{L*S}" height="{DEPTH*S}" fill="{C["conn"]}" stroke="{C["conn_edge"]}"/>')
         e(f'<text x="{x+L*S/2}" y="{y-6}" text-anchor="middle" font-size="11" fill="{C["ink"]}">{label}</text>')
-# the edge table of docs/layout-directives.md (gen/layout.py CONNECTORS; the courtyards of the placed board, 2026-10-08)
+# the edge table of docs/layout-directives.md (gen/layout.py CONNECTORS; the courtyards of the placed board, 2026-10-08;
+# J2 the barrel jack since 2026-10-10)
 conn("T", 71, 19, "J10 RJ45", depth=22.4)
-conn("L", 24.7, 10.6, "J2 PD in"); conn("L", 68.7, 10.6, "J1 upstream")
+conn("L", 25.0, 11.2, "J2 5 V in"); conn("L", 68.7, 10.6, "J1 upstream")
 conn("R", 14, 10.7, "J3 HID"); conn("R", 35.7, 16.6, "J13 console"); conn("R", 63.2, 16.3, "J9 FTDI")
 conn("B", 14, 17.2, "J5"); conn("B", 32.2, 17.2, "J4"); conn("B", 52.4, 13.2, "J18"); conn("B", 66.6, 13.2, "J19")
 conn("B", 84.6, 13.1, "J11"); conn("B", 98.7, 13.1, "J12"); conn("B", 112.8, 13.2, "J14")
-for (hx, hy, hw, hh, lab) in [(91.9, 3.8, 4.5, 7.5, "J16 SWD"), (115.2, 8.2, 6.2, 16.3, "J15 GPIO"), (34.1, 47.4, 7.9, 5.3, "J17 prog")]:
+for (hx, hy, hw, hh, lab) in [(91.9, 3.8, 4.5, 7.5, "J16 SWD"), (115.2, 8.2, 6.2, 16.3, "J15 GPIO")]:
     x, y = mm(hx, hy)
     e(f'<rect x="{x}" y="{y}" width="{hw*S}" height="{hh*S}" fill="{C["dev"]}" stroke="{C["dev_edge"]}"/>')
     if hx + hw > 110:                                                 # near the right edge: the label on the left, clear of J3
@@ -255,7 +245,7 @@ e(f'<text x="{MX+70*S}" y="{MY+100*S+20}" text-anchor="middle" font-size="11.5" 
 KX, KY = 800, 1150
 e(f'<text x="{KX}" y="{KY}" font-size="14" font-weight="700" fill="{C["ink"]}">Indicators — on the net, not on a pin</text>')
 rows = [("out", "Switched outputs, green — PORT 1–4, FT231X, +5V_TGT at the eFuse (6)"),
-        ("rail", "Rails, amber — VBUS_IN, +5V_PORTS, +5V_TGT, +3V3, +3V3_PD (5)"),
+        ("rail", "Rails, amber — +5V, +3V3 (2)"),
         ("coil", "Coils, red — relay 1, relay 2, passthrough (3)"),
         ("rgb", "Heartbeat — K64 RGB, firmware alive (1)"),
         ("out", "TX / RX — FT231X CBUS, beside J9 (2)"),

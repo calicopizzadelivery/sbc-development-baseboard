@@ -1,4 +1,5 @@
 part   host   side  where (side+ring, or free@distance from the pin)
+D101   J2     F     R1
 Y601   U601   F     R0
 Y301   U301   F     L0
 Y401   U402   F     L0
@@ -11,73 +12,30 @@ C606   Y601   F     B0
 C607   Y601   F     L0
 C204   Y201   F     L0
 C205   Y201   F     B0
-D103   J2     F     R1
-D104   J2     F     R1
 D501   J9     F     L1
 D502   J9     F     L1
 D503   J9     F     L2
 D506   J9     F     L1
 D701   J13    F     L1
 D702   J13    F     L1
-D106   J17    F     B0
-D107   J17    F     B0
-L103   U105   F     R0
-D110   U103   F     R0
-D112   U104   F     R0
-L101   U103   F     R1
-L102   U104   F     R1
-C116   U103   F     L0
-C125   U104   F     L0
-R127   U105   F     L0
-R128   U105   F     L0
-C132   U105   F     L1
-C106   U101   F     T0
-C105   U101   F     T0
-R116   U103   F     B0
-R121   U104   F     B0
-R117   U103   F     R0
-R122   U104   F     R0
-C114   U103   F     R1
-C123   U104   F     R1
-R106   U101   F     T0
-R118   U103   F     R1
-R119   U103   F     R1
-R123   U104   F     R1
-R124   U104   F     R1
-R103   U101   F     R0
-R107   U101   F     R0
-D108   U101   F     R1
-R108   U101   F     R1
-R102   U101   F     L0
-R104   U101   F     B0
-R105   U101   F     B0
-C111   U103   F     L0
-C120   U104   F     L0
-C129   U105   F     R0
-C112   U103   F     L0
-C113   U103   F     L0
-C121   U104   F     L0
-C122   U104   F     L0
-C130   L103   F     T0
-C131   L103   F     T0
-C126   L102   F     T0
-C127   L102   F     T0
-C117   L101   F     T0
-C118   L101   F     T0
-C128   L102   F     T0
-C119   L101   F     T0
-C115   R117   F     R0
-C124   R122   F     R0
+L101   U105   F     R0
+R104   U105   F     L0
+R105   U105   F     L0
+C108   U105   F     L1
+C105   U105   F     R0
+C106   L101   F     T0
+C107   L101   F     T0
 C708   U704   F     L0
 C602   U601   F     L0
 C603   U601   F     L0
 C604   U601   F     L1
-C605   U601   F     L2
+C104   Q101   F     L0
 C702   U701   F     T0
 C704   U702   F     B0
 C706   U703   F     L0
 C701   J13    F     L1
 R701   J13    F     L0
+C605   U601   F     L2
 C206   U201   F     L0
 C207   U201   F     L7
 C208   U201   F     L7
@@ -86,24 +44,19 @@ C210   U201   F     B0
 C211   U201   F     T0
 C403   U402   F     B0
 C404   U402   F     R0
-C405   U402   F     T7
+C405   U402   F     T0
 C406   U402   F     B1
-C407   U402   F     L1
-C408   U402   F     L2
+C407   U402   F     L0
+C408   U402   F     L1
 C409   U402   F     L0
-C108   U102   F     B7
-C109   C108   F     R0
 C703   U701   F     T0
 C705   U702   F     R0
 C707   U703   F     R0
 C310   U301   F     B0
-C110   U102   F     R0
-D102   J2     F     R1
-C101   J2     F     R0
-C103   C101   F     L0
-C102   C103   F     R0
+C103   Q101   F     R5
+C101   Q101   F     L1
+C102   Q101   F     L2
 C709   U704   F     L0
-C104   C103   F     R1
 C212   U201   F     R0
 U403   J4     F     T1
 C417   U403   F     T0
@@ -116,12 +69,9 @@ U406   J5     B     T0
 C423   U406   B     B0
 U407   U501   F     T0
 C425   U407   F     T0
-Q102   U102   F     free@12
 Q801   K801   F     T0
 Q802   K802   F     L0
 Q803   K803   F     T0
-Q101   U103   F     L1
-D101   J17    F     L0
 JP502  U501   F     R0
 JP501  U501   F     L0
 D807   U801   F     R0
@@ -152,8 +102,8 @@ R422   J1     B     R0
 R423   J1     B     R0
 C301   J10    B     B0
 C302   J10    B     B0
-R301   J10    F     L1
-R302   J10    F     L2
+R301   J10    F     B0
+R302   J10    F     L1
 R303   J10    B     B0
 R304   J10    B     B1
 R305   J10    B     B0
@@ -164,10 +114,9 @@ R438   U407   F     B0
 R501   J9     B     L0
 R507   J9     B     L0
 R601   U601   B     R0
-R703   U704   F     B0
 R204   U201   F     L1
 R408   U402   F     T0
-R409   U402   F     T0
+R409   U402   F     T1
 R410   U402   F     B3
 R411   U402   F     B4
 C202   U201   B     T0
@@ -202,16 +151,14 @@ D505   U501   F     L0
 D601   U601   F     T0
 FB201  U201   F     T1
 C213   U201   B     T0
-R217   U201   F     L7
-R218   U201   F     T0
+R703   U704   F     B0
 R212   U201   F     R1
 R213   U201   F     R1
 C201   U201   B     T1
 R215   U201   B     R0
 R702   U704   B     L0
-R110   U102   F     free@4
 R309   U301   F     L0
-R310   U301   F     B1
+R310   U301   F     B0
 C304   U301   B     T0
 C305   U301   B     T0
 R308   U301   B     B0
@@ -219,7 +166,6 @@ C411   U402   B     R0
 C412   U402   B     R0
 C413   U402   B     L0
 C414   U402   B     L0
-R109   U101   F     B0
 R424   U403   F     T1
 R427   U404   B     T0
 R430   U405   F     B1
@@ -229,12 +175,12 @@ R704   U704   F     B0
 R706   U704   F     R0
 R812   U801   F     free@5
 C501   U501   B     L0
+R403   U402   F     T1
 R208   U201   F     R1
 R209   U201   F     R1
 R210   U201   F     R1
 R211   U201   F     R1
 R214   U201   F     R1
-R403   U402   F     T1
 C711   U704   B     R0
 R707   U704   B     R0
 C401   U402   B     T1
@@ -243,12 +189,11 @@ R401   U402   B     T2
 D802   K801   F     T2
 D804   K802   F     T1
 D806   K803   F     T2
-R115   U201   B     B0
-C107   J17    B     T0
 FB301  U301   F     T0
 R810   R811   F     free@11
 C502   R504   F     free@10
 C503   R505   F     free@12
+R102   Q101   B     L0
 D202   R205   F     B0
 D401   R426   F     T0
 D402   R429   F     T0
@@ -262,72 +207,45 @@ D703   R705   F     R0
 R801   D802   F     R3
 R804   D804   F     R0
 R807   D806   F     T0
-R111   Q102   B     T0
 R802   Q801   B     T0
 R805   Q802   B     T0
 R808   Q803   B     R0
-R112   Q102   B     T0
 R803   Q801   B     T0
 R806   Q802   B     T0
 R809   Q803   B     R0
 C309   C308   B     T0
 C601   SW601  B     L0
-C303   R303   F     free@15
+C303   R303   F     free@12
 R604   SW601  B     L0
-R113   C107   B     L0
 C203   SW201  B     L0
 R203   SW201  F     L0
-R125   L102   F     T1
-D113   R125   F     L0
-R101   U101   F     T0
-D105   R101   F     L0
-R120   L101   F     R0
-D111   R120   F     R0
-R114   U102   F     free@14
-D109   R114   F     B0
-R126   L103   F     R0
-D114   R126   F     R0
+R101   Q101   F     L0
+D102   R101   F     L0
+R103   L101   F     R0
+D103   R103   F     R0
 
-rail vias (layout.md 4): 237 beside 194 pads on plane nets.
-pads with no room beside them for any via (115; the router or the hand pass joins them to the rail):
-  C103.1 D106.2 D107.2 J2.A4 J2.A9 J2.B1 J2.B4 J2.B9 J2.B12 Q101.2 U101.10 U101.12 U101.13 U101.24 U101.25 U103.2 U103.7 U103.9 U104.2 U104.7 U104.9 U105.1 U105.3 U105.5 U105.7 C202.2 C204.2 C207.2 J3.B1 J3.B12 U201.9 U201.24 U201.41 U201.49 U201.60 U201.74 U201.88 U202.2 C301.2 C302.2 C307.2 C310.2 R311.2 U301.22 U301.25 C401.2 C404.2 C413.2 C415.2 C417.1 C419.1 C420.2 C421.1 C423.1 C423.2 D401.1 J1.B1 J1.B12 R404.2 R405.2 R406.2 R412.2 R414.2 R415.2 R418.2 R419.2 R420.2 R425.2 R428.2 R434.2 U401.2 U402.19 U402.65 U403.1 U403.2 U404.1 U404.2 U405.1 U405.2 U406.1 U406.2 U407.1 U407.2 U408.2 U409.2 U410.2 U411.2 Y401.2 Y401.4 D501.2 D502.2 D503.2 D506.2 U501.6 U501.16 U601.2 U601.6 U601.8 U601.33 C709.1 C711.2 D701.2 D702.2 R703.1 U703.2 U704.2 U704.5 U704.7 U704.8 U704.11 U704.15 U704.25 U704.25 D801.1 R802.2
-pads served short of their class's count or via (placed for wanted; 14; the hand pass adds the rest):
-  C111.1 1x0.6 for 2x1
-  C117.1 2x1.2 for 3x1.2
-  C118.1 2x1.2 for 3x1.2
-  C119.1 2x1.2 for 3x1.2
-  C120.1 1x0.6 for 2x1
-  C126.1 1x1.2 for 3x1.2
-  C127.1 2x1.2 for 3x1.2
-  C128.1 2x1.2 for 3x1.2
-  L101.2 2x1.2 for 3x1.2
-  L102.2 1x1.2 for 3x1.2
-  R125.1 2x1.2 for 3x1.2
-  C605.1 1x1.2 for 3x1.2
-  C708.1 2x1.2 for 3x1.2
-  U704.1 1x1.2 for 3x1.2
+rail vias (layout.md 4): 165 beside 135 pads on plane nets.
+pads with no room beside them for any via (94; the router or the hand pass joins them to the rail):
+  Q101.2 Q101.3 U105.1 U105.3 U105.5 U105.7 C202.2 C204.2 C207.2 J3.B1 J3.B12 U201.9 U201.24 U201.41 U201.49 U201.60 U201.74 U201.88 U202.2 C301.2 C302.2 C307.2 C310.2 R308.2 R311.2 U301.22 U301.25 C401.2 C402.2 C404.2 C405.2 C407.2 C415.2 C417.1 C419.1 C420.2 C421.1 C423.1 C423.2 D401.1 J1.B1 J1.B12 R404.2 R405.2 R412.2 R418.2 R425.2 R428.2 R434.2 U401.2 U402.19 U402.65 U403.1 U403.2 U404.1 U404.2 U405.1 U405.2 U406.1 U406.2 U407.1 U407.2 U408.2 U409.2 U410.2 U411.2 Y401.2 Y401.4 D501.2 D502.2 D503.2 D506.2 U501.6 U501.16 U601.2 U601.6 U601.8 U601.33 C709.1 C711.2 D701.2 D702.2 R703.1 U703.2 U704.2 U704.5 U704.7 U704.8 U704.11 U704.15 U704.25 U704.25 D801.1 R802.2
+pads served short of their class's count or via (placed for wanted; 4; the hand pass adds the rest):
+  C101.1 2x1 for 3x1
+  C102.1 2x1 for 3x1
+  C103.1 2x1 for 3x1
+  C605.1 1x1 for 3x1
 
 cities (layout.md 3.1): the schematic's islands with two or more parts, connectors, holes and ESD aside: each one's extent on
 the board, and the members more than 10 mm from every other member (placed apart from their city)
 daplink/C601                16 parts   27.8 x  20.3 mm
-ethernet/C301               20 parts   28.0 x  27.9 mm  apart: C303@13
+ethernet/C301               20 parts   19.5 x  27.7 mm
 ethernet/C308                2 parts    3.5 x   1.5 mm
 ftdi/C501                   17 parts   23.2 x  21.1 mm
-hub/C401                    60 parts   38.2 x  38.1 mm
+hub/C401                    60 parts   36.3 x  38.1 mm
 hub/C419                     7 parts   13.5 x   8.4 mm
 hub/C423                     7 parts   15.5 x  10.2 mm
 hub/C425                     7 parts   11.7 x   6.3 mm
-mcu/C201                    39 parts   71.2 x  43.4 mm
-power/C101                   4 parts    8.3 x   5.0 mm
-power/C105                  12 parts   12.8 x  12.8 mm
-power/C107                   2 parts    3.2 x   4.0 mm
-power/C108                   2 parts    3.2 x   4.0 mm
-power/C111                  18 parts   27.4 x  21.7 mm
-power/C120                  18 parts   20.5 x  28.8 mm
-power/C129                  10 parts   17.4 x   8.0 mm
-power/D105                   2 parts    1.7 x   0.3 mm
-power/D109                   2 parts    0.0 x   3.2 mm
-power/Q102                   5 parts    4.6 x  11.8 mm
+mcu/C201                    37 parts   71.2 x  43.4 mm
+power/C101                   8 parts   20.3 x  15.1 mm
+power/C105                  10 parts   17.4 x   8.0 mm
 relays/D801                  7 parts    4.6 x  12.4 mm
 relays/D803                  7 parts    8.0 x  11.3 mm
 relays/D805                 12 parts   35.9 x  33.6 mm  apart: R810@12

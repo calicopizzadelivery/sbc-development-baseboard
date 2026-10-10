@@ -8,7 +8,7 @@ report, a PDF of every sheet and a BOM.
 sbc-baseboard/
   sbc-baseboard.kicad_pro   project
   sbc-baseboard.kicad_sch   root: sheet index, mounting holes, the verify-before-fab list
-  power.kicad_sch           PD inlet, STUSB4500, J17 programming, PCA9517A, three bucks
+  power.kicad_sch           barrel-jack inlet J2, its TVS and reverse-polarity FET, +5V bulk, the +3V3 buck
   mcu.kicad_sch             K64, USB device port J3, SWD J16, heartbeat
   ethernet.kicad_sch        KSZ8081RNA, magjack
   hub.kicad_sch             USB2517, upstream J1, four switched USB-A, FT231X switch
@@ -23,9 +23,9 @@ sbc-baseboard/
   erc.txt, bom.csv
 ```
 
-Reference designators are numbered by sheet: R1xx/C1xx power, 2xx MCU,
-3xx Ethernet, 4xx hub, 5xx FTDI, 6xx DAPLink, 7xx target I/O, 8xx relays and
-passthrough.
+Reference designators are numbered by sheet: R1xx/C1xx power (the inlet
+and the +3V3 buck), 2xx MCU, 3xx Ethernet, 4xx hub, 5xx FTDI, 6xx DAPLink,
+7xx target I/O (the +5V_TGT eFuse among them), 8xx relays and passthrough.
 
 ## How it was made, and the handoff
 
@@ -93,7 +93,14 @@ now stops on a class that no net resolves to). Its differential width and
 gap are 0.33 / 0.20 mm, 90 Ω over the ground plane beside each outer layer on
 the six-layer stackup (the fab's calculator rules when the stackup is
 confirmed); the `ETH` class 0.29 / 0.25 mm for 100 Ω. Route each pair as a pair, no stubs,
-over an unbroken reference plane.
+over an unbroken reference plane. The power classes are matched the same
+way: `PWR_4A` (2.5 mm tracks or pours, 1.0 mm / 0.5 mm vias, three rail vias
+per pad) for `+5V` and `*+5V_TGT`, the one inlet rail and the eFuse's
+switched output (2026-10-10; until then `PWR_6A` carried the two bucks'
+6 A outputs and the PD inlet's `VBUS_IN` ran at 3 A); `USB_VBUS_3A` (2 mm,
+1.0 mm vias) for `*PORT?_VBUS` and `*FTDI_VBUS` only; `PWR_1A` (0.6 mm) for
+`+3V3`; `PSU_3A` and `PSU_ISO` for the passthrough and its sense lines;
+`Default` at 0.2 mm.
 
 **Builds are reproducible.** Every UUID in the generated files is derived,
 not drawn: a UUID5 in a namespace made from the project name, keyed by what
@@ -129,14 +136,22 @@ the directives in `gen/layout.py`, which are
 [docs/layout-directives.md](../../docs/layout-directives.md) as data. It
 carries the 140 × 100 mm outline with 2 mm corners, the four M3 holes on GND
 7 mm from the corners with their corner keep-outs, Advanced Circuits' 6-layer
-stackup, every footprint with its nets, the L2 and L5 ground planes with the
-isolated PSU_GND islands, and `sbc-baseboard.kicad_dru` with the passthrough's
-isolation rules.
+stackup, the 270 footprints with their nets (339 until 2026-10-10, when the
+USB-C PD inlet, its STUSB4500 controller, bus buffer and programming header
+and the two 5 V bucks went and a barrel jack came; 481 connections, 499
+before), the L2 and L5 ground planes with the isolated PSU_GND islands, and
+`sbc-baseboard.kicad_dru` with the passthrough's isolation rules.
 
 The placement follows
 [ecad-standards/layout.md](https://github.com/calicopizzadelivery/ecad-standards/blob/main/layout.md)
 section 3: the edge connectors are locked at the directives' positions,
-facing outward; the ICs are anchored by flow (the table in the directives);
+facing outward; the ICs are anchored by flow (the table in the directives:
+power enters at J2 on the left edge, its reverse-polarity FET Q101 anchored
+at (20, 30) behind the jack with the TVS, gate pull-down, bulk capacitors
+and LED around it as the inlet island, the +3V3 buck U105 at (41, 41) as
+the one regulator city, laid out from its datasheet figure, and the eFuse
+U704 behind J14; the corner the two bucks occupied, x 10..70, y 3..36, is
+largely empty since 2026-10-10);
 the two parts that straddle the isolation barrier are fixed; every other
 part is placed at the pin it serves, by the generator, in five passes (small
 decoupling capacitors at their pins, the large parts on an IC's own pins,
@@ -164,10 +179,16 @@ The pairs are laid by the engine as pair lanes (both members at the class's
 differential geometry, escapes, the USB-C bridges, two layer changes where
 a pair must pass under the port pairs, lengths matched by a bump), the ESD
 arrays and series parts anchored for it; the PSU passthrough is laid as
-single-net lanes; the rails are regions on L4 (+3V3 is routed, in its 0.6 mm
-`PWR_1A` class: on the one rail layer the two 6 A rails and the 3 A inlet cut
-any +3V3 plane into pieces, which the standard's rails gate refuses; on six
-layers a plane for it would cost the third routing layer). What is left is routed by
+single-net lanes; the one rail, +5V, is a chain of rectangles on L4
+referenced to the L5 ground plane, from the jack (x 3..42, y 22..40)
+through the 3V3 buck's input, down beside the relay region, along the port
+switches, across above the passthrough region to the FTDI switch, the
+relays and the eFuse behind J14, which the standard's rails gate holds to
+one piece (2026-10-10; until then VBUS_IN, +5V_PORTS and +5V_TGT were
+three rails on that layer, the two 6 A ones and the 3 A inlet competing
+for it); +5V_TGT leaves the eFuse to J14 as a track in the same class;
++3V3 is routed, in its 0.6 mm `PWR_1A` class, since on six layers a plane
+for it would cost the third routing layer. What is left is routed by
 FreeRouting through the standard's `tools/autoroute.py` with all of that
 locked (`gen/pcb.py --route`; the directives' `FREEROUTING` setting names
 the binary), and the hand pass finishes from there. KiCad Routing Tools
@@ -181,7 +202,10 @@ the Specctra rules and the fixed lanes, so it stays the bulk router.
 fill or strays into a keep-out shows; the unconnected count is the ratsnest's
 and does not credit the planes); its report is `drc.txt`.
 
-The board as committed (2026-10-09, routed, six layers) is the engine's
+The board as last routed (2026-10-09, six layers, with the PD inlet and the
+two bucks still on it; the barrel-jack board of 2026-10-10 started from a
+copper reset and is being routed again, so until that routing is committed
+these are the previous board's figures) is the engine's
 placement on the 140 × 100 mm outline, bulk-routed by FreeRouting on L1,
 L3 and L6 over the locked lanes, rail vias and planes (`gen/pcb.py --route
 --copper`, 24 passes, 5 h 12 min on one thread of which 55 min were its
@@ -255,8 +279,8 @@ Layout order, per the standard's section 8: the edge connectors against the
 mechanical drawing (done: they are locked), the isolated passthrough block
 (done: fixed parts, island, rules), then by hand the far-placed parts and
 the indicator LEDs, the USB 2.0 pairs from each receptacle through its ESD
-array to the hub, the bucks' switching loops and the PWR_6A pours, and the
-rest.
+array to the hub, the 3V3 buck's switching loop and the +5V rail's `PWR_4A`
+pours, and the rest.
 
 ## Design decisions that were made during capture
 
@@ -270,10 +294,25 @@ These are also reflected in `docs/hardware-spec.md`.
 - **Clock tree.** KSZ8081RNA with a 25 MHz crystal in its default 25 MHz mode;
   its 50 MHz REF_CLK output drives the K64's EXTAL0. This is the FRDM-K64F
   arrangement and what Zephyr's `frdm_k64f` board file expects.
-- **Bucks.** TPS54560B for both 5 V rails (5 A, in the library); TPS62823 for
-  +3V3. The bucks' EN is gated by the STUSB4500's VBUS_EN_SNK, so no series
-  VBUS FET.
-- **eFuse.** TPS26630 (in the library), with IMON to a K64 ADC pin.
+- **Power inlet.** A 5 V 4 A (20 W) adapter on a Kycon KLDX-0202-BC barrel
+  jack, 2.5 mm centre pin, centre positive, through-hole on the left edge
+  (2026-10-10; a USB-C PD inlet with an STUSB4500 sink, its PCA9517A-buffered
+  I2C and Qwiic programming header and two TPS54560B 5 V bucks until then,
+  which cost 69 of the board's 339 parts and two 6 A rails). An SMAJ5.0A
+  TVS at the centre pin; a DMP3013SFV P-channel MOSFET as reverse-polarity
+  protection, drain at the jack, source on the rail, gate to GND through
+  100 kΩ, body diode toward the rail; 2 × 47 µF, a 100 µF electrolytic and 100 nF on the one +5V
+  rail; an amber LED. No series fuse: the adapter limits the inlet, the eFuse
+  the target rail, the TPS2553s the ports. The rail feeds the four port
+  switches, the FT231X's switch, the three relay coils, the TPS62823 +3V3
+  buck and the eFuse. The four ports at their limits, the target at 3 A and
+  the board's 0.5 to 0.7 A can sum past 4 A; firmware keeps the 20 W
+  budget. The K64's I2C0 and the three PD pins are no-connect, five GPIO
+  freed.
+- **eFuse.** TPS26630 (in the library) switches +5V_TGT to J14 at 3 A
+  (RILIM 6.04 kΩ 1 %, the datasheet's 18 kΩ·A / IOL; 3.65 kΩ for 5 A until
+  2026-10-10), UVLO 4.3 V (196k/75k), IMON through 20 kΩ to a K64 ADC pin
+  (about 1.7 V at 3 A) and /FLT to a K64 GPIO.
 - **I2C translation.** TXS0102 instead of PCA9306, because a 3.3 V target gives
   VREF equal to the K64 rail, which PCA9306 cannot handle.
 - **Magjack.** Kycon G7LX-A88S7-BP-GY, because its library symbol names the
@@ -285,6 +324,8 @@ These are also reflected in `docs/hardware-spec.md`.
 ## Verify before fab
 
 Listed on the root sheet and in the spec's open questions: K803 JW1FSN pad
-mapping, DAPLink k20dx pin assignments, TPS54560B compensation (placeholders),
-TPS2553/TPS26630 limits at bring-up, STUSB4500 from VSYS alone, PCA9517A
-isolation with VCC(B) = 0, USB2517 VBUS_DET divider, KSZ8081 crystal load.
+mapping, DAPLink k20dx pin assignments, TPS2553 ILIM and TPS26630 UVLO/ILIM
+(6.04 kΩ → 3 A) at bring-up, the inlet FET's drop at 4 A, USB2517 VBUS_DET
+divider, KSZ8081 crystal load. (The TPS54560B compensation, the STUSB4500
+from VSYS alone and the PCA9517A isolation with VCC(B) = 0 went with the PD
+inlet, 2026-10-10.)

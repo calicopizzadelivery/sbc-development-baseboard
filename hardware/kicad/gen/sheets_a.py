@@ -24,7 +24,8 @@ def power(project, num, page, sheet_path, plib):
     s.project_lib = plib
     s.note(["POWER", "J2: 2.5 x 5.5 mm barrel jack, centre positive, for a 5 V 4 A (20 W) adapter (2026-10-10; a USB-C PD inlet with two",
             "5 V bucks until then). SMAJ5.0A clamps the inlet; Q101, a P-channel MOSFET with its body diode toward the rail and its",
-            "gate at GND, blocks reverse polarity at 9.5 mOhm. No series fuse: the adapter limits the inlet, the eFuse the target rail,",
+            "gate at GND, blocks reverse polarity at 9.5 mOhm. 2 x 47 uF + 100 uF bulk behind it: the hub's downstream ports want 120 uF.",
+            "No series fuse: the adapter limits the inlet, the eFuse the target rail,",
             "the TPS2553s the ports. The adapter's 4 A is the only limit on the sum: the ports (4 x 1.1 A), the target rail (3 A) and the",
             "board (0.5 A) can ask for more together; firmware keeps the budget (docs/hardware-spec.md section 4).",
             "+5V is laid out for 4 A (class PWR_4A, 2.5 mm or pours); +5V_TGT leaves the eFuse at up to 3 A in the same class."], (16, 17), 1.5)
@@ -34,7 +35,7 @@ def power(project, num, page, sheet_path, plib):
     s.pin_nc(j2, "3")                                                 # the jack's switch contact
     # ---- inlet: TVS at the jack, the FET, the bulk capacitors and the rail LED on its source
     fan(s, j2, {1: chain(Pull("GND", ("Device", "D_Zener", "1"), "SMAJ5.0A", None, fp=FP["SMA"]), Conn(q1, 5)), 2: P("GND")})
-    fan(s, q1, {1: chain(Ladder([("47u/10V", FP["C1210"]), ("47u/10V", FP["C1210"]), ("100n", None)]), PullLED(AMBER, "1k", None), P("+5V")),
+    fan(s, q1, {1: chain(Ladder([("47u/10V", FP["C1210"]), ("47u/10V", FP["C1210"]), ("CP", "100u/10V", FP["CP"]), ("100n", None)]), PullLED(AMBER, "1k", None), P("+5V")),   # 194 uF: the hub's downstream ports want 120 uF of bulk on their rail
                 4: Pull("GND", "R", "100k", None)})
     # ---- the 3V3 buck
     u5 = s.add("Regulator_Switching", "TPS62823DLC", "U105", "TPS62823DLC", (300, 215), footprint="Package_SON:Texas_VSON-HR-8_1.5x2mm_P0.5mm")   # above the title block
