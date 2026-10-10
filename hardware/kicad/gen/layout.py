@@ -88,9 +88,12 @@ SEARCH_RADIUS = 40.0         # the nearest-free-spot search gives up beyond this
 # parts placed by hand across the isolation barrier: (x, y, rotation) of the footprint origin
 FIXED = {"K803": (58.0, 73.0, 0),          # coil pads (1, 8) at x = 58 outside the region, contacts (2, 4, 6) inside
          "U801": (68.0, 80.5, 180)}        # below the relay: LED pins (1, 2) at x = 68 inside the region, transistor pins (3, 4) at 60.4 outside
-# the owner's hand placement (gen/harvest.py from the saved board, 2026-10-10): every part it moved, fixed where it was put;
-# a fixed part outranks its anchor, so the ANCHORS above stay as the first placement's record
-from hand_placement import HAND
+# the owner's hand placement (the standard's tools/handplace.py over the saved board, since 2026-10-10): every part's pose,
+# fixed where the owner put it; a fixed part outranks its anchor, so the ANCHORS above stay as the first placement's record
+try:
+    from hand_placement import HAND
+except ImportError:                 # before the first harvest the engine places everything itself
+    HAND = {}
 FIXED = {**FIXED, **HAND}
 PACK_MARGIN = 0.15          # courtyard to courtyard: with KiCad's 0.25 mm courtyards 0.65 mm pad to pad (reference boards: 0.3-0.6; ECSS Table 14-2: 0.6 between bodies)
 

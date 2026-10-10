@@ -54,18 +54,18 @@
 [courtyards_overlap]: Courtyards overlap
     Rule: board setup constraints courtyard; error
     @(19.1750 mm, 75.5000 mm): Footprint R211
-    @(17.9570 mm, 76.1450 mm): Footprint R433
+    @(17.9575 mm, 76.1450 mm): Footprint R433
 [courtyards_overlap]: Courtyards overlap
     Rule: board setup constraints courtyard; error
-    @(31.4070 mm, 36.5000 mm): Footprint C105
-    @(29.1330 mm, 39.2500 mm): Footprint U105
+    @(31.4075 mm, 36.5000 mm): Footprint C105
+    @(29.1325 mm, 39.2500 mm): Footprint U105
 [courtyards_overlap]: Courtyards overlap
     Rule: board setup constraints courtyard; error
     @(36.7850 mm, 79.4150 mm): Footprint U403
     @(35.0000 mm, 76.5000 mm): Footprint R208
 [courtyards_overlap]: Courtyards overlap
     Rule: board setup constraints courtyard; error
-    @(36.9220 mm, 76.7400 mm): Footprint C417
+    @(36.9225 mm, 76.7400 mm): Footprint C417
     @(35.0000 mm, 76.5000 mm): Footprint R208
 [courtyards_overlap]: Courtyards overlap
     Rule: board setup constraints courtyard; error
@@ -127,10 +127,10 @@
     @(19.1750 mm, 75.5000 mm): Footprint R211
 [items_not_allowed]: Items not allowed (keepout area 'lane_HUB_DN6_15')
     Rule: keepout area 'lane_HUB_DN6_15'; error
-    @(21.3810 mm, 71.8150 mm): Footprint D404
+    @(21.3807 mm, 71.8150 mm): Footprint D404
 [items_not_allowed]: Items not allowed (keepout area 'lane_HUB_DN6_15')
     Rule: keepout area 'lane_HUB_DN6_15'; error
-    @(21.3810 mm, 75.0200 mm): Footprint R435
+    @(21.3807 mm, 75.0200 mm): Footprint R435
 [items_not_allowed]: Items not allowed (keepout area 'lane_HUB_DN7_18')
     Rule: keepout area 'lane_HUB_DN7_18'; error
     @(28.5000 mm, 58.0000 mm): Footprint C416
@@ -142,7 +142,7 @@
     @(75.1350 mm, 44.2500 mm): Footprint C605
 [items_not_allowed]: Items not allowed (keepout area 'lane_K20_USB_25')
     Rule: keepout area 'lane_K20_USB_25'; error
-    @(78.5450 mm, 45.4380 mm): Footprint C603
+    @(78.5450 mm, 45.4375 mm): Footprint C603
 [items_not_allowed]: Items not allowed (keepout area 'lane_K20_USB_27')
     Rule: keepout area 'lane_K20_USB_27'; error
     @(89.6500 mm, 40.5000 mm): Footprint J601
@@ -280,7 +280,7 @@
     @(14.6200 mm, 20.3800 mm): Segment of J2 on F.Silkscreen
 [silk_over_copper]: Silkscreen clipped by solder mask
     Local override; warning
-    @(18.4795 mm, 75.9077 mm): Segment of R433 on B.Silkscreen
+    @(18.4800 mm, 75.9077 mm): Segment of R433 on B.Silkscreen
     @(18.3500 mm, 75.5000 mm): Pad 2 [+3V3] of R211 on B.Cu
 [solder_mask_bridge]: Front solder mask aperture bridges items with different nets
     Rule: board setup solder mask min width; error
@@ -429,7 +429,7 @@
 [solder_mask_bridge]: Front solder mask aperture bridges items with different nets
     Rule: board setup solder mask min width; error
     @(57.8500 mm, 44.2650 mm): Track [/DAPLink/K20_USB_N] on F.Cu, length 33.7598 mm
-    @(78.5450 mm, 44.6630 mm): Pad 2 [GND] of C603 on F.Cu
+    @(78.5450 mm, 44.6625 mm): Pad 2 [GND] of C603 on F.Cu
 [solder_mask_bridge]: Front solder mask aperture bridges items with different nets
     Rule: board setup solder mask min width; error
     @(57.8500 mm, 44.2650 mm): Track [/DAPLink/K20_USB_N] on F.Cu, length 33.7598 mm

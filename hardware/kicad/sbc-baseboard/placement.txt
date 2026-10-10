@@ -13,7 +13,7 @@ pads served short of their class's count or via (placed for wanted; 7; the hand 
   C423.1 1x0.6 for 3x1
 
 hand placement (layout.md 2, item 4): what the hand-fixed parts and the lanes put in each other's way; the next hand pass's work
-  hand-fixed parts closer than the packing margin to a neighbour (24; the DRC gate judges the courtyards): C105 and L101, C105 and U105, C108 and R104, C108 and R105, C204 and Y201, C205 and Y201, C409 and C410, C410 and C415, C410 and Y401, C415 and Y401, C416 and Y401, C417 and R208, C418 and J4, C418 and R208, C418 and R424, C425 and U407, C606 and Y601, D103 and L101, R104 and R105, R208 and U403, R209 and U408, R211 and R433, R211 and R435, R212 and R213
+  hand-fixed pairs closer than the packing margin (24; the DRC gate judges the courtyards): C105 and L101, C105 and U105, C108 and R104, C108 and R105, C204 and Y201, C205 and Y201, C409 and C410, C410 and C415, C410 and Y401, C415 and Y401, C416 and Y401, C417 and R208, C418 and J4, C418 and R208, C418 and R424, C425 and U407, C606 and Y601, D103 and L101, R104 and R105, R208 and U403, R209 and U408, R211 and R433, R211 and R435, R212 and R213
   lane HUB_UP runs through the hand-fixed Y401
   lane HUB_DN4 runs through the hand-fixed R209
   lane HUB_DN4 runs through the hand-fixed C406
@@ -22,19 +22,22 @@ hand placement (layout.md 2, item 4): what the hand-fixed parts and the lanes pu
   lane HUB_DN6 runs through the hand-fixed R435
   lane HUB_DN6 runs through the hand-fixed D404
   lane HUB_DN6 runs through the hand-fixed C416
-  lane HUB_DN7 runs through the hand-fixed Y401
   lane HUB_DN7 runs through the hand-fixed C416
+  lane HUB_DN7 runs through the hand-fixed Y401
   lane HUB_DN1 runs through the hand-fixed C403
-  lane K20_USB runs through the hand-fixed C605
   lane K20_USB runs through the hand-fixed C603
+  lane K20_USB runs through the hand-fixed C605
   lane K20_USB runs through the hand-fixed J601
   lane HUB_DN2 runs through the hand-fixed C403
   lane HUB_DN2 runs through the hand-fixed C406
-  lane HUB_DN2 runs through the hand-fixed C606
-  lane HUB_DN2 runs through the hand-fixed C607
+  lane HUB_DN2 runs through the hand-fixed R602
+  lane HUB_DN2 runs through the hand-fixed U601
   lane HUB_DN2 runs through the hand-fixed Y601
+  lane HUB_DN2 runs through the hand-fixed C607
+  lane HUB_DN2 runs through the hand-fixed C606
   lane ETH_TD runs through the hand-fixed C301
   lane ETH_RD runs through the hand-fixed C301
+  lane PORT2_D_N runs through the hand-fixed U408
   lanes laid with their members crossing (1; the DRC gate faults the crossing): lane K20_USB: the P and N pads are on opposite sides at its two ends: swap the array's channels in the schematic, or lead the path in from the other side
 
 cities (layout.md 3.1): the schematic's islands with two or more parts, connectors, holes and ESD aside: each one's extent on
@@ -74,7 +77,7 @@ voids (layout.md 3.1): every two parts of different cities on one side keep 2 mm
   C422-R210 1.04 mm
   U702-U703 1.16 mm
   D404-R211 1.38 mm
-  D401-R209 1.48 mm
+  D401-R209 1.49 mm
   D402-R209 1.51 mm
   R209-R429 1.51 mm
   C102-C105 1.54 mm

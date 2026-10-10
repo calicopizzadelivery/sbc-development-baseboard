@@ -270,15 +270,17 @@ and the generator reproduces the saved board exactly (`handplace.py
 --check` against the generated board finds nothing placed elsewhere). The
 edge connectors stay in `CONNECTORS`, rewritten by the harvest when one
 moves (J1, J2, J3 and J10 in the first pass). A hand-fixed part is reported
-rather than refused: `placement.txt` ends with a "hand placement" section
-listing the hand-fixed parts closer than the packing margin to a neighbour
-(the DRC gate judges their courtyards), the lanes that run through a
-hand-fixed part, the lanes the engine could not lay, and the pair lanes
-laid with their members crossing because a moved part now faces the path
-the wrong way; that section is
+rather than refused: `placement.txt` carries a "hand placement" section
+(after the rail vias) listing the pairs of hand-fixed parts closer than
+the packing margin (the DRC gate judges their courtyards), the lanes that
+run through a hand-fixed part, the lanes the engine could not lay, and the
+pair lanes laid with their members crossing because a moved part now
+faces the path the wrong way; that section is
 the next hand pass's work, and the board is not routed until the lanes lay
 and the DRC gate is clean. The hand loop is: move parts in KiCad and save,
-harvest, regenerate, read the section, repeat. The anchors below are the
+harvest, regenerate, read the section, repeat. The harvest takes the
+parts' poses only: the designators follow the silkscreen rule on every
+regeneration, so they are not moved by hand. The anchors below are the
 positions the generator used before the hand pass; where `HAND` has an
 entry, it wins, and the table's "why there" still says what the part is
 for and which way it faces.
@@ -287,7 +289,7 @@ for and which way it faces.
 |---|---|---|
 | K803 | (58, 73, 0) | straddles the isolation barrier |
 | U801 | (68, 80.5, 180) | straddles the isolation barrier |
-| U301 | (80.5, 29, 270) | PHY below J10 on the back edge, TX/RX pins up toward the jack (J10 + (4.42, 8.77), the ETH lanes' geometry) |
+| U301 | (54.5, 29, 270) | PHY below J10 on the back edge, TX/RX pins up toward the jack (J10 + (6.81, 8.96), the ETH lanes' geometry; at (80.5, 29) until the jack moved left on 2026-10-10; the hand pass put it at (52.11, 28.81)) |
 | Q101 | (20, 30, 0) | the inlet's reverse-polarity FET (DMP3013SFV) behind J2, drain at the jack's centre pin, source on the +5V rail, gate to GND through R102; the inlet island comes to it and to the jack: D101 the SMAJ5.0A at the jack's centre pin (19.3, 34), C101/C102 47 µF at (12, 22.7) and (7.3, 22.8) with C103 100 nF beside the source, the amber LED D102 and R101 at (13, 20). 2026-10-10: until then the corner held U101 the STUSB4500 at (16, 41) placed from ST's STEVAL-ISC005V1 figure (UM2398 Figure 24), U102 the PD bus buffer at (28, 44), J17 the Qwiic programming header at (38, 50) and the two TPS54560B bucks U103 (+5V_PORTS) at (24, 24) and U104 (+5V_TGT) at (52, 24) placed from TI SLVSF00 Figure 57; all five anchors and both templates went with the PD inlet |
 | U105 | (41, 41, 0) | +3V3 buck above the hub, where the +5V rail's inlet rectangle hands to the next (below buck 1's output until 2026-10-10), laid out to TI SLVSDV6C Figure 52 (the `TPS62823` template): inductor and input capacitor on the power-pin side, output capacitors at the inductor's output, divider and feed-forward on the FB side |
 | U402 | (39, 59, 90) | hub, moved 5 mm down and left toward the USB ports on 2026-10-07 to open the centre: downstream pins toward J4/J5, upstream and crystal toward J1 |
