@@ -53,7 +53,7 @@ def hub(project, num, page, sheet_path, plib):
             "LED_A/B pins pulled down: PRT_SWP normal polarity, BOOST=00, GANG_EN=0 (individual over-current).",
             "Port power is switched by TPS2553 under K64 GPIO (boot ON via pull-ups); PRTPWR outputs unused; /FAULT feeds OCSx_N.",
             "USB 2.0 pairs are named *_P / *_N (KiCad's differential-pair convention) and sit in net class USB: 90 ohm differential, routed as pairs, no stubs. Each ESD array splits its pair into a hub side (HUB_DNn) and a connector side (PORTn_D). Set the class's width and gap from the stackup before routing.",
-            'Current: PORTn_VBUS and FTDI_VBUS are laid out for 3 A each (class USB_VBUS_3A, 2 mm traces); +5V_PORTS feeds them at up to 6 A (PWR_6A).'], (16, 17), 1.5)
+            'Current: PORTn_VBUS and FTDI_VBUS are laid out for 3 A each (class USB_VBUS_3A, 2 mm traces); +5V feeds them from the 4 A inlet (class PWR_4A, 2.5 mm traces or pours)'], (16, 17), 1.5)
     u = s.add("calico-ic", "USB2517", "U402", "USB2517", (165, 150), footprint="Package_DFN_QFN:QFN-64-1EP_9x9mm_P0.5mm_EP7.15x7.15mm")
     j1 = s.add("Connector", "USB_C_Receptacle_USB2.0_16P", "J1", "USB-C upstream", (35, 74.92), footprint=FP["USBC"])
     esd0 = s.add("Power_Protection", "USBLC6-2SC6", "U401", "USBLC6-2SC6", (78.74, 74.93), footprint=FP["SOT236"])     # I/O rows = J1 B7 (D-) and A6 (D+); VBUS pin lands on J1's plain VBUS stretch
@@ -120,7 +120,7 @@ def hub(project, num, page, sheet_path, plib):
         e5 = esd.pin("5")                                              # VBUS pin: short stub up, label reading right
         s.wire(e5, (e5[0], snap(e5[1] - 2.54)), (snap(e5[0] + 5.08), snap(e5[1] - 2.54)))
         s.label(f"PORT{n}_VBUS", (snap(e5[0] + 5.08), snap(e5[1] - 2.54)), 0, None)
-        fan(s, tps, {1: chain(Pull("GND", "C", "100n", None), P("+5V_PORTS")),
+        fan(s, tps, {1: chain(Pull("GND", "C", "100n", None), P("+5V")),
                      3: chain(Pull("+3V3", "R", "10k", None), L(f"PORT{n}_EN")),
                      5: chain(Ser("R", "23.7k", None), P("GND")),
                      6: End(f"vbus{n}"),                                       # the VBUS row is drawn from the connector side (below)
@@ -132,7 +132,7 @@ def hub(project, num, page, sheet_path, plib):
             jatts["SH"] = P("GND")
         fan(s, j, jatts, align="top")
         s.netclass_flag("USB_VBUS_3A", s.lane_end[(j.ref, str(vb))], 90)       # the port's VBUS is laid out for 3 A
-    fan(s, u407, {1: chain(Pull("GND", "C", "100n", None), P("+5V_PORTS")), 3: chain(Pull("+3V3", "R", "10k", None), L("FTDI_EN")),
+    fan(s, u407, {1: chain(Pull("GND", "C", "100n", None), P("+5V")), 3: chain(Pull("+3V3", "R", "10k", None), L("FTDI_EN")),
                   5: chain(Ser("R", "23.7k", None), P("GND")),
                   6: chain(Pull("GND", "C", "10u", None, fp=FP["C0805"]), PullLED(GREEN, "1k", None), P("FTDI_VBUS")),
                   4: L("FTDI_FAULT_N"), 2: P("GND")})
@@ -174,7 +174,7 @@ def ftdi(project, num, page, sheet_path, plib):
 def daplink(project, num, page, sheet_path, plib):
     s = Sheet(project, "DAPLink: MK20DX128VFM5 on hub port 1, SWD + CDC + MSD to the K64", num, page, sheet_path)
     s.project_lib = plib
-    s.note(["DAPLINK", "MK20DX128VFM5 running DAPLink (k20dx HIC), powered from +5V_PORTS through its own USB regulator (VOUT33 -> VDD).",
+    s.note(["DAPLINK", "MK20DX128VFM5 running DAPLink (k20dx HIC), powered from +5V through its own USB regulator (VOUT33 -> VDD).",
             "Pin use follows the DAPLink k20dx HIC: PTC5 = SWCLK, PTC6 = SWDIO, PTB1 = nRESET to the K64, PTD4 = LED,",
             "UART1 PTC3/PTC4 bridges to the K64 UART0 (CDC console). Pins verified against DAPLink k20dx IO_Config.h and the FRDM-K64F OpenSDA circuit:",
             "PTC7 (SWDIO_IN) ties to SWDIO, 33 R in series with USB D+/D- (FRDM R20/R22). No level shifters: the K64 target is 3.3 V like the K20.",
@@ -196,7 +196,7 @@ def daplink(project, num, page, sheet_path, plib):
     for key, net in (("dn1_p", "HUB_DN1_P"), ("dn1_n", "HUB_DN1_N")):      # the hub side of the pair, beyond the series resistors
         s.label(net, End.registry[(id(s), key)][0], 180)
     top_bus(s, u, [1, 7], "K20_3V3", caps_right=[("100n", None), ("100n", None)], rail_at="right", height=12.7)
-    top_caps(s, u, 6, [("2u2", None)], height=20.32, sx=-1, rail="+5V_PORTS")
+    top_caps(s, u, 6, [("2u2", None)], height=20.32, sx=-1, rail="+5V")
     crystal(s, u, "xtalin", "xtalout", "Y601", "8MHz", FP["XTAL4"], "18p")
     fan(s, j, {1: P("K20_3V3"), 3: P("GND"), 9: P("GND"), 10: L("K20_RESET_N")})
     return s

@@ -2471,7 +2471,7 @@
 		)
 		(uuid "2638f6f7-4f9f-5076-aef5-33c92bc191b6")
 	)
-	(text "MK20DX128VFM5 running DAPLink (k20dx HIC), powered from +5V_PORTS through its own USB regulator (VOUT33 -> VDD)."
+	(text "MK20DX128VFM5 running DAPLink (k20dx HIC), powered from +5V through its own USB regulator (VOUT33 -> VDD)."
 		(exclude_from_sim no)
 		(at 16 19.7 0)
 		(effects
@@ -2480,7 +2480,7 @@
 			)
 			(justify left bottom)
 		)
-		(uuid "cf4e5f8c-7dc3-5f30-a55a-02c8cfc1ed8d")
+		(uuid "b69bdd24-79e0-5d35-b245-5d324967ca4c")
 	)
 	(text "Pin use follows the DAPLink k20dx HIC: PTC5 = SWCLK, PTC6 = SWDIO, PTB1 = nRESET to the K64, PTD4 = LED,"
 		(exclude_from_sim no)
@@ -5942,7 +5942,7 @@
 				)
 			)
 		)
-		(property "Value" "+5V_PORTS"
+		(property "Value" "+5V"
 			(at 152.4 55.88 0)
 			(show_name no)
 			(do_not_autoplace no)

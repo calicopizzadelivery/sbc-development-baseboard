@@ -4330,7 +4330,7 @@
 		)
 		(uuid "cb2daadc-55eb-561a-9c6e-6604a36f4534")
 	)
-	(text "TPS26630: ILIM 3.65k -> ~5 A, UVLO 196k/75k -> 4.3 V, OVP/MODE/PGTH to GND (latch-off). IMON 20k -> 2.8 V at 5 A into PTB2."
+	(text "TPS26630: ILIM 6.04k -> 3 A (RILIM = 18 kOhm.A / IOL; 3.65k -> 5 A until 2026-10-10, when the 20 W inlet set the budget), UVLO 196k/75k -> 4.3 V, OVP/MODE/PGTH to GND (latch-off). IMON 20k -> 1.7 V at 3 A into PTB2."
 		(exclude_from_sim no)
 		(at 16 27.8 0)
 		(effects
@@ -4339,7 +4339,7 @@
 			)
 			(justify left bottom)
 		)
-		(uuid "fc768ee6-ae81-54fe-a1f5-c73f72b62186")
+		(uuid "d741ed37-e1df-5126-b3f2-570816912255")
 	)
 	(symbol
 		(lib_id "Connector_Generic:Conn_01x04")
@@ -10282,7 +10282,7 @@
 				)
 			)
 		)
-		(property "Value" "+5V_TGT"
+		(property "Value" "+5V"
 			(at 238.76 170.18 0)
 			(show_name no)
 			(do_not_autoplace no)
@@ -10362,17 +10362,17 @@
 	(wire
 		(pts
 			(xy 274.32 195.58)
-			(xy 233.68 195.58)
+			(xy 236.22 195.58)
 		)
 		(stroke
 			(width 0)
 			(type default)
 		)
-		(uuid "634d3274-940c-5bb9-bc74-f5e98f090c00")
+		(uuid "f9538c91-576e-537e-95c3-ea221ec9ddab")
 	)
 	(symbol
 		(lib_id "Device:R")
-		(at 233.68 203.2 0)
+		(at 236.22 203.2 0)
 		(unit 1)
 		(body_style 1)
 		(exclude_from_sim no)
@@ -10383,7 +10383,7 @@
 		(fields_autoplaced no)
 		(uuid "52c0f349-e2c4-59ac-b663-629ac7eed998")
 		(property "Reference" "R702"
-			(at 231.14 201.93 0)
+			(at 233.68 201.93 0)
 			(show_name no)
 			(do_not_autoplace no)
 			(effects
@@ -10394,7 +10394,7 @@
 			)
 		)
 		(property "Value" "75k"
-			(at 231.14 204.47 0)
+			(at 233.68 204.47 0)
 			(show_name no)
 			(do_not_autoplace no)
 			(effects
@@ -10405,7 +10405,7 @@
 			)
 		)
 		(property "Footprint" "Resistor_SMD:R_0603_1608Metric"
-			(at 233.68 203.2 0)
+			(at 236.22 203.2 0)
 			(hide yes)
 			(show_name no)
 			(do_not_autoplace no)
@@ -10417,7 +10417,7 @@
 			)
 		)
 		(property "Datasheet" "~"
-			(at 233.68 203.2 0)
+			(at 236.22 203.2 0)
 			(hide yes)
 			(show_name no)
 			(do_not_autoplace no)
@@ -10429,7 +10429,7 @@
 			)
 		)
 		(property "Description" "Resistor"
-			(at 233.68 203.2 0)
+			(at 236.22 203.2 0)
 			(hide yes)
 			(show_name no)
 			(do_not_autoplace no)
@@ -10457,29 +10457,29 @@
 	)
 	(wire
 		(pts
-			(xy 233.68 195.58)
-			(xy 233.68 199.39)
+			(xy 236.22 195.58)
+			(xy 236.22 199.39)
 		)
 		(stroke
 			(width 0)
 			(type default)
 		)
-		(uuid "14e5923e-bbbc-5875-ba4d-dbc5373311fc")
+		(uuid "b1abafc6-6466-5400-a7cb-f0c0ce36b6b4")
 	)
 	(wire
 		(pts
-			(xy 233.68 207.01)
-			(xy 233.68 209.55)
+			(xy 236.22 207.01)
+			(xy 236.22 209.55)
 		)
 		(stroke
 			(width 0)
 			(type default)
 		)
-		(uuid "07128725-13fd-5b1a-878c-9f1b8dae2d57")
+		(uuid "1a679b9a-9d0f-5041-ac18-6767cab9a0e8")
 	)
 	(symbol
 		(lib_id "power:GND")
-		(at 233.68 209.55 0)
+		(at 236.22 209.55 0)
 		(unit 1)
 		(body_style 1)
 		(exclude_from_sim no)
@@ -10490,7 +10490,7 @@
 		(fields_autoplaced no)
 		(uuid "d3862fab-d599-5988-b683-6180b0e7653f")
 		(property "Reference" "#PWR08033"
-			(at 233.68 209.55 0)
+			(at 236.22 209.55 0)
 			(hide yes)
 			(show_name no)
 			(do_not_autoplace no)
@@ -10501,7 +10501,7 @@
 			)
 		)
 		(property "Value" "GND"
-			(at 233.68 212.09 0)
+			(at 236.22 212.09 0)
 			(show_name no)
 			(do_not_autoplace no)
 			(effects
@@ -10511,7 +10511,7 @@
 			)
 		)
 		(property "Footprint" ""
-			(at 233.68 209.55 0)
+			(at 236.22 209.55 0)
 			(hide yes)
 			(show_name no)
 			(do_not_autoplace no)
@@ -10522,7 +10522,7 @@
 			)
 		)
 		(property "Datasheet" "~"
-			(at 233.68 209.55 0)
+			(at 236.22 209.55 0)
 			(hide yes)
 			(show_name no)
 			(do_not_autoplace no)
@@ -10533,7 +10533,7 @@
 			)
 		)
 		(property "Description" "Power symbol creates a global label with name \"GND\" , ground"
-			(at 233.68 209.55 0)
+			(at 236.22 209.55 0)
 			(hide yes)
 			(show_name no)
 			(do_not_autoplace no)
@@ -10556,25 +10556,25 @@
 		)
 	)
 	(junction
-		(at 233.68 195.58)
+		(at 236.22 195.58)
 		(diameter 0)
 		(color 0 0 0 0)
-		(uuid "0d70b872-d27d-5498-b71d-157a90ab340e")
+		(uuid "ed385bde-d9ab-5808-8091-a9d866989abb")
 	)
 	(wire
 		(pts
-			(xy 233.68 195.58)
-			(xy 228.6 195.58)
+			(xy 236.22 195.58)
+			(xy 231.14 195.58)
 		)
 		(stroke
 			(width 0)
 			(type default)
 		)
-		(uuid "bf320bf0-0e8e-500a-b048-0b759b6e7f2e")
+		(uuid "e1e1c387-2fc0-5e17-bf15-fd98ea5caa5d")
 	)
 	(symbol
 		(lib_id "Device:R")
-		(at 228.6 187.96 0)
+		(at 231.14 187.96 0)
 		(unit 1)
 		(body_style 1)
 		(exclude_from_sim no)
@@ -10585,7 +10585,7 @@
 		(fields_autoplaced no)
 		(uuid "4f82904e-b1bb-5078-a7fd-38243074a5bc")
 		(property "Reference" "R703"
-			(at 226.06 186.69 0)
+			(at 228.6 186.69 0)
 			(show_name no)
 			(do_not_autoplace no)
 			(effects
@@ -10596,7 +10596,7 @@
 			)
 		)
 		(property "Value" "196k"
-			(at 226.06 189.23 0)
+			(at 228.6 189.23 0)
 			(show_name no)
 			(do_not_autoplace no)
 			(effects
@@ -10607,7 +10607,7 @@
 			)
 		)
 		(property "Footprint" "Resistor_SMD:R_0603_1608Metric"
-			(at 228.6 187.96 0)
+			(at 231.14 187.96 0)
 			(hide yes)
 			(show_name no)
 			(do_not_autoplace no)
@@ -10619,7 +10619,7 @@
 			)
 		)
 		(property "Datasheet" "~"
-			(at 228.6 187.96 0)
+			(at 231.14 187.96 0)
 			(hide yes)
 			(show_name no)
 			(do_not_autoplace no)
@@ -10631,7 +10631,7 @@
 			)
 		)
 		(property "Description" "Resistor"
-			(at 228.6 187.96 0)
+			(at 231.14 187.96 0)
 			(hide yes)
 			(show_name no)
 			(do_not_autoplace no)
@@ -10659,29 +10659,29 @@
 	)
 	(wire
 		(pts
-			(xy 228.6 195.58)
-			(xy 228.6 191.77)
+			(xy 231.14 195.58)
+			(xy 231.14 191.77)
 		)
 		(stroke
 			(width 0)
 			(type default)
 		)
-		(uuid "148f39b9-4909-5e4d-a12a-5641ab15cf86")
+		(uuid "f08ffe65-028b-5b89-a65e-bb4fdd6ca86f")
 	)
 	(wire
 		(pts
-			(xy 228.6 184.15)
-			(xy 228.6 181.61)
+			(xy 231.14 184.15)
+			(xy 231.14 181.61)
 		)
 		(stroke
 			(width 0)
 			(type default)
 		)
-		(uuid "8a6997ec-f4c0-5e7c-8639-d4c2cdd12dff")
+		(uuid "b3458f35-2d12-5df1-bd15-453ca0d4086b")
 	)
 	(symbol
 		(lib_id "power:+5V")
-		(at 228.6 181.61 0)
+		(at 231.14 181.61 0)
 		(unit 1)
 		(body_style 1)
 		(exclude_from_sim no)
@@ -10692,7 +10692,7 @@
 		(fields_autoplaced no)
 		(uuid "3b7fe1ec-137f-5bb3-8894-0eec9f8cfc46")
 		(property "Reference" "#PWR08034"
-			(at 228.6 181.61 0)
+			(at 231.14 181.61 0)
 			(hide yes)
 			(show_name no)
 			(do_not_autoplace no)
@@ -10702,8 +10702,8 @@
 				)
 			)
 		)
-		(property "Value" "+5V_TGT"
-			(at 228.6 177.8 0)
+		(property "Value" "+5V"
+			(at 231.14 177.8 0)
 			(show_name no)
 			(do_not_autoplace no)
 			(effects
@@ -10713,7 +10713,7 @@
 			)
 		)
 		(property "Footprint" ""
-			(at 228.6 181.61 0)
+			(at 231.14 181.61 0)
 			(hide yes)
 			(show_name no)
 			(do_not_autoplace no)
@@ -10724,7 +10724,7 @@
 			)
 		)
 		(property "Datasheet" "~"
-			(at 228.6 181.61 0)
+			(at 231.14 181.61 0)
 			(hide yes)
 			(show_name no)
 			(do_not_autoplace no)
@@ -10735,7 +10735,7 @@
 			)
 		)
 		(property "Description" "Power symbol creates a global label with name \"+5V\""
-			(at 228.6 181.61 0)
+			(at 231.14 181.61 0)
 			(hide yes)
 			(show_name no)
 			(do_not_autoplace no)
@@ -11272,7 +11272,7 @@
 				)
 			)
 		)
-		(property "Value" "+5V_TGT"
+		(property "Value" "+5V"
 			(at 289.56 175.26 0)
 			(show_name no)
 			(do_not_autoplace no)
@@ -11949,7 +11949,7 @@
 		)
 		(uuid "13611935-d57d-5250-b5d8-fbed24565a90")
 	)
-	(label "+5V_TGT_OUT"
+	(label "+5V_TGT"
 		(at 341.63 177.8 0)
 		(fields_autoplaced yes)
 		(effects
@@ -11958,7 +11958,7 @@
 			)
 			(justify left bottom)
 		)
-		(uuid "360793b1-6cef-57dd-b29f-be21fe698072")
+		(uuid "a4dfc67d-3a3f-5525-936f-4b7ec16d0f85")
 	)
 	(wire
 		(pts
@@ -12847,7 +12847,7 @@
 				(justify left)
 			)
 		)
-		(property "Value" "3.65k 1%"
+		(property "Value" "6.04k 1%"
 			(at 328.93 228.6 0)
 			(show_name no)
 			(do_not_autoplace no)
@@ -13238,7 +13238,7 @@
 		)
 		(uuid "b4dcd8ff-df66-5436-a8d0-e565e6c8afa6")
 	)
-	(label "+5V_TGT_OUT"
+	(label "+5V_TGT"
 		(at 369.57 190.5 180)
 		(fields_autoplaced yes)
 		(effects
@@ -13247,7 +13247,7 @@
 			)
 			(justify right bottom)
 		)
-		(uuid "9cc0b908-cd2f-581a-b776-c8d3b353679d")
+		(uuid "19f40078-b675-57dd-953d-75f069257d63")
 	)
 	(wire
 		(pts

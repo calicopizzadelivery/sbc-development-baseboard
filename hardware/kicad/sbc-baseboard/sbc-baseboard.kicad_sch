@@ -1322,7 +1322,7 @@
 		)
 		(uuid "8b16a871-a33b-5e1d-8412-2b7cdb4c0d02")
 	)
-	(text "switched +5V_TGT eFuse, and an isolated PSU passthrough on a 5 A relay. 140 x 80 mm, four M3 at 7 mm from each corner."
+	(text "switched +5V_TGT eFuse, and an isolated PSU passthrough on a 5 A relay. 5 V 4 A in on a 2.5 mm barrel jack. 140 x 100 mm, six layers."
 		(exclude_from_sim no)
 		(at 30 184.6 0)
 		(effects
@@ -1331,7 +1331,7 @@
 			)
 			(justify left bottom)
 		)
-		(uuid "bc4db61c-2c3f-5d1e-a035-ffb4705af650")
+		(uuid "93c92a90-4371-517f-8ff3-46e1f4037864")
 	)
 	(text ""
 		(exclude_from_sim no)
@@ -1377,7 +1377,7 @@
 		)
 		(uuid "3e922aea-f927-59f8-87f7-1d308041a5b9")
 	)
-	(text "  - TPS54560B compensation values; TPS2553 ILIM at bring-up; TPS26630 UVLO/ILIM"
+	(text "  - TPS2553 ILIM at bring-up; TPS26630 UVLO/ILIM (6.04k -> 3 A); the inlet FET's drop at 4 A"
 		(exclude_from_sim no)
 		(at 30 200.6 0)
 		(effects
@@ -1386,9 +1386,9 @@
 			)
 			(justify left bottom)
 		)
-		(uuid "ced4af91-49f4-5b0c-9f11-63ecd5133573")
+		(uuid "e6444de4-3473-51fc-ba06-e7bbf6327502")
 	)
-	(text "  - STUSB4500 operation from VSYS alone (J17 programmer, no VBUS); PCA9517A isolation with VCC(B) = 0"
+	(text "  - USB2517 VBUS_DET divider (10k/22k) vs the EVB; LED_A/B strap pull-downs"
 		(exclude_from_sim no)
 		(at 30 203.8 0)
 		(effects
@@ -1397,9 +1397,9 @@
 			)
 			(justify left bottom)
 		)
-		(uuid "930e8a5c-8051-5817-be40-6d42004c1be3")
+		(uuid "036ede18-6245-5dab-9e32-afd16497ac1a")
 	)
-	(text "  - USB2517 VBUS_DET divider (10k/22k) vs the EVB; LED_A/B strap pull-downs"
+	(text "  - KSZ8081 crystal load (22 pF) and 50 MHz REF_CLK series resistor"
 		(exclude_from_sim no)
 		(at 30 207 0)
 		(effects
@@ -1408,9 +1408,9 @@
 			)
 			(justify left bottom)
 		)
-		(uuid "950d98b2-9c84-5624-add9-852777908c4d")
+		(uuid "d5918816-2f4d-591b-87f4-7ff5574a0c2c")
 	)
-	(text "  - KSZ8081 crystal load (22 pF) and 50 MHz REF_CLK series resistor"
+	(text "Reference designators: 1xx power, 2xx MCU, 3xx Ethernet, 4xx hub, 5xx FTDI, 6xx DAPLink, 7xx target I/O, 8xx relays and passthrough."
 		(exclude_from_sim no)
 		(at 30 210.2 0)
 		(effects
@@ -1419,18 +1419,7 @@
 			)
 			(justify left bottom)
 		)
-		(uuid "5dc253ce-86a5-5b04-9a0a-c3d6ef7355c6")
-	)
-	(text "Reference designators: 1xx power, 2xx MCU, 3xx Ethernet, 4xx hub, 5xx FTDI, 6xx DAPLink, 7xx target I/O, 8xx relays and passthrough."
-		(exclude_from_sim no)
-		(at 30 213.4 0)
-		(effects
-			(font
-				(size 1.6 1.6)
-			)
-			(justify left bottom)
-		)
-		(uuid "5b400020-c690-5c61-94a0-8f04b142f611")
+		(uuid "7ae65b7b-400b-54fe-a6cb-86b57fefc090")
 	)
 	(sheet_instances
 		(path "/"

@@ -27,6 +27,7 @@ FP = dict(
     HDR2x6="Connector_PinHeader_2.54mm:PinHeader_2x06_P2.54mm_Vertical",
     SWD10="Connector_PinHeader_1.27mm:PinHeader_2x05_P1.27mm_Vertical",
     RJ45="Connector_RJ:RJ45_Kycon_G7LX-A88S7-BP-xx_Horizontal",
+    BARREL="Connector_BarrelJack:BarrelJack_Kycon_KLDX-0202-xC_Horizontal",   # KLDX-0202-BC: 2.5 x 5.5 mm, through-hole, horizontal
     RGB="LED_SMD:LED_RGB_1210", DIP4="Package_DIP:DIP-4_W7.62mm", HOLE="MountingHole:MountingHole_3.2mm_M3_Pad",
 )
 

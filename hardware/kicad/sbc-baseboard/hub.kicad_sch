@@ -4603,7 +4603,7 @@
 		)
 		(uuid "f356924f-b8b8-5e6b-b678-d08e4abe9a1f")
 	)
-	(text "Current: PORTn_VBUS and FTDI_VBUS are laid out for 3 A each (class USB_VBUS_3A, 2 mm traces); +5V_PORTS feeds them at up to 6 A (PWR_6A)."
+	(text "Current: PORTn_VBUS and FTDI_VBUS are laid out for 3 A each (class USB_VBUS_3A, 2 mm traces); +5V feeds them from the 4 A inlet (class PWR_4A, 2.5 mm traces or pours)"
 		(exclude_from_sim no)
 		(at 16 35.9 0)
 		(effects
@@ -4612,7 +4612,7 @@
 			)
 			(justify left bottom)
 		)
-		(uuid "d0be5918-8424-5d1d-8763-ad84929d784b")
+		(uuid "92f9aa84-bfaa-5971-986f-6b5b28ff722f")
 	)
 	(symbol
 		(lib_id "calico-ic:USB2517")
@@ -15566,7 +15566,7 @@
 				)
 			)
 		)
-		(property "Value" "+5V_PORTS"
+		(property "Value" "+5V"
 			(at 290.83 52.07 0)
 			(show_name no)
 			(do_not_autoplace no)
@@ -17377,7 +17377,7 @@
 				)
 			)
 		)
-		(property "Value" "+5V_PORTS"
+		(property "Value" "+5V"
 			(at 290.83 102.87 0)
 			(show_name no)
 			(do_not_autoplace no)
@@ -19099,7 +19099,7 @@
 				)
 			)
 		)
-		(property "Value" "+5V_PORTS"
+		(property "Value" "+5V"
 			(at 290.83 153.67 0)
 			(show_name no)
 			(do_not_autoplace no)
@@ -20910,7 +20910,7 @@
 				)
 			)
 		)
-		(property "Value" "+5V_PORTS"
+		(property "Value" "+5V"
 			(at 290.83 204.47 0)
 			(show_name no)
 			(do_not_autoplace no)
@@ -22466,7 +22466,7 @@
 				)
 			)
 		)
-		(property "Value" "+5V_PORTS"
+		(property "Value" "+5V"
 			(at 177.8 240.03 0)
 			(show_name no)
 			(do_not_autoplace no)

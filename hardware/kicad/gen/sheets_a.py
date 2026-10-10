@@ -20,90 +20,30 @@ def flags(s, rails, at, classes=None):
 
 
 def power(project, num, page, sheet_path, plib):
-    s = Sheet(project, "Power: PD inlet, programming header, bus buffer, three bucks", num, page, sheet_path)
+    s = Sheet(project, "Power: 5 V barrel inlet, input protection, 3V3 buck", num, page, sheet_path)
     s.project_lib = plib
-    s.note(["POWER", "J2 is a PD sink only (no data). STUSB4500 negotiates from NVM; VBUS_EN_SNK gates the 5 V bucks through Q101,",
-            "so the rails only come up once a sink contract (or plain Type-C 5 V) is valid. No series VBUS FET.",
-            "J17 (Qwiic) programs the STUSB4500 NVM and powers it through VSYS when the board is dead.",
-            "PCA9517A: A side = PD segment (+3V3_PD, diode-OR of +3V3 and the programmer), B side = K64 I2C0.",
-            "A programmer on J17 pulls PCA_EN low through Q102: the K64 is disconnected from the PD bus in hardware.",
-            'Current: VBUS_IN is laid out for 3 A (class USB_VBUS_3A, 2 mm); +5V_PORTS and +5V_TGT for 6 A (class PWR_6A, 4 mm or pours).'], (16, 17), 1.5)
+    s.note(["POWER", "J2: 2.5 x 5.5 mm barrel jack, centre positive, for a 5 V 4 A (20 W) adapter (2026-10-10; a USB-C PD inlet with two",
+            "5 V bucks until then). SMAJ5.0A clamps the inlet; Q101, a P-channel MOSFET with its body diode toward the rail and its",
+            "gate at GND, blocks reverse polarity at 9.5 mOhm. No series fuse: the adapter limits the inlet, the eFuse the target rail,",
+            "the TPS2553s the ports. The adapter's 4 A is the only limit on the sum: the ports (4 x 1.1 A), the target rail (3 A) and the",
+            "board (0.5 A) can ask for more together; firmware keeps the budget (docs/hardware-spec.md section 4).",
+            "+5V is laid out for 4 A (class PWR_4A, 2.5 mm or pours); +5V_TGT leaves the eFuse at up to 3 A in the same class."], (16, 17), 1.5)
     # ---- parts
-    j2 = s.add("Connector", "USB_C_Receptacle_USB2.0_16P", "J2", "USB-C PD in", (28, 85), footprint=FP["USBC"])
-    u1 = s.add("Interface_USB", "STUSB4500QTR", "U101", "STUSB4500QTR", (147, 85), footprint="Package_DFN_QFN:QFN-24-1EP_4x4mm_P0.5mm_EP2.7x2.7mm")
-    q1 = s.Q("Transistor_FET", "2N7002", "2N7002", (250, 45))       # right of the STUSB4500 routes, above buck 1
-    u2 = s.add("calico-ic", "PCA9517A", "U102", "PCA9517A", (150, 185), footprint="Package_SO:TSSOP-8_4.4x3mm_P0.65mm")   # below the STUSB4500's I2C lanes
-    j17 = s.add("Connector_Generic", "Conn_01x04", "J17", "Qwiic PD", (40, 165), 0, mirror="y", footprint=FP["QWIIC"])
-    q2 = s.Q("Transistor_FET", "2N7002", "2N7002", (150, 215))
-    d8 = s.D("Diode", "BAT54C", "BAT54C", (70, 268), rot=180, fp=FP["SOT23"])   # common cathode on top
-    for pin in ("A6", "B6", "A7", "B7", "A8", "B8"): s.pin_nc(j2, pin)
-    for pin in (3, 14, 15, 17, 20): s.pin_nc(u1, str(pin))
-    # ---- inlet
-    join_pins(s, u1, [2, 1], length=22.86)        # CC1 + CC1DB: dead-battery mode
-    join_pins(s, u1, [4, 5], length=22.86)        # CC2 + CC2DB
-    fan(s, j2, {"A4": chain(Pull("GND", ("Device", "D_Zener", "1"), "SMAJ24A", None, fp=FP["SMA"]), P("VBUS_IN")), "A1": P("GND"), "SH": P("GND"),
-                "A5": chain(TVS("ESDA25W"), Conn(u1, 2, stub=22.86)), "B5": chain(TVS("ESDA25W"), Conn(u1, 4, stub=22.86))})
-    decap_row(s, "VBUS_IN", [("10u/50V", FP["C1210"]), ("10u/50V", FP["C1210"]), ("100n/50V", None), ("1u/50V", FP["C0805"])], (21, 140))
-    s.led_chain("VBUS_IN", "GND", "10k", AMBER, (60, 193.04))     # below the PD I2C routes that turn at x = 59.69
-    fan(s, u1, {6: chain(Ser("R", "10k", None), P("GND")), 2: Skip(), 1: Skip(), 4: Skip(), 5: Skip(),
-                18: chain(Ser("R", "1k", None), P("VBUS_IN")),
-                # PD_SCL/PD_SDA reach U102 and J17 by label: a wire would cross half the sheet
-                7: chain(Pull("+3V3_PD", "R", "4.7k", None), TVS(), L("PD_SCL")),
-                8: chain(Pull("+3V3_PD", "R", "4.7k", None), TVS(), L("PD_SDA")),
-                # (left stack anchored on RESET: the CC rows are drawn by join_pins and must stay put)
-                19: chain(Pull("+3V3_PD", "R", "10k", None), L("PD_ALERT_N")),
-                12: P("GND"), 13: P("GND"),
-                16: chain(Pull("VBUS_IN", "R", "100k", None), Pull("GND", ("Device", "D_Zener", "1"), "BZT52C5V1", None, fp=FP["SOD123"]), L("PD_EN_GATE")),   # to Q101 by label: the wire would run up past the buck input ladder
-                9: Pull("VBUS_IN", "R", "470", None, fp=FP["R1206"]),
-                11: chain(Pull("+3V3_PD", "R", "10k", None), L("PD_ATTACH_N")),
-                10: P("GND"), 25: P("GND")}, align={"L": "top"})
-    jog(s, u1, 24, "VBUS_IN", up=2.54, over=-7.62)
-    jog(s, u1, 22, "+3V3_PRG", up=7.62, over=-20.32)
-    top_caps(s, u1, 21, [("1u", None)], height=20.32, sx=-1)
-    top_caps(s, u1, 23, [("1u", None)], height=17.78, sx=1)
-    fan(s, q1, {1: L("PD_EN_GATE"), 2: P("GND"), 3: L("BUCK_EN")})
-    s.note(["BUCK_EN: VBUS_EN_SNK released (no contract) -> Q101 on",
-            "-> EN low -> bucks off. Contract valid -> VBUS_EN_SNK low",
-            "-> Q101 off -> EN floats high (internal pull-up) -> bucks on.",
-            "The zener keeps the gate under 5.1 V at 20 V VBUS."], (168, 109), 1.3)      # between U101 and the U103 compensation parts
-    # ---- programming header, bus buffer, +3V3_PD
-    fan(s, u2, {2: L("PD_SCL"), 3: L("PD_SDA"), 5: chain(Pull("+3V3", "R", "10k", None), Conn(q2, 3)), 7: L("I2C0_SCL"), 6: L("I2C0_SDA"),
-                1: P("+3V3_PD"), 8: P("+3V3"), 4: P("GND")})
-    fan(s, j17, {1: chain(Gap(7.62), P("GND")), 2: P("+3V3_PRG"), 3: L("PD_SDA"), 4: L("PD_SCL")})   # GND past the value text under the body
-    fan(s, q2, {1: chain(Pull("GND", "R", "100k", None), Ser("R", "100k", None), P("+3V3_PRG")), 2: P("GND")})
-    fan(s, d8, {1: P("+3V3"), 2: P("+3V3_PRG"), 3: P("+3V3_PD")})
-    decap_row(s, "+3V3_PRG", [("1u", None), ("R", "100k", None)], (100, 262))
-    decap_row(s, "+3V3_PD", [("100n", None), ("100n", None)], (135, 262))
-    s.led_chain("+3V3_PD", "GND", "470", AMBER, (170, 262))
-    decap_row(s, "+3V3", [("100n", None)], (190, 262))
-    s.series("+3V3_PRG", "PD_PROG_DET", "100k", (225, 262))
-    # ---- bucks 1 and 2
-    for ref, y, rail in (("U103", 75, "+5V_PORTS"), ("U104", 150, "+5V_TGT")):
-        u = s.add("calico-ic", "TPS54560BDDA", ref, "TPS54560BDDA", (280, y), footprint="Package_SO:HSOP-8-1EP_3.9x4.9mm_P1.27mm_EP2.41x3.1mm")
-        lind = s.add("Device", "L", s.ref("L"), "10u/6A", (330, y - 12.7), 90, footprint=FP["L_PWR"])
-        fan(s, u, {2: chain(Ladder([("100n/50V", None), ("10u/50V", FP["C1210"]), ("10u/50V", FP["C1210"])]), P("VBUS_IN")),
-                   3: L("BUCK_EN"),
-                   4: Pull("GND", "R", "243k", None),
-                   6: chain(Pull("GND", "C", "47p", None), Ser("R", "16.9k", None), Ser("C", "4n7", None), P("GND")),   # TPS54560B datasheet 5 V / 400 kHz example, same 141 uF output
-                   1: chain(Ser("C", "100n/50V", None), Conn(lind, 1, join=False)),   # two routes share the inductor's stub
-                   8: chain(Pull("GND", ("Device", "D_Schottky", "1"), "B560C", None, fp=FP["SMA"]), Conn(lind, 1, join=False)),
-                   }, align={"L": "top"})                                   # VIN stays on its pin with the input ladder
-        fan(s, u, {
-                   5: chain(Gap(7.62), Pull("GND", "R", "9.76k", None), Pull(rail, "R", "51.1k", None)),   # past the catch diode's text on the SW lane
-                   7: P("GND"), 9: P("GND")})
-        fan(s, lind, {2: chain(Ladder([("47u/10V", FP["C1210"]), ("47u/10V", FP["C1210"]), ("CP", "100u/10V", FP["CP"])]), PullLED(AMBER, "1k", None), P(rail, hook=(-7.62, -7.62)))})
-    s.note(["TPS54560B: non-synchronous, 4.5-60 V in, 5 A. fsw 400 kHz (RT 243k).",
-            "FB 51.1k/9.76k -> 5.0 V. COMP 16.9k / 4.7n / 47p and the B560C are the",
-            "datasheet's 5 V / 400 kHz design example (141 uF ceramic out, as here)."], (168, 121), 1.3)
-    # ---- buck 3
+    j2 = s.add("Connector", "Barrel_Jack_Switch", "J2", "5 V in, 2.5 mm", (28, 85), footprint=FP["BARREL"])
+    q1 = s.Q("Transistor_FET", "DMP3013SFV", "DMP3013SFV", (110, 80), fp="Package_SON:Diodes_PowerDI3333-8")   # reverse-polarity pass FET: drain at the jack, source on the rail
+    s.pin_nc(j2, "3")                                                 # the jack's switch contact
+    # ---- inlet: TVS at the jack, the FET, the bulk capacitors and the rail LED on its source
+    fan(s, j2, {1: chain(Pull("GND", ("Device", "D_Zener", "1"), "SMAJ5.0A", None, fp=FP["SMA"]), Conn(q1, 5)), 2: P("GND")})
+    fan(s, q1, {1: chain(Ladder([("47u/10V", FP["C1210"]), ("47u/10V", FP["C1210"]), ("100n", None)]), PullLED(AMBER, "1k", None), P("+5V")),
+                4: Pull("GND", "R", "100k", None)})
+    # ---- the 3V3 buck
     u5 = s.add("Regulator_Switching", "TPS62823DLC", "U105", "TPS62823DLC", (300, 215), footprint="Package_SON:Texas_VSON-HR-8_1.5x2mm_P0.5mm")   # above the title block
     s.pin_nc(u5, "4"); s.pin_nc(u5, "8")
-    fan(s, u5, {7: chain(Pull("GND", "C", "10u", None, fp=FP["C0805"]), P("+5V_PORTS")), 1: chain(Gap(2.54), P("+5V_PORTS")),
+    fan(s, u5, {7: chain(Pull("GND", "C", "10u", None, fp=FP["C0805"]), P("+5V")), 1: chain(Gap(2.54), P("+5V")),
                 6: chain(Ser("L", "470n/4A", None), Pull("GND", "C", "22u", None, fp=FP["C0805"]), Pull("GND", "C", "22u", None, fp=FP["C0805"]), PullLED(AMBER, "470", None), P("+3V3")),
                 2: chain(Pull("GND", "R", "100k", None), Pull("+3V3", "R", "453k", None), Pull("+3V3", "C", "120p", None)),   # TPS62823 datasheet: R2 100k, R1 for 3.3 V, Cff 120 pF
                 3: P("GND"), 5: P("GND")})
-    flags(s, ["VBUS_IN", "GND", "+3V3_PRG", "+3V3_PD", "+5V_PORTS", "+5V_TGT", "+3V3"], (25, 246),
-          classes={"VBUS_IN": "USB_VBUS_3A", "+5V_PORTS": "PWR_6A", "+5V_TGT": "PWR_6A"})   # the high-current rails carry their class (and current) on the sheet
+    flags(s, ["+5V", "GND", "+3V3"], (25, 246), classes={"+5V": "PWR_4A"})   # the high-current rail carries its class (and current) on the sheet
     return s
 
 
@@ -156,7 +96,7 @@ def mcu(project, num, page, sheet_path, plib):
         # right: everything the K64 drives elsewhere
         34: chain(Tag("SWCLK", None), Conn(j16, 4)), 37: chain(Tag("SWDIO", None), Conn(j16, 2)),
         39: L("RMII_RXER"), 42: L("RMII_RXD1"), 43: L("RMII_RXD0"), 44: L("RMII_CRS_DV"), 45: L("RMII_TXEN"), 46: L("RMII_TXD0"), 47: L("RMII_TXD1"),
-        53: L("MDIO"), 54: L("MDC"), 55: L("TGT_IMON"), 56: L("PSU_PRESENT_N"), 57: L("PD_ATTACH_N"), 58: L("PD_ALERT_N"), 59: L("PD_PROG_DET"),
+        53: L("MDIO"), 54: L("MDC"), 55: L("TGT_IMON"), 56: L("PSU_PRESENT_N"),
         62: L("K64_UART0_RX"), 63: L("K64_UART0_TX"), 64: L("HUB_RESET_N"),
         65: chain(led(), Conn(rgb, 1)), 66: chain(led(), Conn(rgb, 2)), 67: chain(led(), Conn(rgb, 3)),
         68: L("PHY_INT_N"),
@@ -167,8 +107,9 @@ def mcu(project, num, page, sheet_path, plib):
         90: L("RLY1_DRV"), 91: L("RLY2_DRV"), 92: L("RLY_PSU_DRV"),
         93: L("GPIO1"), 94: L("GPIO2"), 95: L("GPIO3"), 96: L("GPIO4"), 97: L("GPIO5"), 98: L("GPIO6"),
         99: chain(Pull("GND", "R", "47k", None), Ser("R", "100k", None), L("J3_VBUS")),      # VBUS sense divider at the ADC pin
-        31: chain(Pull("+3V3", "R", "4.7k", None), Gap(17.78), L("I2C0_SCL")), 32: chain(Gap(7.62), Pull("+3V3", "R", "4.7k", None), L("I2C0_SDA")),
     }, align={"L": "top"})
+    for pin in ("31", "32", "57", "58", "59"):                        # I2C0 and the PD sink's lines, free since the PD inlet went (2026-10-10)
+        s.pin_nc(u, pin)
     for pin, net in (("6", "K64_USB_P"), ("4", "K64_USB_N")):            # the K64 side of the pair, named for the router: at the ESD's pin end, text along the route
         s.label(net, esd.pin(pin), 0)
     # seven pull-ups to +3V3 on adjacent pins (four port /FAULT, FTDI /FAULT, I2C1 SCL/SDA): one column

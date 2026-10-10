@@ -13,7 +13,7 @@ EDGE_GAP = 1.0             # between neighbouring edge connectors' bodies
 # edge connectors are locked at the positions the first board settled (x, y, rotation); the mating
 # rule that placed them: a horizontal connector's solder pins sit at the rear, so it mates toward the
 # end of its body farthest from the pad rows; a pin header mates where its pins point
-CONNECTORS = {"J1": (3.1, 74.0, -90), "J2": (3.1, 30.0, -90), "J3": (136.9, 19.345, 90), "J4": (37.285, 83.865, 0),
+CONNECTORS = {"J1": (3.1, 74.0, -90), "J2": (13.9, 30.0, 0), "J3": (136.9, 19.345, 90), "J4": (37.285, 83.865, 0),
               "J5": (19.095, 83.865, 0), "J9": (129.435, 65.045, 0), "J10": (76.08, 20.23, 90), "J11": (87.745, 91.475, 0),
               "J12": (101.805, 91.475, 0), "J13": (131.475, 49.165, 90), "J14": (116.845, 89.475, 0), "J18": (56.445, 89.475, 0),
               "J19": (70.665, 89.475, 0)}   # J18/J19 2 mm right (2026-10-08): J4's shield pads 2.6 mm from the passthrough region (their copper still enters its 2 mm band by 0.9 mm; the fills keep the creepage)
@@ -26,11 +26,7 @@ EDGE_ZONE = 3.0            # no part other than an edge connector nearer the edg
 # make the room, the hub down into the band the taller board gained
 ANCHORS = {
     "U301": (80.5, 29.0, 270),     # PHY below J10 on the back edge, TX/RX pins up toward the jack (J10 + (4.42, 8.77), the ETH lanes' geometry)
-    "U101": (16.0, 41.0, 0),      # PD controller behind J2, CC pins toward it, laid out as the STEVAL-ISC005V1 (UM2398 Figure 24; LAYOUTS)
-    "U102": (28.0, 44.0, 0),      # PD bus buffer, right of the PD controller
-    "J17": (38.0, 50.0, 0),      # Qwiic programming, top entry, beside the PD controller
-    "U103": (24.0, 24.0, 0),       # buck 1 (+5V_PORTS) in the corner at J2, laid out as SLVSF00 Figure 57 (LAYOUTS): input left, diode and inductor right, output capacitors above the inductor
-    "U104": (52.0, 24.0, 0),       # buck 2 (+5V_TGT) beside it along the back edge, the same figure
+    "Q101": (20.0, 30.0, 0),       # the inlet's reverse-polarity FET behind the jack (2026-10-10: the PD controller, its I2C buffer and header and the two 5 V bucks went with the PD inlet)
     "U105": (41.0, 41.0, 0),      # +3V3 buck below buck 1's output, above the hub, laid out as SLVSDV6C Figure 52 (LAYOUTS)
     "U402": (39.0, 59.0, 90),     # hub, 5 mm down and left toward the USB ports (2026-10-07) to open the centre: downstream pins toward J4/J5, upstream and crystal toward J1
     "U201": (100.5, 23.0, 270),    # K64: RMII toward the PHY, port/FAULT/UART pins toward the hub and FTDI, GPIO toward J15
@@ -63,38 +59,21 @@ ANCHORS = {
 SPARE = (8.0, 60.0)     # parts the engine cannot attach anywhere are parked here and reported
 # the regulators' cities (standard 3.1 and 3.2): each with its application circuit around it, the inductor and
 # catch diode on the side its SW pin faces, placed before every other satellite; the void between cities below
-REGULATORS = {"U103": {"layout": "TPS54560B"}, "U104": {"layout": "TPS54560B"}, "U105": {"layout": "TPS62823"}}
-TEMPLATED = {"U101": "STUSB4500"}   # other ICs placed from a figure (standard 3.2): the PD controller from its evaluation board
+REGULATORS = {"U105": {"layout": "TPS62823"}}
+TEMPLATED = {}   # other ICs placed from a figure (standard 3.2); none since the PD controller went
 # the datasheets' layout examples as templates (standard 3.2): for each pin of the IC, the side of the IC (in the
 # footprint's own frame, as the library draws it) on which the figure puts the parts hanging from that pin, and
 # those parts' kinds in order outward (ring 0 first; "^" lays the part along the side); where the output capacitors
 # sit relative to the inductor; whether the figure keeps everything on the top side. Pins are listed in the order
 # they are placed: the switching loop first.
 LAYOUTS = {
-    "TPS54560B": {"source": "TI SLVSF00 section 10.2, Figure 57 PCB Layout Example", "top_only": True,
-                  "pins": {"SW": ("R", ["D^", "L"]),           # catch diode along the right side at SW, the inductor beyond it
-                           "VIN": ("L", ["C"]),                # input bypass at VIN
-                           "BOOT": ("L", ["C"]),               # bootstrap capacitor above the input capacitor
-                           "EN": ("L", ["R"]),                 # UVLO divider (none on this board)
-                           "RT/CLK": ("B", ["R"]),             # frequency-set resistor below the IC
-                           "COMP": ("R", ["R", "C"]),          # compensation network right of COMP
-                           "FB": ("R", ["R"], 1)},             # the divider beyond the compensation network
-                  "inductor_out": ("T", ["C"])},               # output capacitors above the inductor, toward Vout
     "TPS62823": {"source": "TI SLVSDV6C section 11.2, Figure 52 TPS6282x Board Layout", "top_only": True,
                  "pins": {"SW": ("R", ["L"]),                  # inductor on the power-pin side at SW
                           "VIN": ("R", ["C"]),                 # input capacitor beside it at VIN/PGND
                           "FB": ("L", ["R", "C"])},            # divider and feed-forward on the FB/AGND side
                  "inductor_out": ("T", ["C"])},                # output capacitors at the inductor's output, toward the IC's PG end
-    "STUSB4500": {"source": "ST UM2398 section 4, Figure 24 STEVAL-ISC005V1 top composite (the datasheet has no layout figure)", "top_only": True,
-                  # U1 sits behind the receptacle with its CC pins toward it; the decoupling in a column above and to the left of the
-                  # IC; the VBUS sense and discharge resistors to the right; the I2C pull-ups and address straps in a row below
-                  "pins": {"CC1": ("L", ["D"]), "CC2": ("L", ["D"]),
-                           "VDD": ("T", ["C"]), "VREG_2V7": ("T", ["C"]), "VREG_1V2": ("T", ["C"]), "VSYS": ("T", ["C"]),
-                           "ALERT": ("T", ["R"]),
-                           "VBUS_VS_DISCH": ("R", ["R"]), "VBUS_EN_SNK": ("R", ["R", "D"]), "DISCH": ("R", ["R"]),
-                           "RESET": ("L", ["R"]), "SCL": ("B", ["R"]), "SDA": ("B", ["R"])}},
 }
-RAIL_VIAS = {"PWR_6A": 3, "USB_VBUS_3A": 2, "PSU_3A": 2}   # vias beside each SMD pad on a plane net, by class (standard 4); one otherwise
+RAIL_VIAS = {"PWR_4A": 3, "USB_VBUS_3A": 2, "PSU_3A": 2}   # vias beside each SMD pad on a plane net, by class (standard 4); one otherwise
 CITY_GAP = 2.0          # the component void between any two islands' parts, both sides of the board (standard 3.1)
 # no plane or pour under the RJ45 on any layer (standard 3.4 and 4: its pins span the body, so the void is the body;
 # the pins' tracks pass)
@@ -123,24 +102,19 @@ GND_PLANE = [(1, 1), (139, 1), (139, 99), (88, 99), (88, 60), (64, 60), (64, 80)
 # layers are typed power for it (gen/pcb.py passes the layers of PLANES)
 PLANES = [("GND_L2", "GND", "In1.Cu", GND_PLANE),
           ("GND_L5", "GND", "In4.Cu", GND_PLANE),
-          # L4 rails as rectangles (FreeRouting cannot take a concave plane): every piece at its own priority (KiCad wants
-          # touching zones distinct); same-net pieces touch or overlap and merge, and the engine's rails gate holds each rail
-          # to one piece. +3V3 stays routed (PWR_1A, 0.6 mm; three routing layers now): a +3V3 plane would take a signal layer,
-          # and on the rail layer the two 6 A rails and the 3 A inlet cut any +3V3 base into pieces
-          ("VBUS_IN_L4", "VBUS_IN", "In3.Cu", [(3, 3), (50, 3), (50, 36), (3, 36)], 4),                        # inlet to the bucks' VIN pins...
-          ("VBUS_IN_L4_pd", "VBUS_IN", "In3.Cu", [(3, 36), (27, 36), (27, 52), (3, 52)], 3),                   # ...and down to the PD controller's VBUS parts
-          ("5V_TGT_L4_l102", "+5V_TGT", "In3.Cu", [(56, 3), (70, 3), (70, 36), (56, 36)], 9),                  # L102's output (R125 at the back edge) down to the band...
-          ("5V_TGT_L4_band", "+5V_TGT", "In3.Cu", [(56, 36), (129, 36), (129, 40), (56, 40)], 5),              # ...across the board below the PHY...
-          ("5V_TGT_L4_right", "+5V_TGT", "In3.Cu", [(129, 8), (137, 8), (137, 97), (129, 97)], 6),             # ...down the right edge...
-          ("5V_TGT_L4_efuse", "+5V_TGT", "In3.Cu", [(108, 77), (137, 77), (137, 97), (108, 97)], 8),           # ...to the eFuse and J14
-          ("5V_PORTS_L4_l101", "+5V_PORTS", "In3.Cu", [(28, 10), (42, 10), (42, 40), (28, 40)], 10),            # L101's output down to the 3V3 buck...
-          ("5V_PORTS_L4_u105", "+5V_PORTS", "In3.Cu", [(36, 40), (62, 40), (62, 48), (36, 48)], 11),            # ...to the 3V3 buck's input...
-          ("5V_PORTS_L4_mid", "+5V_PORTS", "In3.Cu", [(48, 48), (64, 48), (64, 80), (48, 80)], 12),             # ...down beside the relay...
-          ("5V_PORTS_L4_band", "+5V_PORTS", "In3.Cu", [(10, 70), (48, 70), (48, 83), (10, 83)], 13),            # ...along the port switches (their pads at y 78.5 to 80.5)
-          ("5V_PORTS_L4_bridge", "+5V_PORTS", "In3.Cu", [(62, 45), (100, 45), (100, 57), (62, 57)], 15),        # ...across above the region to the DAPLink's VBUS...
-          ("5V_PORTS_L4_right", "+5V_PORTS", "In3.Cu", [(86, 52), (126, 52), (126, 57), (86, 57)], 14),        # ...to the FTDI switch...
-          ("5V_PORTS_L4_relays", "+5V_PORTS", "In3.Cu", [(88, 57), (108, 57), (108, 82), (88, 82)], 16),      # ...down to the relays...
-          ("5V_PORTS_L4_ftdi", "+5V_PORTS", "In3.Cu", [(108, 57), (126, 57), (126, 77), (108, 77)], 17)]       # ...and to the FTDI switch behind J9 (K802's coil pin at y 76.7)
+          # the L4 rail as rectangles (FreeRouting cannot take a concave plane): every piece at its own priority (KiCad wants
+          # touching zones distinct); same-net pieces touch or overlap and merge, and the engine's rails gate holds the rail
+          # to one piece. One rail since 2026-10-10: +5V from the barrel jack (4 A, PWR_4A), the two 6 A bucks and the 3 A PD
+          # inlet gone with the PD controller. +3V3 stays routed (PWR_1A, 0.6 mm): a +3V3 plane would take a signal layer
+          ("5V_L4_in", "+5V", "In3.Cu", [(3, 22), (42, 22), (42, 40), (3, 40)], 4),                            # the jack's centre pin, the FET and the bulk capacitors...
+          ("5V_L4_u105", "+5V", "In3.Cu", [(36, 40), (62, 40), (62, 48), (36, 48)], 11),                        # ...to the 3V3 buck's input...
+          ("5V_L4_mid", "+5V", "In3.Cu", [(48, 48), (64, 48), (64, 80), (48, 80)], 12),                         # ...down beside the relay...
+          ("5V_L4_band", "+5V", "In3.Cu", [(10, 70), (48, 70), (48, 83), (10, 83)], 13),                        # ...along the port switches (their pads at y 78.5 to 80.5)
+          ("5V_L4_bridge", "+5V", "In3.Cu", [(62, 45), (100, 45), (100, 57), (62, 57)], 15),                    # ...across above the region to the DAPLink's VBUS...
+          ("5V_L4_right", "+5V", "In3.Cu", [(86, 52), (126, 52), (126, 57), (86, 57)], 14),                    # ...to the FTDI switch...
+          ("5V_L4_relays", "+5V", "In3.Cu", [(88, 57), (108, 57), (108, 82), (88, 82)], 16),                   # ...down to the relays...
+          ("5V_L4_ftdi", "+5V", "In3.Cu", [(108, 57), (126, 57), (126, 77), (108, 77)], 17),                   # ...to the FTDI switch behind J9 (K802's coil pin at y 76.7)...
+          ("5V_L4_efuse", "+5V", "In3.Cu", [(108, 77), (137, 77), (137, 97), (108, 97)], 8)]                    # ...and to the eFuse's input behind J14; +5V_TGT leaves it to J14 as a track
 ISO_GAP = 2.0
 # ---- lanes (ecad-standards/layout.md sections 1 and 5): a corridor reserved for one routed path, from pad to pad
 # through axis-aligned legs ("x"/"y" items move along one axis to a coordinate or to another pad's coordinate),
@@ -186,7 +160,7 @@ LANE_MARGIN = 0.25
 # LEDs, large parts and the parts on current-carrying, pair and switching-loop nets stay on top; a small part of
 # these kinds, up to the courtyard area given, may go to the bottom, under the pin it serves
 BOTTOM_MAX_AREA = {"R": 7.0, "C": 7.0, "D": 8.0, "Q": 12.0}   # mm2: up to 1206, SOD-123, SOT-23
-BOTTOM_NEVER_CLASSES = {"USB_VBUS_3A", "PWR_6A", "PSU_3A", "USB"}   # parts on these nets stay on top (current paths, pairs); PSU_ISO parts may go under
+BOTTOM_NEVER_CLASSES = {"USB_VBUS_3A", "PWR_4A", "PSU_3A", "USB"}   # parts on these nets stay on top (current paths, pairs); PSU_ISO parts may go under
 # ---- ESD protection (ecad-standards/layout.md section 3.8): recognised by value; placed first of all, on top, at the
 # connector's signal pins, a flow-through array turned so its connector-side pins face the connector
 ESD_VALUES = ("USBLC", "PESD", "ESDA", "TPD", "SRV05", "IP42", "TVS", "SMAJ", "SMBJ")
@@ -197,7 +171,7 @@ BOTTOM_TUCK = 1.75    # a bottom part's inner edge sits this far inside its host
 THT_MARGIN = 0.5      # bottom parts keep this far from through-hole pads (reference boards: 0.5; wave or selective soldering needs the assembler's figure)
 EP_MARGIN = 0.6       # and from an exposed pad's via field
 REFDES_SIZES = (0.8, 0.7)   # designator text heights tried, mm (reference boards: 0.8 typical, 0.65-0.72 smallest); stroke 15 %, never under 0.1
-CURRENT_CLASSES = {"USB_VBUS_3A", "PWR_6A", "PSU_3A", "PSU_ISO"}   # a part on these nets belongs at the connector or IC that carries them
+CURRENT_CLASSES = {"USB_VBUS_3A", "PWR_4A", "PSU_3A", "PSU_ISO"}   # a part on these nets belongs at the connector or IC that carries them
 PAIR_CLASSES = {"USB"}
 ISOLATION_RECTS = [(66, 62, 86, 100), (50, 82, 66, 100)]           # ISOLATION as rectangles, for the placer
 ISOLATION_GROWN_RECTS = [(64, 60, 88, 100), (48, 80, 64, 100)]     # ISOLATION_PLANE_HOLE likewise: board-net parts stay out              # creepage between PSU_3A nets and board nets

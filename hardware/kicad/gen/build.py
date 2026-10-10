@@ -38,11 +38,11 @@ def net_settings():
     # 90 ohm differential microstrip on Advanced Circuits' standard 6-layer 62 mil stackup (2026-10-09): 1 oz outer
     # copper over two 2116 sheets (9.8 mil pressed, er 4.3) to the L2 / L5 ground planes -> 0.33 mm traces, 0.20 mm gap; the ETH
     # pairs 100 ohm -> 0.29 mm, 0.25 mm gap (edge-coupled microstrip estimate); the fab's impedance calculator has the last word
-    # current-carrying classes, the current in the name (1 oz outer copper, 10 C rise: 3 A ~ 1.5 mm, 6 A ~ 3.6 mm)
+    # current-carrying classes, the current in the name (1 oz outer copper, 10 C rise: 3 A ~ 1.5 mm, 4 A ~ 2.3 mm)
     return {"classes": [netclass("Default", clearance=0.15), netclass("USB", priority=0, diff_pair_width=0.33, diff_pair_gap=0.2, track_width=0.33),
                         netclass("PSU_3A", priority=1, track_width=2.0, clearance=0.3, via_diameter=1.0, via_drill=0.5),
                         netclass("USB_VBUS_3A", priority=2, track_width=2.0, via_diameter=1.0, via_drill=0.5),
-                        netclass("PWR_6A", priority=3, track_width=4.0, via_diameter=1.2, via_drill=0.6),
+                        netclass("PWR_4A", priority=3, track_width=2.5, via_diameter=1.0, via_drill=0.5),   # +5V from the 4 A inlet, and the target rail behind the 3 A eFuse
                         netclass("PSU_ISO", priority=4, track_width=0.25),
                         netclass("ETH", priority=5, diff_pair_width=0.29, diff_pair_gap=0.25, track_width=0.29),
                         netclass("PWR_1A", priority=6, track_width=0.6, clearance=0.15)],   # +3V3, routed (no room for a plane of it among the rails): 0.6 mm, since an inner 1 oz track carries about half of an outer one (IPC-2221); the default clearance, since it reaches 0.5 mm pitch pins   # 100 ohm MDI pairs on the same stackup (estimate; the fab's calculator rules)               # the opto's sense nets: isolated like PSU_3A, thin "meta": {"version": 4}, "net_colors": None,
@@ -51,8 +51,8 @@ def net_settings():
                                + [{"netclass": "PSU_3A", "pattern": p} for p in ("*PSU_VP", "*PSU_VOUT", "PSU_GND")]   # local nets carry their sheet path
                                + [{"netclass": "PSU_ISO", "pattern": "*PSU_SENSE*"}]
                                + [{"netclass": "ETH", "pattern": "*ETH_?D_?"}]
-                               + [{"netclass": "USB_VBUS_3A", "pattern": p} for p in ("VBUS_IN", "*PORT?_VBUS", "*FTDI_VBUS")]
-                               + [{"netclass": "PWR_6A", "pattern": p} for p in ("+5V_PORTS", "+5V_TGT", "*+5V_TGT_OUT")]
+                               + [{"netclass": "USB_VBUS_3A", "pattern": p} for p in ("*PORT?_VBUS", "*FTDI_VBUS")]
+                               + [{"netclass": "PWR_4A", "pattern": p} for p in ("+5V", "*+5V_TGT")]
                                + [{"netclass": "PWR_1A", "pattern": "+3V3"}]}
 
 
@@ -79,13 +79,12 @@ def main():
     notes = ["SBC DEVELOPMENT BASEBOARD - schematic first pass, generated 2026-10-04",
              "One board for remote development on an attached SBC: K64 as USB HID to the target and Ethernet to the workstation,",
              "four switched USB-A ports, FT231X FTDI header, two isolated SPDT signal relays, level-shifted console and GPIO/I2C,",
-             "switched +5V_TGT eFuse, and an isolated PSU passthrough on a 5 A relay. 140 x 80 mm, four M3 at 7 mm from each corner.",
+             "switched +5V_TGT eFuse, and an isolated PSU passthrough on a 5 A relay. 5 V 4 A in on a 2.5 mm barrel jack. 140 x 100 mm, six layers.",
              "",
              "VERIFY BEFORE FAB (also in docs/hardware-spec.md section 8):",
              "  - K803 JW1FSN contact pad mapping (COM 6 / NO 4 / NC 2) against the Panasonic drawing",
              "  - DAPLink K20: pins verified against DAPLink k20dx and the FRDM-K64F OpenSDA circuit; confirm SWD at bring-up",
-             "  - TPS54560B compensation values; TPS2553 ILIM at bring-up; TPS26630 UVLO/ILIM",
-             "  - STUSB4500 operation from VSYS alone (J17 programmer, no VBUS); PCA9517A isolation with VCC(B) = 0",
+             "  - TPS2553 ILIM at bring-up; TPS26630 UVLO/ILIM (6.04k -> 3 A); the inlet FET's drop at 4 A",
              "  - USB2517 VBUS_DET divider (10k/22k) vs the EVB; LED_A/B strap pull-downs",
              "  - KSZ8081 crystal load (22 pF) and 50 MHz REF_CLK series resistor",
              "Reference designators: 1xx power, 2xx MCU, 3xx Ethernet, 4xx hub, 5xx FTDI, 6xx DAPLink, 7xx target I/O, 8xx relays and passthrough."]

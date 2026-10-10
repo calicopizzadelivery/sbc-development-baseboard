@@ -118,13 +118,13 @@
         "line_style": 0,
         "microvia_diameter": 0.3,
         "microvia_drill": 0.1,
-        "name": "PWR_6A",
+        "name": "PWR_4A",
         "pcb_color": "rgba(0, 0, 0, 0.000)",
         "priority": 3,
         "schematic_color": "rgba(0, 0, 0, 0.000)",
-        "track_width": 4.0,
-        "via_diameter": 1.2,
-        "via_drill": 0.6,
+        "track_width": 2.5,
+        "via_diameter": 1.0,
+        "via_drill": 0.5,
         "wire_width": 6
       },
       {
@@ -222,10 +222,6 @@
       },
       {
         "netclass": "USB_VBUS_3A",
-        "pattern": "VBUS_IN"
-      },
-      {
-        "netclass": "USB_VBUS_3A",
         "pattern": "*PORT?_VBUS"
       },
       {
@@ -233,16 +229,12 @@
         "pattern": "*FTDI_VBUS"
       },
       {
-        "netclass": "PWR_6A",
-        "pattern": "+5V_PORTS"
+        "netclass": "PWR_4A",
+        "pattern": "+5V"
       },
       {
-        "netclass": "PWR_6A",
-        "pattern": "+5V_TGT"
-      },
-      {
-        "netclass": "PWR_6A",
-        "pattern": "*+5V_TGT_OUT"
+        "netclass": "PWR_4A",
+        "pattern": "*+5V_TGT"
       },
       {
         "netclass": "PWR_1A",

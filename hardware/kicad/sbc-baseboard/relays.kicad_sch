@@ -3609,7 +3609,7 @@
 				)
 			)
 		)
-		(property "Value" "+5V_PORTS"
+		(property "Value" "+5V"
 			(at 139.7 60.96 0)
 			(show_name no)
 			(do_not_autoplace no)
@@ -3871,7 +3871,7 @@
 				)
 			)
 		)
-		(property "Value" "+5V_PORTS"
+		(property "Value" "+5V"
 			(at 129.54 67.31 0)
 			(show_name no)
 			(do_not_autoplace no)
@@ -4169,7 +4169,7 @@
 				)
 			)
 		)
-		(property "Value" "+5V_PORTS"
+		(property "Value" "+5V"
 			(at 114.3 60.96 0)
 			(show_name no)
 			(do_not_autoplace no)
@@ -5129,7 +5129,7 @@
 				)
 			)
 		)
-		(property "Value" "+5V_PORTS"
+		(property "Value" "+5V"
 			(at 139.7 135.89 0)
 			(show_name no)
 			(do_not_autoplace no)
@@ -5391,7 +5391,7 @@
 				)
 			)
 		)
-		(property "Value" "+5V_PORTS"
+		(property "Value" "+5V"
 			(at 129.54 142.24 0)
 			(show_name no)
 			(do_not_autoplace no)
@@ -5689,7 +5689,7 @@
 				)
 			)
 		)
-		(property "Value" "+5V_PORTS"
+		(property "Value" "+5V"
 			(at 114.3 135.89 0)
 			(show_name no)
 			(do_not_autoplace no)
@@ -6806,7 +6806,7 @@
 				)
 			)
 		)
-		(property "Value" "+5V_PORTS"
+		(property "Value" "+5V"
 			(at 132.08 218.44 0)
 			(show_name no)
 			(do_not_autoplace no)
@@ -6864,17 +6864,17 @@
 	(wire
 		(pts
 			(xy 137.16 224.79)
-			(xy 116.84 224.79)
+			(xy 123.19 224.79)
 		)
 		(stroke
 			(width 0)
 			(type default)
 		)
-		(uuid "0c79f080-8f4f-5873-923e-33d248445b1a")
+		(uuid "fcebbdd1-69f4-526f-96f3-c5bc6ef8b59e")
 	)
 	(symbol
 		(lib_id "Diode:1N4148W")
-		(at 116.84 217.17 270)
+		(at 123.19 217.17 270)
 		(unit 1)
 		(body_style 1)
 		(exclude_from_sim no)
@@ -6885,7 +6885,7 @@
 		(fields_autoplaced no)
 		(uuid "5900253f-a1a9-58aa-82b8-e6e0d450a999")
 		(property "Reference" "D805"
-			(at 114.3 215.9 90)
+			(at 120.65 215.9 90)
 			(show_name no)
 			(do_not_autoplace no)
 			(effects
@@ -6896,7 +6896,7 @@
 			)
 		)
 		(property "Value" "1N4148W"
-			(at 114.3 218.44 90)
+			(at 120.65 218.44 90)
 			(show_name no)
 			(do_not_autoplace no)
 			(effects
@@ -6907,7 +6907,7 @@
 			)
 		)
 		(property "Footprint" "Diode_SMD:D_SOD-123"
-			(at 116.84 217.17 0)
+			(at 123.19 217.17 0)
 			(hide yes)
 			(show_name no)
 			(do_not_autoplace no)
@@ -6919,7 +6919,7 @@
 			)
 		)
 		(property "Datasheet" "~"
-			(at 116.84 217.17 0)
+			(at 123.19 217.17 0)
 			(hide yes)
 			(show_name no)
 			(do_not_autoplace no)
@@ -6931,7 +6931,7 @@
 			)
 		)
 		(property "Description" "75V 0.15A Fast Switching Diode, SOD-123"
-			(at 116.84 217.17 0)
+			(at 123.19 217.17 0)
 			(hide yes)
 			(show_name no)
 			(do_not_autoplace no)
@@ -6959,29 +6959,29 @@
 	)
 	(wire
 		(pts
-			(xy 116.84 224.79)
-			(xy 116.84 220.98)
+			(xy 123.19 224.79)
+			(xy 123.19 220.98)
 		)
 		(stroke
 			(width 0)
 			(type default)
 		)
-		(uuid "353f1506-2897-5b74-8a09-1be0f4010680")
+		(uuid "da8ef37c-af95-5b46-a9c0-1a4e4ea2b815")
 	)
 	(wire
 		(pts
-			(xy 116.84 213.36)
-			(xy 116.84 210.82)
+			(xy 123.19 213.36)
+			(xy 123.19 210.82)
 		)
 		(stroke
 			(width 0)
 			(type default)
 		)
-		(uuid "08f1d6f6-d37f-5b5e-97af-730530ff1abf")
+		(uuid "ef5f0b0b-7d4e-59a6-b76d-c3876a37739a")
 	)
 	(symbol
 		(lib_id "power:+5V")
-		(at 116.84 210.82 0)
+		(at 123.19 210.82 0)
 		(unit 1)
 		(body_style 1)
 		(exclude_from_sim no)
@@ -6992,7 +6992,7 @@
 		(fields_autoplaced no)
 		(uuid "a21bc201-e178-594e-986a-4aaf3d6746c0")
 		(property "Reference" "#PWR09012"
-			(at 116.84 210.82 0)
+			(at 123.19 210.82 0)
 			(hide yes)
 			(show_name no)
 			(do_not_autoplace no)
@@ -7002,8 +7002,8 @@
 				)
 			)
 		)
-		(property "Value" "+5V_PORTS"
-			(at 116.84 207.01 0)
+		(property "Value" "+5V"
+			(at 123.19 207.01 0)
 			(show_name no)
 			(do_not_autoplace no)
 			(effects
@@ -7013,7 +7013,7 @@
 			)
 		)
 		(property "Footprint" ""
-			(at 116.84 210.82 0)
+			(at 123.19 210.82 0)
 			(hide yes)
 			(show_name no)
 			(do_not_autoplace no)
@@ -7024,7 +7024,7 @@
 			)
 		)
 		(property "Datasheet" "~"
-			(at 116.84 210.82 0)
+			(at 123.19 210.82 0)
 			(hide yes)
 			(show_name no)
 			(do_not_autoplace no)
@@ -7035,7 +7035,7 @@
 			)
 		)
 		(property "Description" "Power symbol creates a global label with name \"+5V\""
-			(at 116.84 210.82 0)
+			(at 123.19 210.82 0)
 			(hide yes)
 			(show_name no)
 			(do_not_autoplace no)
@@ -7058,25 +7058,25 @@
 		)
 	)
 	(junction
-		(at 116.84 224.79)
+		(at 123.19 224.79)
 		(diameter 0)
 		(color 0 0 0 0)
-		(uuid "2bc34ddd-d3af-593e-b291-9ff1b0c52ba2")
+		(uuid "727f6b18-d28a-53d7-a954-85d1993e0849")
 	)
 	(wire
 		(pts
-			(xy 116.84 224.79)
-			(xy 101.6 224.79)
+			(xy 123.19 224.79)
+			(xy 107.95 224.79)
 		)
 		(stroke
 			(width 0)
 			(type default)
 		)
-		(uuid "3b83156e-ca38-5203-95a9-d66cc83f7c8a")
+		(uuid "c26594eb-2884-5cf9-aa93-4168c6d1f3b8")
 	)
 	(symbol
 		(lib_id "Device:LED")
-		(at 101.6 219.71 90)
+		(at 107.95 219.71 90)
 		(unit 1)
 		(body_style 1)
 		(exclude_from_sim no)
@@ -7087,7 +7087,7 @@
 		(fields_autoplaced no)
 		(uuid "943ea36d-dcea-53d6-844a-74e65db0137a")
 		(property "Reference" "D806"
-			(at 99.06 218.44 90)
+			(at 105.41 218.44 90)
 			(show_name no)
 			(do_not_autoplace no)
 			(effects
@@ -7098,7 +7098,7 @@
 			)
 		)
 		(property "Value" "LED RED"
-			(at 99.06 220.98 90)
+			(at 105.41 220.98 90)
 			(show_name no)
 			(do_not_autoplace no)
 			(effects
@@ -7109,7 +7109,7 @@
 			)
 		)
 		(property "Footprint" "LED_SMD:LED_0603_1608Metric"
-			(at 101.6 219.71 0)
+			(at 107.95 219.71 0)
 			(hide yes)
 			(show_name no)
 			(do_not_autoplace no)
@@ -7121,7 +7121,7 @@
 			)
 		)
 		(property "Datasheet" "~"
-			(at 101.6 219.71 0)
+			(at 107.95 219.71 0)
 			(hide yes)
 			(show_name no)
 			(do_not_autoplace no)
@@ -7133,7 +7133,7 @@
 			)
 		)
 		(property "Description" "Light emitting diode"
-			(at 101.6 219.71 0)
+			(at 107.95 219.71 0)
 			(hide yes)
 			(show_name no)
 			(do_not_autoplace no)
@@ -7161,7 +7161,7 @@
 	)
 	(symbol
 		(lib_id "Device:R")
-		(at 101.6 210.82 0)
+		(at 107.95 210.82 0)
 		(unit 1)
 		(body_style 1)
 		(exclude_from_sim no)
@@ -7172,7 +7172,7 @@
 		(fields_autoplaced no)
 		(uuid "753fca7c-9756-52ce-936b-21163015ac59")
 		(property "Reference" "R807"
-			(at 99.06 209.55 0)
+			(at 105.41 209.55 0)
 			(show_name no)
 			(do_not_autoplace no)
 			(effects
@@ -7183,7 +7183,7 @@
 			)
 		)
 		(property "Value" "2.2k"
-			(at 99.06 212.09 0)
+			(at 105.41 212.09 0)
 			(show_name no)
 			(do_not_autoplace no)
 			(effects
@@ -7194,7 +7194,7 @@
 			)
 		)
 		(property "Footprint" "Resistor_SMD:R_0603_1608Metric"
-			(at 101.6 210.82 0)
+			(at 107.95 210.82 0)
 			(hide yes)
 			(show_name no)
 			(do_not_autoplace no)
@@ -7206,7 +7206,7 @@
 			)
 		)
 		(property "Datasheet" "~"
-			(at 101.6 210.82 0)
+			(at 107.95 210.82 0)
 			(hide yes)
 			(show_name no)
 			(do_not_autoplace no)
@@ -7218,7 +7218,7 @@
 			)
 		)
 		(property "Description" "Resistor"
-			(at 101.6 210.82 0)
+			(at 107.95 210.82 0)
 			(hide yes)
 			(show_name no)
 			(do_not_autoplace no)
@@ -7246,40 +7246,40 @@
 	)
 	(wire
 		(pts
-			(xy 101.6 224.79)
-			(xy 101.6 223.52)
+			(xy 107.95 224.79)
+			(xy 107.95 223.52)
 		)
 		(stroke
 			(width 0)
 			(type default)
 		)
-		(uuid "80a33e2d-e433-58d6-9b31-8793ae652aad")
+		(uuid "7fc81b91-3352-593c-a67a-e4cc1e553d8f")
 	)
 	(wire
 		(pts
-			(xy 101.6 215.9)
-			(xy 101.6 214.63)
+			(xy 107.95 215.9)
+			(xy 107.95 214.63)
 		)
 		(stroke
 			(width 0)
 			(type default)
 		)
-		(uuid "2356407f-b8fe-528c-9e45-9381819b296c")
+		(uuid "6762a28e-9f35-560e-b912-22c57b3f3d49")
 	)
 	(wire
 		(pts
-			(xy 101.6 207.01)
-			(xy 101.6 204.47)
+			(xy 107.95 207.01)
+			(xy 107.95 204.47)
 		)
 		(stroke
 			(width 0)
 			(type default)
 		)
-		(uuid "14d85f28-7a53-5ef9-ab62-86a05c73c82b")
+		(uuid "6108c008-1db4-5819-8958-0d8173dd3fb4")
 	)
 	(symbol
 		(lib_id "power:+5V")
-		(at 101.6 204.47 0)
+		(at 107.95 204.47 0)
 		(unit 1)
 		(body_style 1)
 		(exclude_from_sim no)
@@ -7290,7 +7290,7 @@
 		(fields_autoplaced no)
 		(uuid "57a31fb3-b215-528e-b34d-a8a50c12073f")
 		(property "Reference" "#PWR09013"
-			(at 101.6 204.47 0)
+			(at 107.95 204.47 0)
 			(hide yes)
 			(show_name no)
 			(do_not_autoplace no)
@@ -7300,8 +7300,8 @@
 				)
 			)
 		)
-		(property "Value" "+5V_PORTS"
-			(at 101.6 200.66 0)
+		(property "Value" "+5V"
+			(at 107.95 200.66 0)
 			(show_name no)
 			(do_not_autoplace no)
 			(effects
@@ -7311,7 +7311,7 @@
 			)
 		)
 		(property "Footprint" ""
-			(at 101.6 204.47 0)
+			(at 107.95 204.47 0)
 			(hide yes)
 			(show_name no)
 			(do_not_autoplace no)
@@ -7322,7 +7322,7 @@
 			)
 		)
 		(property "Datasheet" "~"
-			(at 101.6 204.47 0)
+			(at 107.95 204.47 0)
 			(hide yes)
 			(show_name no)
 			(do_not_autoplace no)
@@ -7333,7 +7333,7 @@
 			)
 		)
 		(property "Description" "Power symbol creates a global label with name \"+5V\""
-			(at 101.6 204.47 0)
+			(at 107.95 204.47 0)
 			(hide yes)
 			(show_name no)
 			(do_not_autoplace no)
@@ -7356,54 +7356,54 @@
 		)
 	)
 	(junction
-		(at 101.6 224.79)
+		(at 107.95 224.79)
 		(diameter 0)
 		(color 0 0 0 0)
-		(uuid "22e7df5f-8171-5164-abb1-8ec8b9e13509")
+		(uuid "d1370ebc-6d70-5c5d-b340-59932426b1fd")
 	)
 	(wire
 		(pts
-			(xy 101.6 224.79)
-			(xy 96.52 224.79)
+			(xy 107.95 224.79)
+			(xy 102.87 224.79)
 		)
 		(stroke
 			(width 0)
 			(type default)
 		)
-		(uuid "af0c8282-18f3-5bca-ae6c-b986a4370379")
+		(uuid "f13b47cb-7603-509e-9328-5fe771a75f41")
 	)
 	(wire
 		(pts
-			(xy 96.52 224.79)
-			(xy 87.63 224.79)
+			(xy 102.87 224.79)
+			(xy 93.98 224.79)
 		)
 		(stroke
 			(width 0)
 			(type default)
 		)
-		(uuid "85996ce4-90f5-5c04-bb49-f108e0b37fb2")
+		(uuid "9e43d67c-2ec6-5436-ac5b-b527dd35c52e")
 	)
 	(wire
 		(pts
-			(xy 87.63 224.79)
-			(xy 87.63 243.84)
+			(xy 93.98 224.79)
+			(xy 93.98 243.84)
 		)
 		(stroke
 			(width 0)
 			(type default)
 		)
-		(uuid "16223ffd-bfd5-5a31-b5dd-5f49e570057c")
+		(uuid "4d6c3ac4-c077-53b8-8d3c-478528d07934")
 	)
 	(wire
 		(pts
-			(xy 87.63 243.84)
+			(xy 93.98 243.84)
 			(xy 72.39 243.84)
 		)
 		(stroke
 			(width 0)
 			(type default)
 		)
-		(uuid "19e8247b-016d-5f65-908e-5650e171b41e")
+		(uuid "f0f919ca-be3f-5b60-9cc5-bbeb2440b7f2")
 	)
 	(wire
 		(pts
