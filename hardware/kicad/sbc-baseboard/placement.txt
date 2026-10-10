@@ -10,7 +10,7 @@ C415   Y401   F     B0
 C416   Y401   F     L0
 C606   Y601   F     B0
 C607   Y601   F     L0
-C204   Y201   F     L0
+C204   Y201   F     T0
 C205   Y201   F     B0
 D501   J9     F     L1
 D502   J9     F     L1
@@ -36,9 +36,9 @@ C706   U703   F     L0
 C701   J13    F     L1
 R701   J13    F     L0
 C605   U601   F     L2
-C206   U201   F     L0
-C207   U201   F     L7
-C208   U201   F     L7
+C206   U201   F     L1
+C207   U201   F     L0
+C208   U201   F     L0
 C209   U201   F     B0
 C210   U201   F     B0
 C211   U201   F     T0
@@ -88,7 +88,7 @@ R811   J18    F     free@17
 C504   U501   F     R0
 C426   U407   F     B0
 C214   U201   F     T0
-C308   U301   F     L1
+C308   U301   F     R0
 R705   U704   F     R1
 R426   J4     F     T6
 R432   J5     F     T7
@@ -102,7 +102,7 @@ R422   J1     B     R0
 R423   J1     B     R0
 C301   J10    B     B0
 C302   J10    B     B0
-R301   J10    F     B0
+R301   J10    F     R1
 R302   J10    F     L1
 R303   J10    B     B0
 R304   J10    B     B1
@@ -157,7 +157,7 @@ R213   U201   F     R1
 C201   U201   B     T1
 R215   U201   B     R0
 R702   U704   B     L0
-R309   U301   F     L0
+R309   U301   F     L1
 R310   U301   F     B0
 C304   U301   B     T0
 C305   U301   B     T0
@@ -213,9 +213,9 @@ R808   Q803   B     R0
 R803   Q801   B     T0
 R806   Q802   B     T0
 R809   Q803   B     R0
-C309   C308   B     T0
+C309   C308   B     B0
 C601   SW601  B     L0
-C303   R303   F     free@12
+C303   R303   F     B0
 R604   SW601  B     L0
 C203   SW201  B     L0
 R203   SW201  F     L0
@@ -224,9 +224,9 @@ D102   R101   F     L0
 R103   L101   F     R0
 D103   R103   F     R0
 
-rail vias (layout.md 4): 165 beside 135 pads on plane nets.
-pads with no room beside them for any via (94; the router or the hand pass joins them to the rail):
-  Q101.2 Q101.3 U105.1 U105.3 U105.5 U105.7 C202.2 C204.2 C207.2 J3.B1 J3.B12 U201.9 U201.24 U201.41 U201.49 U201.60 U201.74 U201.88 U202.2 C301.2 C302.2 C307.2 C310.2 R308.2 R311.2 U301.22 U301.25 C401.2 C402.2 C404.2 C405.2 C407.2 C415.2 C417.1 C419.1 C420.2 C421.1 C423.1 C423.2 D401.1 J1.B1 J1.B12 R404.2 R405.2 R412.2 R418.2 R425.2 R428.2 R434.2 U401.2 U402.19 U402.65 U403.1 U403.2 U404.1 U404.2 U405.1 U405.2 U406.1 U406.2 U407.1 U407.2 U408.2 U409.2 U410.2 U411.2 Y401.2 Y401.4 D501.2 D502.2 D503.2 D506.2 U501.6 U501.16 U601.2 U601.6 U601.8 U601.33 C709.1 C711.2 D701.2 D702.2 R703.1 U703.2 U704.2 U704.5 U704.7 U704.8 U704.11 U704.15 U704.25 U704.25 D801.1 R802.2
+rail vias (layout.md 4): 166 beside 136 pads on plane nets.
+pads with no room beside them for any via (93; the router or the hand pass joins them to the rail):
+  Q101.2 Q101.3 U105.1 U105.3 U105.5 U105.7 C202.2 J3.B1 J3.B12 U201.9 U201.24 U201.41 U201.49 U201.60 U201.74 U201.88 U202.2 C301.2 C302.2 C307.2 C308.2 C310.2 R308.2 R311.2 U301.22 U301.25 C401.2 C402.2 C404.2 C405.2 C407.2 C415.2 C417.1 C419.1 C420.2 C421.1 C423.1 C423.2 D401.1 J1.B1 J1.B12 R404.2 R405.2 R412.2 R418.2 R425.2 R428.2 R434.2 U401.2 U402.19 U402.65 U403.1 U403.2 U404.1 U404.2 U405.1 U405.2 U406.1 U406.2 U407.1 U407.2 U408.2 U409.2 U410.2 U411.2 Y401.2 Y401.4 D501.2 D502.2 D503.2 D506.2 U501.6 U501.16 U601.2 U601.6 U601.8 U601.33 C709.1 C711.2 D701.2 D702.2 R703.1 U703.2 U704.2 U704.5 U704.7 U704.8 U704.11 U704.15 U704.25 U704.25 D801.1 R802.2
 pads served short of their class's count or via (placed for wanted; 4; the hand pass adds the rest):
   C101.1 2x1 for 3x1
   C102.1 2x1 for 3x1
@@ -236,8 +236,8 @@ pads served short of their class's count or via (placed for wanted; 4; the hand 
 cities (layout.md 3.1): the schematic's islands with two or more parts, connectors, holes and ESD aside: each one's extent on
 the board, and the members more than 10 mm from every other member (placed apart from their city)
 daplink/C601                16 parts   27.8 x  20.3 mm
-ethernet/C301               20 parts   19.5 x  27.7 mm
-ethernet/C308                2 parts    3.5 x   1.5 mm
+ethernet/C301               20 parts   22.7 x  24.5 mm  apart: R301@16
+ethernet/C308                2 parts    8.0 x   1.5 mm
 ftdi/C501                   17 parts   23.2 x  21.1 mm
 hub/C401                    60 parts   36.3 x  38.1 mm
 hub/C419                     7 parts   13.5 x   8.4 mm

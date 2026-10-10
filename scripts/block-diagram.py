@@ -225,7 +225,7 @@ def conn(edge, a, L, label, depth=DEPTH):
         e(f'<text x="{x+L*S/2}" y="{y-6}" text-anchor="middle" font-size="11" fill="{C["ink"]}">{label}</text>')
 # the edge table of docs/layout-directives.md (gen/layout.py CONNECTORS; the courtyards of the placed board, 2026-10-08;
 # J2 the barrel jack since 2026-10-10)
-conn("T", 71, 19, "J10 RJ45", depth=22.4)
+conn("T", 55, 19, "J10 RJ45", depth=22.4)
 conn("L", 25.0, 11.2, "J2 5 V in"); conn("L", 68.7, 10.6, "J1 upstream")
 conn("R", 14, 10.7, "J3 HID"); conn("R", 35.7, 16.6, "J13 console"); conn("R", 63.2, 16.3, "J9 FTDI")
 conn("B", 14, 17.2, "J5"); conn("B", 32.2, 17.2, "J4"); conn("B", 52.4, 13.2, "J18"); conn("B", 66.6, 13.2, "J19")
