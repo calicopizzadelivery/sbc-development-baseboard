@@ -125,8 +125,8 @@ PLANES = [("GND_L2", "GND", "In1.Cu", GND_PLANE),
 ISO_GAP = 2.0
 # ---- lanes (ecad-standards/layout.md sections 1 and 5): a corridor reserved for one routed path, from pad to pad
 # through axis-aligned legs ("x"/"y" items move along one axis to a coordinate or to another pad's coordinate),
-# as wide as the net class's track plus its clearance plus LANE_MARGIN each side, kept free of parts on both
-# sides of the board, and laid as tracks by the generator
+# as wide as the net class's track plus its clearance plus LANE_MARGIN each side, kept free of parts on each leg's
+# own side and on both sides around its vias (standard 2.5), and laid as tracks by the generator
 LANES = {
     "PSU_VP":   {"net": "PSU_VP",   "layer": "F.Cu", "path": [("J18", "1"), ("y", 85.0), ("x", ("K803", "6")), ("K803", "6")]},
     "PSU_VOUT": {"net": "PSU_VOUT", "layer": "F.Cu", "path": [("K803", "4"), ("y", 93.0), ("x", ("J19", "1")), ("J19", "1")]},   # under J19's body, past its GND pin
@@ -150,8 +150,8 @@ LANES = {
     # pins past C603 (the pin rows shifted 0.1 mm up so the corridor clears C603's courtyard)
     "K20_USB": {"pair": "K20_USB", "path": [("pads", {"P": ("R602", "1"), "N": ("R603", "1")}), ("x", 60.0), ("y", 41.7), ("x", 77.5),
                                             ("y", ("U601", {"P": "3", "N": "4"}, (0.0, -0.1))), ("U601", {"P": "3", "N": "4"}, (0.0, -0.1))]},
-    "HUB_DN2": {"pair": "HUB_DN2", "path": [("U402", {"P": "4", "N": "3"}, (0.1, 0.0)), ("y", 65.6), ("x", 37.8), ("layer", "B.Cu"), ("x", 52.1), ("layer", "F.Cu"), ("y", 48.0),
-                                            ("x", 92.5), ("y", 51.5), ("x", 112.0), ("y", 62.0), ("x", 126.6),   # over the relay, between the DAPLink and its crystal, round the FTDI
+    "HUB_DN2": {"pair": "HUB_DN2", "path": [("U402", {"P": "4", "N": "3"}, (0.1, 0.0)), ("y", 65.6), ("x", 37.8), ("layer", "B.Cu"), ("x", 52.1), ("layer", "F.Cu"), ("y", 54.8),
+                                            ("x", 112.0), ("y", 62.0), ("x", 126.6),   # over the relay, below the DAPLink's crystal and above Q803, round the FTDI
                                             ("y", ("pads", {"P": ("R505", "2"), "N": ("R504", "2")})), ("pads", {"P": ("R505", "2"), "N": ("R504", "2")})]},
     "FTDI_USB": {"pair": "FTDI_USB", "path": [("pads", {"P": ("R505", "1"), "N": ("R504", "1")}), ("x", 121.2), ("y", ("U501", {"P": "11", "N": "12"})), ("U501", {"P": "11", "N": "12"})]},
     "J3_D":    {"pair": "J3_D",    "path": [("J3", {"P": ["A6", "B6"], "N": ["A7", "B7"]}), ("U202", {"P": "1", "N": "3"})]},

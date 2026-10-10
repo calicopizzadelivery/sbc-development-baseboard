@@ -291,22 +291,24 @@ State on 2026-10-10, after the first hand pass and the lane redraw: the
 generator reproduces the hand placement (271 parts fixed, 84 on the
 bottom), the lanes were redrawn around the hand-placed parts where a path
 exists (K20_USB enters the DAPLink from the resistors' side over C605 and
-past C603; HUB_DN2 crosses the board at y = 48 between the DAPLink and its
-crystal; PORT2_D_N's bottom leg passes U408; the standard's corridors now
-keep parts off a leg's own side only, so the bottom-side parts under the
-ETH, HUB_DN6 and HUB_DN7 legs no longer count), and `placement.txt`'s
-"hand placement" section lists what still stands on a lane: C403 and C406
-under the hub's bottom row (HUB_DN1, HUB_DN2, HUB_DN4, HUB_DN5), C416 and
-Y401 at its left column (HUB_UP, HUB_DN6, HUB_DN7) and R209 at U408's exit
-(HUB_DN4): the hub's USB pairs and +3V3 pins alternate along those rows,
-so a capacitor laid against its pin on top sits across a pair's exit. The
-DRC gate reports 66 errors (138 before the redraw): the lanes laid through
-those five parts (shorts, clearance, keep-outs, mask bridges, two hole
-clearances) and six hand-placed courtyard overlaps (R211/R433, C105/U105,
-U403/R208, C417/R208, U408/R209, C606/Y601); the crossings are gone. 24
-pairs of hand-fixed parts stand closer than the packing margin and 23 gaps
-between cities are narrower than 2 mm. The board is not routed before the
-gate is clean.
+past C603; HUB_DN2 crosses the board at y = 54.8, below the DAPLink's
+crystal and above Q803; PORT2_D_N's bottom leg passes U408; the standard's
+corridors now keep parts off a leg's own side only, so C301 under the ETH
+lanes and R211, R435 and D404 under HUB_DN6's leg no longer count), and
+`placement.txt`'s "hand placement" section lists what still stands on a
+lane: C403 and C406 under the hub's bottom row (HUB_DN1, HUB_DN2, HUB_DN4,
+HUB_DN5), the crystal Y401 and its load capacitor C416 at its left column
+(HUB_UP, HUB_DN6, HUB_DN7) and R209 at U408's exit (HUB_DN4): the hub's
+USB pairs and +3V3 pins alternate along those rows, so a decoupling
+capacitor laid against its pin on top sits across a pair's exit, and the
+crystal at its pins sits across the upstream pair's. The DRC gate reports
+66 errors (138 before the redraw): the lanes laid through those five parts
+(shorts, clearance, keep-outs, mask bridges, four hole clearances) and
+six hand-placed courtyard overlaps (R211/R433, C105/U105, U403/R208,
+C417/R208, U408/R209, C606/Y601); the crossings are gone. 24 pairs of
+hand-fixed parts stand closer than the packing margin and 23 gaps between
+cities are narrower than 2 mm. The board is not routed before the gate is
+clean.
 
 ## Design decisions that were made during capture
 

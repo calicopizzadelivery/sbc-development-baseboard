@@ -140,7 +140,7 @@ parts are anchored so the lanes can be declared before placement.
 | HUB_DN6, HUB_DN7 | U410, U411 | U402 left row | up the left of the hub, right into the row, nested, 1.2 mm apart | — |
 | HUB_DN1 | U402 pins 2/1 | R602/R603 (hub side) | down to y = 66.6, under the port pairs on the bottom, up along x = 50.5, right across the band at y = 38.75 | 2 |
 | K20_USB | R602/R603 | U601 pins 3/4 | right to x = 60, up to y = 41.7 over C605, right to x = 77.5, down past C603 and into the K20's left row, which faces the resistors since the hand pass (until 2026-10-10: right to x = 92 and back into the row from the east) | — |
-| HUB_DN2 | U402 pins 4/3 | R505/R504 (hub side) | down to y = 65.6, under the port pairs, up along x = 52.1, right across the band at y = 48 between the DAPLink and its crystal, down at x = 92.5, right at y = 51.5, down at x = 112, right under the FTDI at y = 62, up at x = 126.6, left into the resistors (until 2026-10-10 the band was y = 41.5, through where the hand pass put the DAPLink) | 2 |
+| HUB_DN2 | U402 pins 4/3 | R505/R504 (hub side) | down to y = 65.6, under the port pairs, up along x = 52.1, right across the band at y = 54.8 below the DAPLink's crystal and above Q803, down at x = 112, right above the FTDI at y = 62, down at x = 126.6, left into the resistors (until 2026-10-10 the band was y = 41.5, through where the hand pass put the DAPLink; a band at y = 48 between the DAPLink and its crystal would have cut the crystal's and C602/C604's tracks off from the chip) | 2 |
 | FTDI_USB | R505/R504 | U501 pins 11/12 | direct | — |
 | J3_D | J3 (A7/A6 middle members; B7/B6 bridged at both ends of the row) | U202 | direct | — |
 | K64_USB | U202 | U201 pins 10/11 | left, up to y = 6 along the back edge, left, down into the K64's top row | — |
@@ -162,18 +162,21 @@ lane via. The USB 2.0 pairs get their lanes when the pairs are placed
 
 After the first hand pass (2026-10-10) the lanes were redrawn around the
 hand-placed parts where a path exists: K20_USB and HUB_DN2 as in the table,
-PORT2_D_N's bottom leg at x = 43.3 past U408, and the ETH, HUB_DN6 and
-HUB_DN7 legs that only had bottom-side parts under them are clear under
+PORT2_D_N's bottom leg at x = 43.1 past U408 with its via at y = 81.9, and
+the legs that only had bottom-side parts under them (C301 under the ETH
+lanes; R211, R435 and D404 under HUB_DN6's vertical leg) are clear under
 the per-side rule. No path exists into the hub's left column and bottom
-row: its USB pairs and +3V3 pins alternate along both (pins 1-4 and 8-12
-with 5 and 10; pins 53-56 and 58-59 with 52 and 57), so a decoupling
-capacitor laid against its pin on top (C403 and C406 under the bottom row,
-C416 at the left column) sits across a pair's exit, where the pair's escape
-needs 1.6 mm straight out of the pins; the crystal Y401 at (30, 61) with
-C416 above it closes the left column's approach (the engine had put it at
-(31.9, 63.5), below HUB_UP's line); and R209 stands 0.4 mm into HUB_DN4's
-exit from U408. Those lanes keep their straight paths and the report names
-the parts.
+row: its USB pairs and +3V3 pins alternate along both (pins 1-4, 8-9 and
+11-12 with +3V3 at 5 and 10; pins 53-56 and 58-59 with +3V3 at 52 and 57),
+so a decoupling capacitor laid against its pin on top (C403 and C406 under
+the bottom row) sits across a pair's exit, where the pair's escape runs
+1.2 mm straight past the pad tips (1.5 mm from the pad centres) before
+it can turn; the crystal Y401 at (30, 61), at the XTAL pins 60/61 with its
+load capacitor C416 above it, closes the left column's approach (the
+engine had put the crystal at (31.9, 63.5), below HUB_UP's line, with C416
+beside it); and R209 stands 0.4 mm into HUB_DN4's exit from U408. Those
+lanes keep their straight paths and the report names the parts, with the
+depth by which each corridor overlaps them.
 
 ## Planes
 
