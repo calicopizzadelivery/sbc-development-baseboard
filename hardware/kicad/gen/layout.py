@@ -14,7 +14,7 @@ EDGE_GAP = 1.0             # between neighbouring edge connectors' bodies
 # rule that placed them: a horizontal connector's solder pins sit at the rear, so it mates toward the
 # end of its body farthest from the pad rows; a pin header mates where its pins point
 CONNECTORS = {"J1": (3.1, 64.0, -90), "J2": (13.9, 30.0, 0), "J3": (136.9, 19.345, 90), "J4": (37.285, 83.865, 0),
-              "J5": (19.095, 83.865, 0), "J9": (129.435, 65.045, 0), "J10": (60.08, 20.23, 90), "J11": (87.745, 91.475, 0),
+              "J5": (19.095, 83.865, 0), "J9": (129.435, 65.045, 0), "J10": (50.08, 20.23, 90), "J11": (87.745, 91.475, 0),
               "J12": (101.805, 91.475, 0), "J13": (131.475, 49.165, 90), "J14": (116.845, 89.475, 0), "J18": (56.445, 89.475, 0),
               "J19": (70.665, 89.475, 0)}   # J18/J19 2 mm right (2026-10-08): J4's shield pads 2.6 mm from the passthrough region (their copper still enters its 2 mm band by 0.9 mm; the fills keep the creepage)
 EDGE_ZONE = 3.0            # no part other than an edge connector nearer the edge than this (ECSS 14.3.2 c, tailored)
@@ -25,7 +25,7 @@ EDGE_ZONE = 3.0            # no part other than an edge connector nearer the edg
 # beside J2, the 3V3 buck below them at buck 1's output, the RJ45 and PHY moved right along the back edge to
 # make the room, the hub down into the band the taller board gained
 ANCHORS = {
-    "U301": (64.5, 29.0, 270),     # PHY below J10 on the back edge, TX/RX pins up toward the jack (J10 + (4.42, 8.77), the ETH lanes' geometry); 16 mm left with the jack on 2026-10-10 into the corner the bucks left, opening the K64's side
+    "U301": (54.5, 29.0, 270),     # PHY below J10 on the back edge, TX/RX pins up toward the jack (J10 + (4.42, 8.77), the ETH lanes' geometry); 26 mm left with the jack on 2026-10-10 into the corner the bucks left, opening the K64's side
     "Q101": (20.0, 30.0, 0),       # the inlet's reverse-polarity FET behind the jack (2026-10-10: the PD controller, its I2C buffer and header and the two 5 V bucks went with the PD inlet)
     "U105": (41.0, 41.0, 0),      # +3V3 buck below buck 1's output, above the hub, laid out as SLVSDV6C Figure 52 (LAYOUTS)
     "U402": (39.0, 59.0, 90),     # hub, 5 mm down and left toward the USB ports (2026-10-07) to open the centre: downstream pins toward J4/J5, upstream and crystal toward J1
@@ -53,8 +53,8 @@ ANCHORS = {
     "R505": (123.5, 73.5, 0),     # 
     "J15":  (117.0, 10.0, 0),      # GPIO header, inboard
     # the two reset buttons in the open centre band (2026-10-07), their debounce parts with them
-    "SW201": (66.0, 50.0, 0),      # K64 reset
-    "SW601": (80.0, 50.0, 0),      # DAPLink reset (the buttons' courtyards are 10.2 mm wide: 2 mm of void between the two cities)
+    "SW201": (71.5, 8.0, 0),       # K64 reset, in a column beside the RJ45 on the back edge (in the centre band until 2026-10-10)
+    "SW601": (71.5, 17.0, 0),      # DAPLink reset below it (the buttons' courtyards are 10.2 x 6.9 mm: 2 mm of void between the two cities, 2 mm from the jack)
 }
 SPARE = (8.0, 60.0)     # parts the engine cannot attach anywhere are parked here and reported
 # the regulators' cities (standard 3.1 and 3.2): each with its application circuit around it, the inductor and
@@ -77,7 +77,7 @@ RAIL_VIAS = {"PWR_4A": 3, "USB_VBUS_3A": 2, "PSU_3A": 2}   # vias beside each SM
 CITY_GAP = 2.0          # the component void between any two islands' parts, both sides of the board (standard 3.1)
 # no plane or pour under the RJ45 on any layer (standard 3.4 and 4: its pins span the body, so the void is the body;
 # the pins' tracks pass)
-COPPER_VOIDS = {"J10_magnetics": (55.0, 1.0, 74.1, 22.5)}   # the jack's courtyard: origin -5.07..+13.97 in x (x 71 to 90 until 2026-10-10)
+COPPER_VOIDS = {"J10_magnetics": (45.0, 1.0, 64.1, 22.5)}   # the jack's courtyard: origin -5.07..+13.97 in x (x 71 to 90 until 2026-10-10)
 RING_GAP = 0.15             # a ring's gap to its host and to the ring inside it (courtyards + this: 0.65 mm pad to pad, the standard's spacing)
 RINGS = 8
 BIG_AREA = 20.0              # courtyard mm2 from which a part on an IC's pins goes down before the bulk capacitors (inductors, diodes)

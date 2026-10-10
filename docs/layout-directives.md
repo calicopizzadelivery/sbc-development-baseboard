@@ -48,7 +48,7 @@ the spec accepted).
 | Edge | Connectors, in order from the back corner to the front | Faces | Courtyards (measured) |
 |---|---|---|---|
 | Left (x = 0), 74 mm usable | J2 barrel power in (Kycon KLDX-0202-BC, 2.5 × 5.5 mm, through-hole, horizontal, centre positive: origin y = 30, its front face at the edge and its body 14.5 mm inboard, pins at y 30 and 34.7; a USB-C PD receptacle until 2026-10-10) · J1 USB-C upstream (centred y = 64; y = 74 until 2026-10-10, when it moved 10 mm up the edge toward the middle), split around the middle | adapter / workstation | 11.2 + 10.6 = 21.8 mm |
-| Back (y = 0), 114 mm usable | J10 RJ45, from x = 55 (from x = 14 until 2026-10-07, when the PD inlet's two 5 V bucks took the back-edge corner beside J2; from x = 71 until 2026-10-10, when the bucks had gone and the jack and its PHY moved 16 mm back toward the corner to open the K64's side) | workstation | 19.0 mm wide, 22.4 mm deep |
+| Back (y = 0), 114 mm usable | J10 RJ45, from x = 45 (from x = 14 until 2026-10-07, when the PD inlet's two 5 V bucks took the back-edge corner beside J2; from x = 71 until 2026-10-10, when the bucks had gone and the jack and its PHY moved 26 mm back toward the corner to open the K64's side, the two reset buttons in a column beside the jack) | workstation | 19.0 mm wide, 22.4 mm deep |
 | Right (x = 140), 74 mm usable | J3 USB-C HID (centred y = 19.3) · J13 console (origin y = 49.2) · J9 FTDI right-angle (origin y = 65.0), J13 moved 10 mm and J9 20 mm down the edge on 2026-10-07, leaving 11 mm between courtyards (they were packed 1.5 mm apart in the back half) | target | 10.6 + 16.5 + 16.3 = 43.4 mm |
 | Front (y = 100), left end | J5, J4 USB-A stacks (J5 at x = 19, J4 at x = 37: swapped on 2026-10-06 so each stack's pairs reach the hub row they are wired to without crossing) · J18 PSU in (x = 56.4) · J19 PSU out (x = 70.7), both 2 mm right since 2026-10-08 so J4's shield pads stand 2.6 mm from the passthrough region (their copper still enters its 2 mm creepage band by 0.9 mm; the fills keep the creepage, DRC agrees) | bench / PSU | 17.2 + 17.2 + 13.2 + 13.2 = 60.8 mm |
 | Front (y = 100), right end | J14 +5V_TGT · J12, J11 relays | target | 13.2 + 13.05 + 13.05 = 39.3 mm |
@@ -290,8 +290,8 @@ are the knobs.
 | R504 | (123.5, 71.6, 0) | FTDI pair series resistors, N above P as the lane arrives from the right |
 | R505 | (123.5, 73.5, 0) |  |
 | J15 | (117, 10, 0) | GPIO header, inboard |
-| SW201 | (66, 50, 0) | K64 reset button in the open centre band (2026-10-07), its debounce parts with it |
-| SW601 | (80, 50, 0) | DAPLink reset button beside it, 2 mm of void between the two cities |
+| SW201 | (71.5, 8, 0) | K64 reset button, in a column beside the RJ45 on the back edge (in the open centre band from 2026-10-07 to 2026-10-10), its debounce parts with it |
+| SW601 | (71.5, 17, 0) | DAPLink reset button below it, 2 mm of void between the two cities and from the jack |
 
 The LEDs and their resistors are not anchored: the generator puts them at
 the nearest free spot to the pin that drives them, and they are moved by
