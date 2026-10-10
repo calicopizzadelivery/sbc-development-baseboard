@@ -13,8 +13,8 @@ EDGE_GAP = 1.0             # between neighbouring edge connectors' bodies
 # edge connectors are locked at the positions the first board settled (x, y, rotation); the mating
 # rule that placed them: a horizontal connector's solder pins sit at the rear, so it mates toward the
 # end of its body farthest from the pad rows; a pin header mates where its pins point
-CONNECTORS = {"J1": (3.1, 64.0, -90), "J2": (13.9, 30.0, 0), "J3": (136.9, 19.345, 90), "J4": (37.285, 83.865, 0),
-              "J5": (19.095, 83.865, 0), "J9": (129.435, 65.045, 0), "J10": (50.08, 20.23, 90), "J11": (87.745, 91.475, 0),
+CONNECTORS = {"J1": (2.5, 52, -90), "J2": (13.9, 25, 0), "J3": (137, 22, 90), "J4": (37.285, 83.865, 0),
+              "J5": (19.095, 83.865, 0), "J9": (129.435, 65.045, 0), "J10": (47.69, 20.04, 90), "J11": (87.745, 91.475, 0),
               "J12": (101.805, 91.475, 0), "J13": (131.475, 49.165, 90), "J14": (116.845, 89.475, 0), "J18": (56.445, 89.475, 0),
               "J19": (70.665, 89.475, 0)}   # J18/J19 2 mm right (2026-10-08): J4's shield pads 2.6 mm from the passthrough region (their copper still enters its 2 mm band by 0.9 mm; the fills keep the creepage)
 EDGE_ZONE = 3.0            # no part other than an edge connector nearer the edge than this (ECSS 14.3.2 c, tailored)
@@ -77,7 +77,7 @@ RAIL_VIAS = {"PWR_4A": 3, "USB_VBUS_3A": 2, "PSU_3A": 2}   # vias beside each SM
 CITY_GAP = 2.0          # the component void between any two islands' parts, both sides of the board (standard 3.1)
 # no plane or pour under the RJ45 on any layer (standard 3.4 and 4: its pins span the body, so the void is the body;
 # the pins' tracks pass)
-COPPER_VOIDS = {"J10_magnetics": (45.0, 1.0, 64.1, 22.5)}   # the jack's courtyard: origin -5.07..+13.97 in x (x 71 to 90 until 2026-10-10)
+COPPER_VOIDS = {"J10_magnetics": (CONNECTORS["J10"][0] - 5.07, 1.0, CONNECTORS["J10"][0] + 13.97, CONNECTORS["J10"][1] + 2.27)}   # the jack's courtyard, wherever J10 stands (origin -5.07..+13.97 in x, to 2.27 below it)
 RING_GAP = 0.15             # a ring's gap to its host and to the ring inside it (courtyards + this: 0.65 mm pad to pad, the standard's spacing)
 RINGS = 8
 BIG_AREA = 20.0              # courtyard mm2 from which a part on an IC's pins goes down before the bulk capacitors (inductors, diodes)
@@ -88,6 +88,10 @@ SEARCH_RADIUS = 40.0         # the nearest-free-spot search gives up beyond this
 # parts placed by hand across the isolation barrier: (x, y, rotation) of the footprint origin
 FIXED = {"K803": (58.0, 73.0, 0),          # coil pads (1, 8) at x = 58 outside the region, contacts (2, 4, 6) inside
          "U801": (68.0, 80.5, 180)}        # below the relay: LED pins (1, 2) at x = 68 inside the region, transistor pins (3, 4) at 60.4 outside
+# the owner's hand placement (gen/harvest.py from the saved board, 2026-10-10): every part it moved, fixed where it was put;
+# a fixed part outranks its anchor, so the ANCHORS above stay as the first placement's record
+from hand_placement import HAND
+FIXED = {**FIXED, **HAND}
 PACK_MARGIN = 0.15          # courtyard to courtyard: with KiCad's 0.25 mm courtyards 0.65 mm pad to pad (reference boards: 0.3-0.6; ECSS Table 14-2: 0.6 between bodies)
 
 # the isolated PSU region: the passthrough block behind J18, a strip along the front and a riser to J19

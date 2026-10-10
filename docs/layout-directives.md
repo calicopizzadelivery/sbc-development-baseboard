@@ -260,6 +260,29 @@ those, the members placed apart from their island, and the indicator LEDs
 are the first things to refine by hand. The anchors are the second: they
 are the knobs.
 
+Since 2026-10-10 the placement is the owner's: the first hand pass in
+KiCad moved 133 of the 271 parts (commit c1628c5), and the standard's
+`tools/handplace.py` harvests every part's pose (x, y, rotation, side) off
+the saved board into `gen/hand_placement.py` (`HAND`, 254 parts, 84 on the
+bottom; standard section 2, item 4). `layout.py` merges `HAND` over
+`FIXED`, a hand-fixed part outranks its anchor and the engine's own rule,
+and the generator reproduces the saved board exactly (`handplace.py
+--check` against the generated board finds nothing placed elsewhere). The
+edge connectors stay in `CONNECTORS`, rewritten by the harvest when one
+moves (J1, J2, J3 and J10 in the first pass). A hand-fixed part is reported
+rather than refused: `placement.txt` ends with a "hand placement" section
+listing the hand-fixed parts closer than the packing margin to a neighbour
+(the DRC gate judges their courtyards), the lanes that run through a
+hand-fixed part, the lanes the engine could not lay, and the pair lanes
+laid with their members crossing because a moved part now faces the path
+the wrong way; that section is
+the next hand pass's work, and the board is not routed until the lanes lay
+and the DRC gate is clean. The hand loop is: move parts in KiCad and save,
+harvest, regenerate, read the section, repeat. The anchors below are the
+positions the generator used before the hand pass; where `HAND` has an
+entry, it wins, and the table's "why there" still says what the part is
+for and which way it faces.
+
 | Part | (x, y, rot) | Why there |
 |---|---|---|
 | K803 | (58, 73, 0) | straddles the isolation barrier |

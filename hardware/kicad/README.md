@@ -157,7 +157,12 @@ part is placed at the pin it serves, by the generator, in five passes (small
 decoupling capacitors at their pins, the large parts on an IC's own pins,
 bulk capacitors, the small parts on those pins, then parts hosted by other
 passives), each on its host's nearest side with the pad on the host's net
-facing it, packed outward in rings. Small resistors, capacitors, diodes and
+facing it, packed outward in rings; since 2026-10-10 the owner's hand
+placement outranks all of this (the directives' Placement section: the
+saved board is harvested into `gen/hand_placement.py` by the standard's
+`tools/handplace.py`, every part fixed where the owner put it, and the
+generator reproduces it), so the engine's own placement is what a part
+gets until the owner moves it. Small resistors, capacitors, diodes and
 transistors that are not on a current-carrying, pair or switching-loop net go
 to the bottom, tucked under their host's pin row, clear of through-hole pads
 and exposed-pad via fields (the directives' Sides section); the rest stay on
@@ -204,8 +209,8 @@ and does not credit the planes); its report is `drc.txt`.
 
 The board as last routed (2026-10-09, six layers, with the PD inlet and the
 two bucks still on it; the barrel-jack board of 2026-10-10 started from a
-copper reset and is being routed again, so until that routing is committed
-these are the previous board's figures) is the engine's
+copper reset and is being placed by hand before it is routed again, so
+until that routing is committed these are the previous board's figures) is the engine's
 placement on the 140 × 100 mm outline, bulk-routed by FreeRouting on L1,
 L3 and L6 over the locked lanes, rail vias and planes (`gen/pcb.py --route
 --copper`, 24 passes, 5 h 12 min on one thread of which 55 min were its
@@ -281,6 +286,25 @@ mechanical drawing (done: they are locked), the isolated passthrough block
 the indicator LEDs, the USB 2.0 pairs from each receptacle through its ESD
 array to the hub, the 3V3 buck's switching loop and the +5V rail's `PWR_4A`
 pours, and the rest.
+
+State on 2026-10-10, after the first hand pass: the generator reproduces the
+hand placement (271 parts fixed, 84 on the bottom), and `placement.txt`'s
+"hand placement" section lists what the pass put in the way of the lanes
+drawn for the generated placement: the hub's decoupling capacitors C403 and
+C406 under its downstream pins (lanes HUB_DN1, HUB_DN2, HUB_DN4, HUB_DN5),
+its crystal Y401 and C416 at the upstream pins (HUB_UP, HUB_DN6, HUB_DN7),
+R209 under U408's pads (HUB_DN4), the DAPLink's C605 and C603 at its USB
+pins and J601 (K20_USB), C606, Y601 and C607 on HUB_DN2's old path, C301 on
+the bottom under the ETH lanes, R211, R435 and D404 on the bottom under
+HUB_DN6; K20_USB's path, drawn to come back from x = 92, now enters the
+turned DAPLink from the wrong side, so its members cross each other and
+the lane crosses HUB_DN1 and HUB_DN2. The DRC gate reports 138 errors, all
+from those lanes laid through those parts (shorts, clearance, keep-outs,
+mask bridges, the crossings) and from six hand-placed courtyard overlaps (R211/R433,
+C105/U105, U403/R208, C417/R208, U408/R209, C606/Y601); 24 hand-fixed pairs
+stand closer than the packing margin and 23 gaps between cities are
+narrower than 2 mm. The lanes are redrawn for the hand placement once it
+settles, and the board is not routed before the gate is clean.
 
 ## Design decisions that were made during capture
 
