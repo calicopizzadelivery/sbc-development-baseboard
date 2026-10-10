@@ -99,7 +99,7 @@ host is attached and whether or not the host agrees.
 | J1 | USB-C receptacle | workstation | Hub upstream data. USB 2.0 only, UFP (5.1 kΩ Rd on both CC). |
 | J2 | 2.5 × 5.5 mm barrel jack | adapter | 5 V 4 A (20 W) power in, centre positive: Kycon KLDX-0202-BC, through-hole, horizontal. No data. (2026-10-10; a USB-C PD sink until then.) |
 | J3 | USB-C receptacle | target | K64 USB FS device port — HID keyboard/mouse. UFP, **VBUS sense-only**. |
-| J4, J5 | USB-A, 2× double-stacked | bench | Hub ports 1–4, two per receptacle, each individually switched. Hub port 5 is unconnected. |
+| J4, J5 | USB-A, 2× double-stacked | bench | Hub ports 4–7, two per receptacle, each individually switched (port 1 is the DAPLink, port 2 the FT231X, port 3 disabled). |
 | J9 | 6-pin 0.1″ header | target | FT231X UART on hub port 6. Standard FTDI pinout: GND, CTS, VCC, TXD, RXD, RTS/DTR. **3.3 V levels.** |
 | J10 | RJ45 + magnetics + LEDs | workstation | 10/100 Ethernet. |
 | J11, J12 | 3-pos pluggable 3.5 mm | target | Relay 1 and 2: COM, NO, NC. |
