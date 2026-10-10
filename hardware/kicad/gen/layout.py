@@ -146,9 +146,12 @@ LANES = {
     # lines are shifted 0.1 mm apart, the FTDI pair turns first, and each goes under the port pairs on the bottom
     "HUB_DN1": {"pair": "HUB_DN1", "path": [("U402", {"P": "2", "N": "1"}, (-0.1, 0.0)), ("y", 66.6), ("layer", "B.Cu"), ("y", 68.2), ("x", 50.5), ("y", 66.6), ("layer", "F.Cu"),
                                             ("y", ("pads", {"P": ("R602", "2"), "N": ("R603", "2")})), ("pads", {"P": ("R602", "2"), "N": ("R603", "2")})]},
-    "K20_USB": {"pair": "K20_USB", "path": [("pads", {"P": ("R602", "1"), "N": ("R603", "1")}), ("x", 92.0), ("y", ("U601", {"P": "3", "N": "4"})), ("U601", {"P": "3", "N": "4"})]},
-    "HUB_DN2": {"pair": "HUB_DN2", "path": [("U402", {"P": "4", "N": "3"}, (0.1, 0.0)), ("y", 65.6), ("x", 37.8), ("layer", "B.Cu"), ("x", 52.1), ("layer", "F.Cu"), ("y", 41.5),
-                                            ("x", 86.5), ("y", 51.5), ("x", 112.0), ("y", 62.0), ("x", 126.5),   # over the relay, under the DAPLink and SWD, round the FTDI
+    # the DAPLink's USB pins face its series resistors since the hand pass: east from the resistors, up over C605 and down into the
+    # pins past C603 (the pin rows shifted 0.1 mm up so the corridor clears C603's courtyard)
+    "K20_USB": {"pair": "K20_USB", "path": [("pads", {"P": ("R602", "1"), "N": ("R603", "1")}), ("x", 60.0), ("y", 41.7), ("x", 77.5),
+                                            ("y", ("U601", {"P": "3", "N": "4"}, (0.0, -0.1))), ("U601", {"P": "3", "N": "4"}, (0.0, -0.1))]},
+    "HUB_DN2": {"pair": "HUB_DN2", "path": [("U402", {"P": "4", "N": "3"}, (0.1, 0.0)), ("y", 65.6), ("x", 37.8), ("layer", "B.Cu"), ("x", 52.1), ("layer", "F.Cu"), ("y", 48.0),
+                                            ("x", 92.5), ("y", 51.5), ("x", 112.0), ("y", 62.0), ("x", 126.6),   # over the relay, between the DAPLink and its crystal, round the FTDI
                                             ("y", ("pads", {"P": ("R505", "2"), "N": ("R504", "2")})), ("pads", {"P": ("R505", "2"), "N": ("R504", "2")})]},
     "FTDI_USB": {"pair": "FTDI_USB", "path": [("pads", {"P": ("R505", "1"), "N": ("R504", "1")}), ("x", 121.2), ("y", ("U501", {"P": "11", "N": "12"})), ("U501", {"P": "11", "N": "12"})]},
     "J3_D":    {"pair": "J3_D",    "path": [("J3", {"P": ["A6", "B6"], "N": ["A7", "B7"]}), ("U202", {"P": "1", "N": "3"})]},
@@ -157,7 +160,7 @@ LANES = {
     "ETH_TD":  {"pair": "ETH_TD",  "path": [("J10", {"P": "1", "N": "2"}), ("y", 24.0), ("x", ("U301", {"P": "6", "N": "5"}, (-0.05, 0.0))), ("U301", {"P": "6", "N": "5"}, (-0.05, 0.0))]},
     "ETH_RD":  {"pair": "ETH_RD",  "path": [("J10", {"P": "3", "N": "6"}), ("U301", {"P": "4", "N": "3"}, (0.05, 0.0))]},
     # the stacks' back rows on the bottom, through the front row's pin gaps, up to the array's connector-side pads
-    "PORT2_D_N": {"net": "PORT2_D_N", "layer": "B.Cu", "width": 0.2, "path": [("J4", "6"), ("y", 84.92), ("x", 43.03), ("y", 81.7), ("layer", "F.Cu"), ("U409", "4")]},
+    "PORT2_D_N": {"net": "PORT2_D_N", "layer": "B.Cu", "width": 0.2, "path": [("J4", "6"), ("y", 84.92), ("x", 43.1), ("y", 81.9), ("layer", "F.Cu"), ("U409", "4")]},
     "PORT2_D_P": {"net": "PORT2_D_P", "layer": "B.Cu", "width": 0.2, "path": [("J4", "7"), ("y", 85.43), ("x", 45.44), ("y", 81.7), ("layer", "F.Cu"), ("U409", "6")]},
     "PORT4_D_N": {"net": "PORT4_D_N", "layer": "B.Cu", "width": 0.2, "path": [("J5", "6"), ("y", 84.92), ("x", 24.84), ("y", 81.7), ("layer", "F.Cu"), ("U411", "4")]},
     "PORT4_D_P": {"net": "PORT4_D_P", "layer": "B.Cu", "width": 0.2, "path": [("J5", "7"), ("y", 85.43), ("x", 27.25), ("y", 81.7), ("layer", "F.Cu"), ("U411", "6")]},

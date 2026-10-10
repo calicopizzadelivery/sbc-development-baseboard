@@ -91,7 +91,9 @@ along it); a pin header mates where its pins point. Checked in the 3D view.
   the region by placement). The L2 ground plane is drawn as one outline
   notched around the region from the front edge. Only the opto-coupler and
   the relay body cross the gap.
-- **Lanes** (below): no part on either side inside a lane's corridor.
+- **Lanes** (below): no part on a leg's own side inside its corridor, and
+  none on either side around a lane via (standard 2.5, since 2026-10-10;
+  until then both sides everywhere).
 - Under J10: no plane or pour on any layer under the jack's body (its pins
   span the body, so the whole body is the void; the pins' tracks pass),
   drawn by the generator as the rule area `void_J10_magnetics` from
@@ -137,8 +139,8 @@ parts are anchored so the lanes can be declared before placement.
 | HUB_DN4, HUB_DN5 | U408, U409 | U402 bottom row | up to y = 69, left, up (DN4); up to y = 67.5, left, up (DN5) | — |
 | HUB_DN6, HUB_DN7 | U410, U411 | U402 left row | up the left of the hub, right into the row, nested, 1.2 mm apart | — |
 | HUB_DN1 | U402 pins 2/1 | R602/R603 (hub side) | down to y = 66.6, under the port pairs on the bottom, up along x = 50.5, right across the band at y = 38.75 | 2 |
-| K20_USB | R602/R603 | U601 pins 3/4 | right, down into the K20's left row | — |
-| HUB_DN2 | U402 pins 4/3 | R505/R504 (hub side) | down to y = 65.6, under the port pairs, up along x = 52.1, right across the band at y = 41.5, down past the DAPLink at x = 86.5, right under it at y = 51.5, down at x = 112, right under the FTDI at y = 62, up at x = 126.5, left into the resistors | 2 |
+| K20_USB | R602/R603 | U601 pins 3/4 | right to x = 60, up to y = 41.7 over C605, right to x = 77.5, down past C603 and into the K20's left row, which faces the resistors since the hand pass (until 2026-10-10: right to x = 92 and back into the row from the east) | — |
+| HUB_DN2 | U402 pins 4/3 | R505/R504 (hub side) | down to y = 65.6, under the port pairs, up along x = 52.1, right across the band at y = 48 between the DAPLink and its crystal, down at x = 92.5, right at y = 51.5, down at x = 112, right under the FTDI at y = 62, up at x = 126.6, left into the resistors (until 2026-10-10 the band was y = 41.5, through where the hand pass put the DAPLink) | 2 |
 | FTDI_USB | R505/R504 | U501 pins 11/12 | direct | — |
 | J3_D | J3 (A7/A6 middle members; B7/B6 bridged at both ends of the row) | U202 | direct | — |
 | K64_USB | U202 | U201 pins 10/11 | left, up to y = 6 along the back edge, left, down into the K64's top row | — |
@@ -153,9 +155,25 @@ apart and the FTDI pair turns first.
 The VP leg at y = 85 keeps the 2 mm creepage to the opto-coupler's board-side
 pins (y ≤ 82); the VOUT leg at y = 93 clears J19's GND pad by the class
 clearance. The lanes' corridors stop at the courtyards of the parts they join
-and appear in the board as footprint keep-out rule areas named `lane_*`. The
-USB 2.0 pairs get their lanes when the pairs are placed (standard, section
-8.3).
+and appear in the board as footprint keep-out rule areas named `lane_*`, one
+per leg on the leg's own layer, and `lane_*_via` on both layers around each
+lane via. The USB 2.0 pairs get their lanes when the pairs are placed
+(standard, section 8.3).
+
+After the first hand pass (2026-10-10) the lanes were redrawn around the
+hand-placed parts where a path exists: K20_USB and HUB_DN2 as in the table,
+PORT2_D_N's bottom leg at x = 43.3 past U408, and the ETH, HUB_DN6 and
+HUB_DN7 legs that only had bottom-side parts under them are clear under
+the per-side rule. No path exists into the hub's left column and bottom
+row: its USB pairs and +3V3 pins alternate along both (pins 1-4 and 8-12
+with 5 and 10; pins 53-56 and 58-59 with 52 and 57), so a decoupling
+capacitor laid against its pin on top (C403 and C406 under the bottom row,
+C416 at the left column) sits across a pair's exit, where the pair's escape
+needs 1.6 mm straight out of the pins; the crystal Y401 at (30, 61) with
+C416 above it closes the left column's approach (the engine had put it at
+(31.9, 63.5), below HUB_UP's line); and R209 stands 0.4 mm into HUB_DN4's
+exit from U408. Those lanes keep their straight paths and the report names
+the parts.
 
 ## Planes
 

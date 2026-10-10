@@ -287,27 +287,26 @@ the indicator LEDs, the USB 2.0 pairs from each receptacle through its ESD
 array to the hub, the 3V3 buck's switching loop and the +5V rail's `PWR_4A`
 pours, and the rest.
 
-State on 2026-10-10, after the first hand pass: the generator reproduces the
-hand placement (271 parts fixed, 84 on the bottom), and `placement.txt`'s
-"hand placement" section lists what the pass put in the way of the lanes
-drawn for the generated placement: the hub's decoupling capacitors C403 and
-C406 under its downstream pins (lanes HUB_DN1, HUB_DN2, HUB_DN4, HUB_DN5),
-its crystal Y401 and C416 at the upstream pins (HUB_UP, HUB_DN6, HUB_DN7),
-R209 under U408's pads (HUB_DN4), U408 itself under PORT2_D_N, the
-DAPLink's C605 and C603 at its USB pins and J601 (K20_USB), the DAPLink
-U601 and R602 with C606, Y601 and C607 on HUB_DN2's old path, C301 on the
-bottom under the ETH lanes, R211, R435 and D404 on the bottom under
-HUB_DN6; K20_USB's path, drawn to come back from x = 92 to the DAPLink's
-old position, now enters it from the wrong side, so its members cross each
-other, and the lane crosses HUB_DN2, as HUB_DN1 does: HUB_DN2's path was
-drawn for the old positions. The DRC gate reports 138 errors: the lanes
-laid through those parts (shorts, clearance, keep-outs, mask bridges), the
-three crossings, and six hand-placed courtyard overlaps (R211/R433,
-C105/U105, U403/R208, C417/R208, U408/R209, C606/Y601); 24 pairs of
-hand-fixed parts stand closer than the packing margin and 23 gaps between
-cities are narrower than 2 mm. The lanes are redrawn for the hand
-placement once it settles, and the board is not routed before the gate is
-clean.
+State on 2026-10-10, after the first hand pass and the lane redraw: the
+generator reproduces the hand placement (271 parts fixed, 84 on the
+bottom), the lanes were redrawn around the hand-placed parts where a path
+exists (K20_USB enters the DAPLink from the resistors' side over C605 and
+past C603; HUB_DN2 crosses the board at y = 48 between the DAPLink and its
+crystal; PORT2_D_N's bottom leg passes U408; the standard's corridors now
+keep parts off a leg's own side only, so the bottom-side parts under the
+ETH, HUB_DN6 and HUB_DN7 legs no longer count), and `placement.txt`'s
+"hand placement" section lists what still stands on a lane: C403 and C406
+under the hub's bottom row (HUB_DN1, HUB_DN2, HUB_DN4, HUB_DN5), C416 and
+Y401 at its left column (HUB_UP, HUB_DN6, HUB_DN7) and R209 at U408's exit
+(HUB_DN4): the hub's USB pairs and +3V3 pins alternate along those rows,
+so a capacitor laid against its pin on top sits across a pair's exit. The
+DRC gate reports 66 errors (138 before the redraw): the lanes laid through
+those five parts (shorts, clearance, keep-outs, mask bridges, two hole
+clearances) and six hand-placed courtyard overlaps (R211/R433, C105/U105,
+U403/R208, C417/R208, U408/R209, C606/Y601); the crossings are gone. 24
+pairs of hand-fixed parts stand closer than the packing margin and 23 gaps
+between cities are narrower than 2 mm. The board is not routed before the
+gate is clean.
 
 ## Design decisions that were made during capture
 

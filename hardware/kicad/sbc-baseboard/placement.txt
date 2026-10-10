@@ -1,8 +1,8 @@
 part   host   side  where (side+ring, or free@distance from the pin)
 
-rail vias (layout.md 4): 165 beside 135 pads on plane nets.
-pads with no room beside them for any via (92; the router or the hand pass joins them to the rail):
-  Q101.2 Q101.3 R102.2 U105.1 U105.3 U105.5 U105.7 C203.2 J3.B1 J3.B12 R201.2 U201.9 U201.24 U201.41 U201.49 U201.60 U201.74 U201.88 U202.2 C301.2 C302.2 C306.2 C308.2 U301.22 U301.25 C401.2 C402.2 C403.2 C404.2 C405.2 C406.2 C407.2 C409.2 C416.2 C417.1 C417.2 C419.1 C420.2 D401.1 D404.1 J1.B1 J1.B12 R404.2 R412.2 R413.2 R428.2 R431.2 R434.2 U401.2 U402.19 U402.65 U403.1 U403.2 U404.1 U404.2 U405.1 U406.1 U406.2 U407.2 U408.2 U409.2 U410.2 U411.2 Y401.2 D501.2 D502.2 D503.2 D506.2 U501.6 U501.16 C601.2 C603.2 U601.2 U601.8 U601.33 Y601.4 C709.1 C711.2 D701.2 D702.2 R703.1 U703.2 U704.2 U704.5 U704.7 U704.8 U704.11 U704.15 U704.25 U704.25 D801.1 R802.2
+rail vias (layout.md 4): 166 beside 136 pads on plane nets.
+pads with no room beside them for any via (91; the router or the hand pass joins them to the rail):
+  Q101.2 Q101.3 R102.2 U105.1 U105.3 U105.5 U105.7 C203.2 J3.B1 J3.B12 R201.2 U201.9 U201.24 U201.41 U201.49 U201.60 U201.74 U201.88 U202.2 C301.2 C302.2 C306.2 C308.2 U301.22 U301.25 C401.2 C402.2 C403.2 C404.2 C405.2 C406.2 C407.2 C409.2 C416.2 C417.1 C417.2 C419.1 C420.2 D401.1 D404.1 J1.B1 J1.B12 R404.2 R412.2 R413.2 R428.2 R431.2 R434.2 U401.2 U402.19 U402.65 U403.1 U403.2 U404.1 U404.2 U405.1 U406.1 U406.2 U407.2 U408.2 U409.2 U410.2 U411.2 Y401.2 D501.2 D502.2 D503.2 D506.2 U501.6 U501.16 C601.2 U601.2 U601.8 U601.33 Y601.4 C709.1 C711.2 D701.2 D702.2 R703.1 U703.2 U704.2 U704.5 U704.7 U704.8 U704.11 U704.15 U704.25 U704.25 D801.1 R802.2
 pads served short of their class's count or via (placed for wanted; 7; the hand pass adds the rest):
   C101.1 2x1 for 3x1
   C102.1 2x1 for 3x1
@@ -14,31 +14,19 @@ pads served short of their class's count or via (placed for wanted; 7; the hand 
 
 hand placement (layout.md 2, item 4): what the hand-fixed parts and the lanes put in each other's way; the next hand pass's work
   hand-fixed pairs closer than the packing margin (24; the DRC gate judges the courtyards): C105 and L101, C105 and U105, C108 and R104, C108 and R105, C204 and Y201, C205 and Y201, C409 and C410, C410 and C415, C410 and Y401, C415 and Y401, C416 and Y401, C417 and R208, C418 and J4, C418 and R208, C418 and R424, C425 and U407, C606 and Y601, D103 and L101, R104 and R105, R208 and U403, R209 and U408, R211 and R433, R211 and R435, R212 and R213
+  lane HUB_UP_via runs through the hand-fixed Y401
   lane HUB_UP runs through the hand-fixed Y401
   lane HUB_DN4 runs through the hand-fixed R209
   lane HUB_DN4 runs through the hand-fixed C406
   lane HUB_DN5 runs through the hand-fixed C406
-  lane HUB_DN6 runs through the hand-fixed R211
-  lane HUB_DN6 runs through the hand-fixed R435
-  lane HUB_DN6 runs through the hand-fixed D404
   lane HUB_DN6 runs through the hand-fixed C416
-  lane HUB_DN7 runs through the hand-fixed C416
   lane HUB_DN7 runs through the hand-fixed Y401
+  lane HUB_DN7 runs through the hand-fixed C416
+  lane HUB_DN1_via runs through the hand-fixed C403
   lane HUB_DN1 runs through the hand-fixed C403
-  lane K20_USB runs through the hand-fixed C603
-  lane K20_USB runs through the hand-fixed C605
-  lane K20_USB runs through the hand-fixed J601
+  lane HUB_DN2_via runs through the hand-fixed C406
+  lane HUB_DN2_via runs through the hand-fixed C403
   lane HUB_DN2 runs through the hand-fixed C403
-  lane HUB_DN2 runs through the hand-fixed C406
-  lane HUB_DN2 runs through the hand-fixed R602
-  lane HUB_DN2 runs through the hand-fixed U601
-  lane HUB_DN2 runs through the hand-fixed Y601
-  lane HUB_DN2 runs through the hand-fixed C607
-  lane HUB_DN2 runs through the hand-fixed C606
-  lane ETH_TD runs through the hand-fixed C301
-  lane ETH_RD runs through the hand-fixed C301
-  lane PORT2_D_N runs through the hand-fixed U408
-  lanes laid with their members crossing (1; the DRC gate faults the crossing): lane K20_USB: the P and N pads are on opposite sides at its two ends: swap the array's channels in the schematic, or lead the path in from the other side
 
 cities (layout.md 3.1): the schematic's islands with two or more parts, connectors, holes and ESD aside: each one's extent on
 the board, and the members more than 10 mm from every other member (placed apart from their city)
