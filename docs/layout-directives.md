@@ -300,7 +300,7 @@ faces the path the wrong way; that section is
 the next hand pass's work, and the board is not routed until the lanes lay
 and the DRC gate is clean. The hand loop is: move parts in KiCad and save,
 harvest, regenerate, read the section, repeat; since 2026-10-15 the
-standard's `tools/live.py check --select` runs the lane check on the open
+standard's `tools/live.py check gen --select` runs the lane check on the open
 board through KiCad's IPC API and selects the offending parts in the
 editor, so the section is read before the save. The harvest takes the
 parts' poses only: the designators follow the silkscreen rule on every

@@ -165,9 +165,9 @@ generator reproduces it), so the engine's own placement is what a part
 gets until the owner moves it; since 2026-10-15 the standard's `tools/live.py`
 runs the lane check on the board open in the PCB editor over KiCad's IPC
 API and selects the parts that stand in a lane, so a move is judged as it
-is made (`../standards/.venv/bin/python ../standards/tools/live.py check
-gen --select`, after `tools/bootstrap.sh` in the standard and "Enable
-KiCad API" in KiCad's preferences). Small resistors, capacitors, diodes and
+is made (from this directory: `standards/tools/bootstrap.sh` once, "Enable
+KiCad API" in KiCad's preferences, then `standards/.venv/bin/python
+standards/tools/live.py check gen --select`). Small resistors, capacitors, diodes and
 transistors that are not on a current-carrying, pair or switching-loop net go
 to the bottom, tucked under their host's pin row, clear of through-hole pads
 and exposed-pad via fields (the directives' Sides section); the rest stay on
